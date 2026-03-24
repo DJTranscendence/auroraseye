@@ -1,0 +1,15 @@
+# apphosting.yaml
+# Configures Firebase App Hosting for Next.js 15+
+
+# Use the 'run' configuration for server-side rendering support
+run:
+  concurrency: 80
+  memory: 512Mi
+  cpu: 1
+
+# If we have secrets or specific environment variables:
+env:
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: auroras-eye-films-v1
+  - variable: FIREBASE_PROJECT_ID
+    value: auroras-eye-films-v1

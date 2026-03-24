@@ -1,0 +1,222 @@
+.main {
+  padding-top: calc(var(--nav-height) + 40px);
+  padding-bottom: 80px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.titleInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.titleInfo h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.titleInfo p {
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.tableCard {
+  background: var(--surface);
+  border-radius: 1.5rem;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.tableHeader {
+  padding: 1.5rem 2.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.searchWrapper {
+  position: relative;
+  width: 400px;
+}
+
+.searchWrapper input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--foreground);
+}
+
+.searchWrapper svg {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.tableWrapper {
+  padding: 1.5rem 2.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 1.25rem 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 2px solid var(--border);
+}
+
+.table td {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.tdThumb img {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.tdTitle strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.tdTitle p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  max-width: 400px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.tdActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.tdActions button {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: var(--text-muted);
+  transition: var(--transition-smooth);
+}
+
+.tdActions button:hover {
+  background: var(--background);
+  color: var(--primary);
+}
+
+.deleteBtn:hover {
+  color: #ef4444 !important;
+}
+
+.editOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editModal {
+  background: var(--surface);
+  border-radius: 2rem;
+  padding: 4rem;
+  width: 100%;
+  max-width: 800px;
+  border: 1px solid var(--border);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+}
+
+.editModal h2 {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.fieldFull {
+  grid-column: span 2;
+}
+
+.field, .fieldFull {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.field label, .fieldFull label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.field input, .fieldFull input, .fieldFull textarea {
+  padding: 0.75rem 1rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--foreground);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  .searchWrapper { width: 100%; }
+  .formGrid { grid-template-columns: 1fr; }
+  .fieldFull { grid-column: span 1; }
+}

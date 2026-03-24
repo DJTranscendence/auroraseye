@@ -1,0 +1,101 @@
+.footer {
+  background: #050608;
+  padding-top: 80px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+  gap: 4rem;
+  padding-bottom: 60px;
+}
+
+.brand p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 1.5rem;
+  line-height: 1.8;
+}
+
+.social {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.social a {
+  color: var(--text-muted);
+}
+
+.social a:hover {
+  color: var(--primary);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.nav h4, .newsletter h4 {
+  margin-bottom: 1.5rem;
+}
+
+.nav a {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.nav a:hover {
+  color: var(--foreground);
+}
+
+.newsletter p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.form {
+  display: flex;
+  gap: 10px;
+}
+
+.form input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--foreground);
+  font-family: inherit;
+}
+
+.form input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.bottom {
+  padding: 2rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 992px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}

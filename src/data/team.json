@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "name": "Serena Aurora",
+    "role": "Founder & Filmmaker",
+    "bio": "Serena is a filmmaker dedicated to documenting auroville's growth and the human experience. With over 15 years of experience in visual storytelling.",
+    "photo": "/uploads/1774268639068-Swati.png"
+  },
+  {
+    "id": "2",
+    "name": "Raj Kumar",
+    "role": "Sound Designer",
+    "bio": "Experienced sound designer focused on capturing the acoustic soul of Auroville.",
+    "photo": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=2574&auto=format&fit=crop"
+  }
+]

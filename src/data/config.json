@@ -1,0 +1,15 @@
+{
+  "hero": {
+    "title": "Storytelling through Light & Life",
+    "description": "Aurora's Eye Films is an independent documentary film production house based in Auroville, dedicated to telling stories that matter—focusing on culture, environment, and the human spirit.",
+    "videoUrl": "https://www.youtube.com/watch?v=irjXPzzv6iU&pp=0gcJCcUKAYcqIYzv",
+    "bgImage": "https://images.unsplash.com/photo-1492691523567-6170c8675fa8?q=80&w=2670&auto=format&fit=crop"
+  },
+  "contact": {
+    "email": "Serena_aurora@auroville.org.in",
+    "address": "Anitya community, Auroville, Tamil Nadu 605101, India",
+    "youtube": "https://youtube.com/@AuroraEyeFilms",
+    "instagram": "https://instagram.com/auroraseyefilms",
+    "linkedin": "https://linkedin.com/company/auroras-eye-films"
+  }
+}

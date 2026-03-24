@@ -1,0 +1,201 @@
+.gallerySection {
+  padding: 60px 0 120px 0;
+  margin-top: -25px;
+  position: relative;
+  z-index: 5;
+  background: transparent;
+  overflow: hidden;
+}
+
+
+
+.header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.carouselContainer {
+  width: 100%;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  user-select: none;
+}
+
+.carouselTrack {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  height: 60vh;
+  min-height: 400px;
+}
+
+.card {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.card.active {
+  flex: 3.5;
+}
+
+.card.inactive {
+  flex: 0.8;
+  opacity: 0.6;
+  filter: grayscale(0.5);
+}
+
+.videoWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.videoWrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.1);
+  transition: transform 1.2s ease;
+}
+
+.card.active video {
+  transform: scale(1);
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(10, 11, 18, 0.9), transparent 70%);
+  display: flex;
+  align-items: flex-end;
+  padding: 2.5rem;
+  z-index: 1;
+}
+
+.content {
+  width: 100%;
+  color: white;
+}
+
+.category {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.cardTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.1;
+  transition: all 0.5s ease;
+}
+
+.card.inactive .cardTitle {
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transform: rotate(-90deg);
+  position: absolute;
+  bottom: 6rem;
+  left: 50%;
+  transform-origin: center;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  width: max-content;
+}
+
+.extraInfo {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.5s ease;
+  transform: translateY(20px);
+}
+
+.card.active .extraInfo {
+  opacity: 1;
+  max-height: 200px;
+  transform: translateY(0);
+  transition-delay: 0.3s;
+}
+
+.extraInfo p {
+  font-size: 1rem;
+  color: #cad1d9;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  max-width: 400px;
+}
+
+.playLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+  color: black;
+  padding: 0.75rem 1.5rem;
+  border-radius: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  transition: var(--transition-smooth);
+}
+
+.playLink:hover {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.05);
+}
+
+.playIcon {
+  width: 32px;
+  height: 32px;
+  background: black;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: inherit;
+}
+
+.playLink:hover .playIcon {
+  background: white;
+  color: var(--primary);
+}
+
+@media (max-width: 992px) {
+  .carouselTrack {
+    height: 50vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .carouselTrack {
+    flex-direction: column;
+    height: auto;
+  }
+  .card {
+    height: 300px;
+    flex: none;
+    width: 100%;
+  }
+  .card.active {
+    height: 450px;
+  }
+}
