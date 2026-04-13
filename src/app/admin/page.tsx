@@ -1,10 +1,29 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import styles from "./page.module.css";
-import { Plus, Edit, Trash2, ArrowLeft, LayoutDashboard, Film, Users, Mail, Shield, Settings } from "lucide-react";
+import { Plus, Edit, Trash2, ArrowLeft, LayoutDashboard, Film, Users, Mail, Shield, Settings, HandCoins, Newspaper, Send } from "lucide-react";
 import Link from "next/link";
+import { promises as fs } from "fs";
+import path from "path";
 
-export default function AdminDashboard() {
+async function getCollectionCount(fileName: string) {
+  try {
+    const filePath = path.join(process.cwd(), "src", "data", fileName);
+    const raw = await fs.readFile(filePath, "utf-8");
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.length : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export default async function AdminDashboard() {
+  const [filmsCount, teamCount, mailingListCount] = await Promise.all([
+    getCollectionCount("films.json"),
+    getCollectionCount("team.json"),
+    getCollectionCount("newsletter.json"),
+  ]);
+
   return (
     <>
       <Navbar />
@@ -24,27 +43,27 @@ export default function AdminDashboard() {
           </div>
 
           <div className={styles.statsOverview}>
-            <div className={styles.statCard}>
+            <Link href="/admin/films" className={styles.statCard}>
               <Film size={24} />
               <div>
-                <h3>4</h3>
+                <h3>{filmsCount}</h3>
                 <p>Films in Catalog</p>
               </div>
-            </div>
-            <div className={styles.statCard}>
+            </Link>
+            <Link href="/admin/team" className={styles.statCard}>
               <Users size={24} />
               <div>
-                <h3>2</h3>
+                <h3>{teamCount}</h3>
                 <p>Team Members</p>
               </div>
-            </div>
-            <div className={styles.statCard}>
+            </Link>
+            <Link href="/admin/mailing-list" className={styles.statCard}>
               <Mail size={24} />
               <div>
-                <h3>124</h3>
-                <p>Mailing List Signup</p>
+                <h3>{mailingListCount}</h3>
+                <p>Mailing List Signups</p>
               </div>
-            </div>
+            </Link>
           </div>
 
           <div className={styles.adminGrid}>
@@ -64,6 +83,27 @@ export default function AdminDashboard() {
                 </Link>
                 <Link href="/admin/settings" className={styles.navItem}>
                   <Settings size={20} /> <span>Site Settings</span>
+                </Link>
+                <Link href="/admin/donations" className={styles.navItem}>
+                  <HandCoins size={20} /> <span>Donations</span>
+                </Link>
+                <Link href="/admin/donations/projects" className={styles.navItem}>
+                  <HandCoins size={20} /> <span>Donation Projects</span>
+                </Link>
+                <Link href="/admin/news" className={styles.navItem}>
+                  <Newspaper size={20} /> <span>News</span>
+                </Link>
+                <Link href="/admin/newsletter" className={styles.navItem}>
+                  <Send size={20} /> <span>Newsletter</span>
+                </Link>
+                <Link href="/admin/karsha-nuns" className={styles.navItem}>
+                  <Film size={20} /> <span>Karsha Nuns</span>
+                </Link>
+                <Link href="/admin/breaking-the-silence" className={styles.navItem}>
+                  <Film size={20} /> <span>Breaking the Silence</span>
+                </Link>
+                <Link href="/admin/mailing-list" className={styles.navItem}>
+                  <Mail size={20} /> <span>Mailing List</span>
                 </Link>
 
               </nav>
@@ -88,6 +128,34 @@ export default function AdminDashboard() {
             <Link href="/admin/settings" className={styles.actionCard}>
               <Settings />
               <span>Settings</span>
+            </Link>
+            <Link href="/admin/donations" className={styles.actionCard}>
+              <HandCoins />
+              <span>Donations</span>
+            </Link>
+            <Link href="/admin/donations/projects" className={styles.actionCard}>
+              <HandCoins />
+              <span>Donation Projects</span>
+            </Link>
+            <Link href="/admin/news" className={styles.actionCard}>
+              <Newspaper />
+              <span>News</span>
+            </Link>
+            <Link href="/admin/newsletter" className={styles.actionCard}>
+              <Send />
+              <span>Newsletter</span>
+            </Link>
+            <Link href="/admin/karsha-nuns" className={styles.actionCard}>
+              <Film />
+              <span>Karsha Nuns</span>
+            </Link>
+            <Link href="/admin/breaking-the-silence" className={styles.actionCard}>
+              <Film />
+              <span>Breaking the Silence</span>
+            </Link>
+            <Link href="/admin/mailing-list" className={styles.actionCard}>
+              <Mail />
+              <span>Mailing List</span>
             </Link>
                 </div>
               </div>

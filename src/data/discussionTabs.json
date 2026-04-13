@@ -1,0 +1,25 @@
+{
+  "tabs": [
+    {
+      "id": "breaking-the-silence",
+      "label": "Breaking the Silence",
+      "slug": "breaking-the-silence",
+      "description": "Share reflections, questions, and ideas about the film and its impact.",
+      "backgroundImageUrl": "/uploads/1775815412281-file_000000006dc471fabd4a6595e1ca28ed.png"
+    },
+    {
+      "id": "karsha-nuns",
+      "label": "Karsha Nuns",
+      "slug": "karsha-nuns",
+      "description": "Discuss the journey, the community exchange, and the stories from Karsha.",
+      "backgroundImageUrl": "/uploads/1775815499571-Serena-on-her-Zanskar-Journey.jpg"
+    },
+    {
+      "id": "matrimandir-and-i",
+      "label": "Matrimandir and I",
+      "slug": "matrimandir-and-i",
+      "description": "Join the conversation around the Matrimandir and I series.",
+      "backgroundImageUrl": "/uploads/1775815574481-Polish_20250812_140939885.jpg"
+    }
+  ]
+}

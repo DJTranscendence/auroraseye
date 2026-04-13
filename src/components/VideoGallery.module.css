@@ -1,201 +1,401 @@
 .gallerySection {
-  padding: 60px 0 120px 0;
+  padding: 50px 0 80px 0;
   margin-top: -25px;
   position: relative;
   z-index: 5;
   background: transparent;
   overflow: hidden;
 }
-
-
-
+    z-index: 6;
 .header {
   margin-bottom: 3rem;
   text-align: center;
 }
 
-.carouselContainer {
-  width: 100%;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  user-select: none;
+.adminEditOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.7);
+  display: grid;
+  place-items: center;
+  z-index: 1200;
+  padding: 1.5rem;
 }
 
-.carouselTrack {
-  display: flex;
+.adminEditModal {
+  width: min(520px, 90vw);
+  border-radius: 1rem;
+  background: #0b1220;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  padding: 1.5rem;
+  color: #f8fafc;
+  box-shadow: 0 30px 80px rgba(2, 6, 23, 0.55);
+  display: grid;
   gap: 1rem;
-  width: 100%;
-  height: 60vh;
-  min-height: 400px;
 }
 
-.card {
-  position: relative;
-  flex: 1;
-  height: 100%;
-  border-radius: 1.5rem;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+.adminEditModal h3 {
+  margin: 0;
+  font-size: 1.4rem;
 }
 
-.card.active {
-  flex: 3.5;
+.adminEditMeta {
+  margin: 0;
+  color: rgba(226, 232, 240, 0.7);
+  font-size: 0.95rem;
 }
 
-.card.inactive {
-  flex: 0.8;
-  opacity: 0.6;
-  filter: grayscale(0.5);
+.adminEditField {
+  display: grid;
+  gap: 0.5rem;
 }
 
-.videoWrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-
-.videoWrapper video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(1.1);
-  transition: transform 1.2s ease;
-}
-
-.card.active video {
-  transform: scale(1);
-}
-
-.overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to top, rgba(10, 11, 18, 0.9), transparent 70%);
-  display: flex;
-  align-items: flex-end;
-  padding: 2.5rem;
-  z-index: 1;
-}
-
-.content {
-  width: 100%;
-  color: white;
-}
-
-.category {
-  display: block;
+.adminEditField label {
   font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--primary);
-  margin-bottom: 0.5rem;
-  font-weight: 700;
-  opacity: 0.8;
+  letter-spacing: 0.12em;
+  color: rgba(148, 163, 184, 0.9);
 }
 
-.cardTitle {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  line-height: 1.1;
-  transition: all 0.5s ease;
+.adminEditField input {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(2, 6, 23, 0.8);
+  color: #f8fafc;
 }
 
-.card.inactive .cardTitle {
-  font-size: 0.9rem;
-  white-space: nowrap;
-  transform: rotate(-90deg);
-  position: absolute;
-  bottom: 6rem;
-  left: 50%;
-  transform-origin: center;
-  transform: translate(-50%, -50%) rotate(-90deg);
-  width: max-content;
+.adminEditField input:focus {
+  outline: none;
+  border-color: rgba(125, 211, 252, 0.7);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
 }
 
-.extraInfo {
-  opacity: 0;
-  max-height: 0;
+.adminEditActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.posterGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.8rem 2rem;
+  align-items: stretch;
+}
+
+.posterCard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: inherit;
+  transition: transform 0.35s ease, filter 0.35s ease;
+}
+
+.posterThumbButton {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  text-align: inherit;
+}
+
+.posterCard:hover {
+  transform: translateY(-8px);
+}
+
+.posterImage {
+  position: relative;
+  aspect-ratio: 3 / 1.9;
+  border-radius: 0.15rem;
   overflow: hidden;
-  transition: all 0.5s ease;
-  transform: translateY(20px);
+  background: #09111f;
+  box-shadow: 0 26px 60px rgba(2, 6, 23, 0.28);
 }
 
-.card.active .extraInfo {
-  opacity: 1;
-  max-height: 200px;
-  transform: translateY(0);
-  transition-delay: 0.3s;
+.posterImg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.16);
 }
 
-.extraInfo p {
-  font-size: 1rem;
-  color: #cad1d9;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-  max-width: 400px;
+.posterPreview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
+  transform: scale(1.45);
+  transform-origin: center center;
 }
 
-.playLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-  background: white;
-  color: black;
-  padding: 0.75rem 1.5rem;
-  border-radius: 2rem;
+.posterInlineFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.posterImage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 11, 18, 0.18), rgba(10, 11, 18, 0.22));
+}
+
+.posterTag {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 2;
+  padding: 0.22rem 0.55rem;
+  background: rgba(10, 11, 18, 0.78);
+  color: #ffffff;
+  font-size: 0.56rem;
   font-weight: 700;
   text-transform: uppercase;
-  font-size: 0.85rem;
-  transition: var(--transition-smooth);
+  letter-spacing: 0.12em;
 }
 
-.playLink:hover {
-  background: var(--primary);
-  color: white;
-  transform: scale(1.05);
+.posterMetricOverlay {
+  position: absolute;
+  left: 0.65rem;
+  right: 0.65rem;
+  bottom: 0.55rem;
+  z-index: 3;
+  padding: 0.34rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(4, 10, 26, 0.82);
+  border: 1px solid rgba(138, 180, 255, 0.48);
+  color: var(--foreground);
+  padding: 0.32rem 0.7rem;
+  background: rgba(10, 11, 18, 0.88);
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  backdrop-filter: blur(4px);
+}
+  border: 1px solid rgba(248, 250, 252, 0.35);
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.5);
+
+.latestBadge {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  z-index: 3;
+  padding: 0.24rem 0.62rem;
+  border-radius: 999px;
+  background: rgba(255, 0, 51, 0.9);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 24px rgba(190, 24, 93, 0.38);
 }
 
-.playIcon {
-  width: 32px;
-  height: 32px;
-  background: black;
-  border-radius: 50%;
-  display: flex;
+.adminEditLink {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  z-index: 3;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: #e2e8f0;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+.adminEditLinkShifted {
+  top: 2.1rem;
+}
+
+.posterPlay {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  z-index: 2;
+  width: 3.8rem;
+  height: 3.8rem;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  transition: inherit;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  transition: transform 0.25s ease, background 0.25s ease;
 }
 
-.playLink:hover .playIcon {
-  background: white;
-  color: var(--primary);
+.posterCard:hover .posterPlay {
+  transform: translate(-50%, -50%) scale(1.08);
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.posterMeta {
+  padding-top: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  text-align: center;
+}
+
+.posterTitle {
+  margin: 0;
+  color: var(--foreground);
+  font-size: clamp(1rem, 1.55vw, 1.4rem);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: calc(2 * 1.04em);
+}
+
+.posterSubtitle {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.98rem;
+  line-height: 1.4;
+  min-height: calc(2 * 1.4em);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.posterWhy {
+  margin: 0.4rem auto 0;
+  color: #5b4036;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  background: rgba(248, 237, 227, 0.92);
+  border: 1px solid rgba(160, 122, 98, 0.25);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  width: fit-content;
+  max-width: 100%;
+  text-align: center;
+}
+
+.posterActions {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.posterLikeButton {
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.7rem;
+  z-index: 4;
+  width: 2.1rem;
+  height: 2.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.4rem;
+  border: none;
+  background: transparent;
+  color: #f8fafc;
+  cursor: pointer;
+  padding: 0;
+}
+
+.posterLikeButtonActive {
+  color: #7fe9e6;
+}
+
+.posterLikeTooltip {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.55rem);
+  width: max-content;
+  max-width: 220px;
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.6rem;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: #e2e8f0;
+  font-size: 0.72rem;
+  line-height: 1.3;
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 5;
+}
+
+.posterLikeButton:hover .posterLikeTooltip,
+.posterLikeButton:focus-visible .posterLikeTooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.posterActionPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.8rem;
+  border-radius: 999px;
+  background: rgba(66, 197, 192, 0.16);
+  border: 1px solid rgba(66, 197, 192, 0.5);
+  color: var(--foreground);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.posterPrompt {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 @media (max-width: 992px) {
-  .carouselTrack {
-    height: 50vh;
+  .posterGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .carouselTrack {
-    flex-direction: column;
-    height: auto;
+  .posterGrid {
+    gap: 1.5rem;
   }
-  .card {
-    height: 300px;
-    flex: none;
-    width: 100%;
+
+  .posterPlay {
+    width: 3.3rem;
+    height: 3.3rem;
   }
-  .card.active {
-    height: 450px;
+}
+
+@media (max-width: 560px) {
+  .posterGrid {
+    grid-template-columns: 1fr;
   }
 }

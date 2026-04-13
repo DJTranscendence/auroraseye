@@ -1,0 +1,280 @@
+.main {
+  padding-top: calc(var(--nav-height) + 40px);
+  padding-bottom: 80px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.titleInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.titleInfo h1 {
+  margin: 0;
+  font-size: 2.3rem;
+}
+
+.titleInfo p {
+  color: var(--text-muted);
+  margin: 0.35rem 0 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.field label {
+  font-size: 0.87rem;
+  font-weight: 600;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  border-radius: 0.7rem;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  padding: 0.7rem 0.8rem;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+.storyList {
+  display: grid;
+  gap: 0.6rem;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  padding: 0.65rem;
+  background: var(--background);
+}
+
+.storyItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.storyItem p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.previewWrap {
+  background: #ffffff;
+  border-radius: 0.8rem;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.preview {
+  padding: 24px;
+}
+
+.previewBannerWrap {
+  margin: -24px -24px 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  background: #ffffff;
+}
+
+.previewBanner {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.previewHeader {
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.previewContactRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 10px;
+  margin: 0 0 6px;
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.previewContactRow a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.previewContactLink {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.previewContactLink:hover {
+  border-color: rgba(148, 163, 184, 0.7);
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.previewPhoneRow {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0 0 10px;
+}
+
+.previewPhoneLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  text-decoration: none;
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.previewPhoneLink:hover {
+  opacity: 1;
+}
+
+.previewHeader img {
+  max-height: 48px;
+  max-width: 180px;
+}
+
+.previewTitle {
+  margin: 10px 0 8px;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', 'Franklin Gothic Medium', sans-serif;
+  font-size: 42px;
+  line-height: 1;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.previewTitleMain {
+  display: block;
+}
+
+.previewTitleSub {
+  display: block;
+  margin-top: 6px;
+  font-size: 60%;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+  text-transform: none;
+}
+
+.previewIntro {
+  line-height: 1.6;
+  margin: 0;
+}
+
+.previewStories {
+  margin-top: 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.previewStory {
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.previewStoryImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.previewStory h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.previewStory p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.previewFooter {
+  margin-top: 18px;
+  font-size: 13px;
+  opacity: 0.82;
+}
+
+.notice {
+  color: var(--text-muted);
+  margin-bottom: 0.8rem;
+}
+
+@media (max-width: 1050px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}

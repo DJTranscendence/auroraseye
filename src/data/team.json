@@ -4,13 +4,34 @@
     "name": "Serena Aurora",
     "role": "Founder & Filmmaker",
     "bio": "Serena is a filmmaker dedicated to documenting auroville's growth and the human experience. With over 15 years of experience in visual storytelling.",
-    "photo": "/uploads/1774268639068-Swati.png"
+    "photo": "/uploads/1774409608609-Serena.png"
   },
   {
     "id": "2",
-    "name": "Raj Kumar",
+    "name": "Kardash",
     "role": "Sound Designer",
     "bio": "Experienced sound designer focused on capturing the acoustic soul of Auroville.",
-    "photo": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=2574&auto=format&fit=crop"
+    "photo": "/uploads/1774409628535-Kardash.png"
+  },
+  {
+    "name": "Marco",
+    "role": "",
+    "bio": "Marco is the quiet force behind the sound - precise, intuitive, and relentlessly attentive to detail. As a sound engineer, he doesn’t just manage audio; he shapes atmosphere, clarity, and emotional impact. Whether balancing live acoustics or refining recordings in post, Marco brings a deep technical fluency paired with a musician’s ear, ensuring every frequency sits exactly where it should. The result is sound that feels effortless, immersive, and exact.",
+    "photo": "/uploads/1774409649228-Marco.png",
+    "id": "1774409813075"
+  },
+  {
+    "name": "Shinu",
+    "role": "",
+    "bio": "Shinu is a video editor with a sharp eye for rhythm, pacing, and visual coherence. He cuts with intentevery transition, frame, and beat serving a clear narrative purpose. Whether working with raw footage or polished assets, Shinu brings structure and flow, turning scattered material into something cohesive and compelling. His edits are clean, precise, and quietly impactful - never excessive, always effective.",
+    "photo": "/uploads/1774409823453-Shinu.png",
+    "id": "1774409901721"
+  },
+  {
+    "name": "Venkatesh",
+    "role": "",
+    "bio": "Venkatesh is an award-winning cinematographer known for his precision, visual discipline, and command of light. His work reflects a deep understanding of composition and color, producing images that are both technically exact and cinematically compelling. Recognized at international film festivals, he consistently delivers visuals that elevate storytelling with clarity and intent.",
+    "photo": "/uploads/1774409916209-Venkatesh.png",
+    "id": "1774410024227"
   }
 ]

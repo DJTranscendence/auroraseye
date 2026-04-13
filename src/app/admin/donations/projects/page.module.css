@@ -1,0 +1,249 @@
+.main {
+  padding-top: calc(var(--nav-height) + 40px);
+  padding-bottom: 80px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.titleInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.titleInfo h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.titleInfo p {
+  color: var(--text-muted);
+}
+
+.settingsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.settingCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2rem;
+  padding: 2.4rem;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  font-weight: 600;
+}
+
+.formGroup input,
+.formGroup textarea,
+.listRow input,
+.videoRow input,
+.singleInput {
+  padding: 0.85rem 1rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  color: var(--foreground);
+  font-size: 0.95rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.tabRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.4rem;
+  justify-content: center;
+}
+
+.tab,
+.tabActive,
+.addTab {
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  border: 1px solid rgba(66, 197, 192, 0.4);
+  background: rgba(66, 197, 192, 0.1);
+  color: #7fe9e6;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tabActive {
+  background: rgba(66, 197, 192, 0.25);
+  border-color: rgba(66, 197, 192, 0.7);
+}
+
+.addTab {
+  background: rgba(255, 255, 255, 0.08);
+  border-style: dashed;
+}
+
+.projectEditor h3 {
+  margin: 1.4rem 0 0.8rem;
+}
+
+.helperText {
+  margin: -0.2rem 0 0.9rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.previewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.previewCard {
+  position: relative;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(66, 197, 192, 0.25);
+  background: rgba(10, 18, 32, 0.6);
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+.previewCard img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+}
+
+.previewEmpty {
+  display: grid;
+  place-items: center;
+  height: 120px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.previewBadge {
+  position: absolute;
+  bottom: 0.6rem;
+  left: 0.6rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(8, 15, 25, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #e2e8f0;
+}
+
+.previewActive {
+  border-color: rgba(66, 197, 192, 0.7);
+  box-shadow: 0 0 0 2px rgba(66, 197, 192, 0.2);
+}
+
+
+.projectActions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.2rem;
+}
+
+.deleteButton {
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  border: 1px solid rgba(248, 113, 113, 0.55);
+  background: rgba(248, 113, 113, 0.12);
+  color: #fecaca;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.deleteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sectionDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 1.4rem 0;
+}
+
+.listRow,
+.videoRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.videoRow {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.singleInput {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.addRow {
+  background: rgba(66, 197, 192, 0.12);
+  border: 1px dashed rgba(66, 197, 192, 0.5);
+  color: #7fe9e6;
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+}
+
+.footerActions {
+  display: flex;
+  justify-content: center;
+  padding-top: 2.5rem;
+}
+
+.savedBtn {
+  background: #10b981 !important;
+  color: white !important;
+  border-color: #059669 !important;
+}
+
+@media (max-width: 1024px) {
+  .settingsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formRow,
+  .listRow,
+  .videoRow {
+    grid-template-columns: 1fr;
+  }
+}

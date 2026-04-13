@@ -1,0 +1,22 @@
+{
+  "subject": "The Lens - News & Events from Aurora's Eye",
+  "preheader": "This week from Auroville: 5 highlighted stories.",
+  "heading": "The Lens - News & Events from Aurora's Eye",
+  "intro": "A curated update from our documentary work, awards, and community storytelling in and around Auroville.",
+  "bannerUrl": "/uploads/newsletter-banner.jpeg",
+  "ctaText": "Watch our channel",
+  "ctaUrl": "https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw",
+  "footerNote": "You are receiving this because you subscribed on auroraseyefilms.com.",
+  "logoUrl": "https://auroraseyefilms.com/wp-content/uploads/2022/03/cropped-aurora-logo.png",
+  "backgroundColor": "#0f172a",
+  "textColor": "#e2e8f0",
+  "accentColor": "#3b82f6",
+  "selectedStoryIds": [
+    "news-1774509929154-xnlzia",
+    "news-1774509929154-yso2l7",
+    "news-1774509929154-f85qy9",
+    "news-1774509929154-fl2dpv",
+    "news-1774509929154-z6w21l"
+  ],
+  "updatedAt": "2026-03-26T07:35:34.443Z"
+}

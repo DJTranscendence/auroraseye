@@ -1,0 +1,589 @@
+.section {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 2rem;
+  align-items: start;
+  padding: 2rem;
+  border-radius: 2rem;
+  border-top-left-radius: 0;
+  background: linear-gradient(135deg, rgba(10, 18, 32, 0.9), rgba(12, 30, 34, 0.85));
+  border: 1px solid rgba(66, 197, 192, 0.3);
+  box-shadow: 0 24px 50px rgba(2, 6, 23, 0.35);
+}
+
+.heroCopy h2 {
+  margin-bottom: 0.6rem;
+  font-size: 2.4rem;
+}
+
+.heroCopy p {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.heroHighlights {
+  margin-top: 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #c7f7f6;
+}
+
+.heroHighlights span {
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(66, 197, 192, 0.12);
+  border: 1px solid rgba(66, 197, 192, 0.3);
+}
+
+.heroMetrics {
+  margin-top: 1.3rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.heroMetrics > div {
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: rgba(12, 20, 34, 0.7);
+  border: 1px solid rgba(66, 197, 192, 0.2);
+}
+
+.heroMetrics span {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8ddfdd;
+  margin-bottom: 0.35rem;
+}
+
+.heroMetrics strong {
+  font-size: 1.05rem;
+  color: #e5ffff;
+}
+
+.episodeColumn {
+  margin-top: 1.6rem;
+}
+
+.episodeColumn h4 {
+  margin: 0 0 0.8rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8ddfdd;
+}
+
+.episodeList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.episodeCard {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.6rem;
+  border-radius: 1rem;
+  background: rgba(12, 20, 34, 0.7);
+  border: 1px solid rgba(66, 197, 192, 0.2);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.episodeCard img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 0.75rem;
+}
+
+.episodeCard span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #8ddfdd;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.episodeCard strong {
+  font-size: 0.95rem;
+  color: #f4f9ff;
+}
+
+.episodeCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(127, 233, 230, 0.45);
+}
+
+.heroActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+}
+
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  background: #35d3d1;
+  color: #04111f;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 18px 35px rgba(53, 211, 209, 0.35);
+}
+
+.ghostButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(127, 233, 230, 0.6);
+  color: #7fe9e6;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.heroImageWrap {
+  position: relative;
+  border-radius: 1.6rem;
+  overflow: hidden;
+  box-shadow: 0 18px 35px rgba(2, 6, 23, 0.4);
+  background: rgba(10, 18, 32, 0.55);
+}
+
+.heroMediaGrid {
+  column-count: 2;
+  column-gap: 0.75rem;
+  padding: 0.85rem;
+}
+
+.heroMediaTile {
+  display: block;
+  width: 100%;
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(66, 197, 192, 0.25);
+  background: rgba(12, 20, 34, 0.7);
+  text-decoration: none;
+  color: inherit;
+  margin: 0 0 0.75rem;
+  break-inside: avoid;
+}
+
+.heroMediaTile:first-child {
+  column-span: all;
+  width: 100%;
+}
+
+.heroMediaTile img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.heroMediaTile:hover img {
+  transform: scale(1.05);
+}
+
+.heroMediaBadge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: rgba(4, 10, 20, 0.7);
+  border: 1px solid rgba(127, 233, 230, 0.4);
+  color: #7fe9e6;
+}
+
+.heroMediaVideo {
+  border-color: rgba(66, 197, 192, 0.45);
+}
+
+.videoPlaceholder {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: grid;
+  place-items: center;
+  gap: 0.35rem;
+  color: #bfeff0;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.65rem;
+  background: radial-gradient(circle at 20% 20%, rgba(66, 197, 192, 0.25), transparent 55%),
+    rgba(7, 16, 28, 0.85);
+}
+
+.imagePlaceholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+  gap: 0.35rem;
+  color: #bfeff0;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.65rem;
+  background: radial-gradient(circle at 25% 20%, rgba(66, 197, 192, 0.22), transparent 60%),
+    rgba(7, 16, 28, 0.85);
+}
+
+.mediaUpload {
+  position: absolute;
+  right: 0.65rem;
+  bottom: 0.65rem;
+  z-index: 2;
+}
+
+.mediaUploadLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(4, 10, 20, 0.78);
+  border: 1px solid rgba(127, 233, 230, 0.45);
+  color: #c9ffff;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.mediaUploadInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mediaWall {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.mediaHeader h3 {
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.75rem;
+  color: #8ddfdd;
+}
+
+.mediaHeader p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.mediaHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.mediaHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.mediaAddButton {
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+  border: 1px solid rgba(127, 233, 230, 0.55);
+  background: rgba(66, 197, 192, 0.18);
+  color: #e6fffe;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  cursor: pointer;
+}
+
+.mediaAddButton:hover {
+  background: rgba(66, 197, 192, 0.28);
+  border-color: rgba(127, 233, 230, 0.8);
+}
+
+.mediaWallGrid {
+  column-count: 4;
+  column-gap: 1rem;
+}
+
+.mediaTile {
+  display: inline-block;
+  width: 100%;
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(66, 197, 192, 0.2);
+  background: rgba(12, 20, 34, 0.7);
+  text-decoration: none;
+  color: inherit;
+  margin: 0 0 1rem;
+  break-inside: avoid;
+}
+
+.mediaTile img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.mediaTile:hover img {
+  transform: scale(1.05);
+}
+
+.mediaBadge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: rgba(4, 10, 20, 0.7);
+  border: 1px solid rgba(127, 233, 230, 0.4);
+  color: #7fe9e6;
+}
+
+.mediaTitle {
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  font-size: 0.85rem;
+  color: #f4f9ff;
+  text-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+}
+
+.mediaTileVideo {
+  border-color: rgba(66, 197, 192, 0.35);
+}
+
+@media (max-width: 1200px) {
+  .mediaWallGrid {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 900px) {
+  .mediaWallGrid {
+    column-count: 2;
+  }
+}
+
+.fundGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 2rem;
+  border: none;
+}
+
+.fundAreas h3,
+.btsPanel h3,
+.timeline h3 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.areaList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.areaCard {
+  padding: 1rem 1.2rem;
+  border-radius: 1rem;
+  background: rgba(12, 20, 34, 0.7);
+  border: 1px solid rgba(66, 197, 192, 0.2);
+}
+
+.areaCard h4 {
+  margin-bottom: 0.35rem;
+}
+
+.areaCard p {
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.btsPanel {
+  padding: 2rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(66, 197, 192, 0.3);
+  background: linear-gradient(140deg, rgba(9, 15, 26, 0.9), rgba(7, 23, 28, 0.88));
+  display: grid;
+  gap: 1rem;
+}
+
+.btsPanel h3 {
+  margin-top: 5mm;
+}
+
+.btsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.btsItem {
+  position: relative;
+  border-radius: 0.9rem;
+  overflow: hidden;
+  border: 1px solid rgba(66, 197, 192, 0.25);
+  background: rgba(12, 20, 34, 0.7);
+}
+
+.btsThumb {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.btsBadge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: rgba(4, 10, 20, 0.7);
+  border: 1px solid rgba(127, 233, 230, 0.4);
+  color: #7fe9e6;
+}
+
+.btsUpload {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  z-index: 2;
+}
+
+.btsLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  color: #7fe9e6;
+  font-weight: 700;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.7rem;
+}
+
+.btsLink:hover {
+  color: #e6fffe;
+}
+
+.timeline {
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  border: none;
+  background: rgba(10, 18, 32, 0.72);
+}
+
+.timelineGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.timelineCard {
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(12, 20, 34, 0.7);
+  border: 1px solid rgba(66, 197, 192, 0.2);
+}
+
+.timelineDate {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #7fe9e6;
+  margin-bottom: 0.4rem;
+}
+
+.timelineCard p {
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .fundGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .episodeStrip {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 720px) {
+  .heroMetrics {
+    grid-template-columns: 1fr;
+  }
+
+  .episodeCard {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .mediaWallGrid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-auto-rows: 120px;
+  }
+
+  .mediaWallGrid .mediaTile:nth-child(6n + 1),
+  .mediaWallGrid .mediaTile:nth-child(9n + 4),
+  .mediaWallGrid .mediaTile:nth-child(10n + 7) {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+}

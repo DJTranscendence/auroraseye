@@ -42,3 +42,11 @@ next-env.d.ts
 
 # firebase
 .firebase/
+.env*.local
+
+# editor settings
+.idea/
+.vscode/
+
+# user uploads
+/public/uploads/

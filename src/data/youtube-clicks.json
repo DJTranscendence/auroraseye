@@ -1,0 +1,79 @@
+[
+  {
+    "label": "Navbar watch CTA",
+    "url": "https://youtube.com/@AuroraEyeFilms",
+    "location": "navbar-action",
+    "pathname": "/karsha-nuns",
+    "timestamp": "2026-03-25T09:47:43.614Z"
+  },
+  {
+    "label": "Navbar watch CTA",
+    "url": "https://youtube.com/@AuroraEyeFilms",
+    "location": "navbar-action",
+    "pathname": "/karsha-nuns",
+    "timestamp": "2026-03-25T09:47:52.182Z"
+  },
+  {
+    "label": "Navbar YouTube",
+    "url": "https://youtube.com/@AuroraEyeFilms",
+    "location": "navbar",
+    "pathname": "/karsha-nuns",
+    "timestamp": "2026-03-25T09:48:03.176Z"
+  },
+  {
+    "label": "Navbar watch CTA",
+    "url": "https://youtube.com/@AuroraEyeFilms",
+    "location": "navbar-action",
+    "pathname": "/karsha-nuns",
+    "timestamp": "2026-03-25T09:49:19.556Z"
+  },
+  {
+    "label": "Navbar watch CTA",
+    "url": "https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw",
+    "location": "navbar-action",
+    "pathname": "/karsha-nuns",
+    "timestamp": "2026-03-25T09:52:47.356Z"
+  },
+  {
+    "label": "Navbar YouTube",
+    "url": "https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw",
+    "location": "navbar",
+    "pathname": "/karsha-nuns",
+    "timestamp": "2026-03-25T09:53:17.926Z"
+  },
+  {
+    "label": "FROM FARM TO FUTURE: The Cashew Story watch",
+    "url": "https://www.youtube.com/watch?v=59osVIL-ebw",
+    "location": "featured-films-watch-button",
+    "pathname": "/",
+    "timestamp": "2026-03-26T05:55:11.427Z"
+  },
+  {
+    "label": "Latest upload",
+    "url": "https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw",
+    "location": "featured-films-poster",
+    "pathname": "/",
+    "timestamp": "2026-03-26T05:58:02.593Z"
+  },
+  {
+    "label": "LET’S TALK ABOUT DEATH (Honestly) comments",
+    "url": "https://www.youtube.com/watch?v=bNnKqnkzzSY#comments",
+    "location": "featured-films-comments-link",
+    "pathname": "/",
+    "timestamp": "2026-03-26T09:56:35.634Z"
+  },
+  {
+    "label": "Matrimandir & I : ‘Matrimandir gardens is an art gallery.’ - Oliver | Auroras Eye Films like",
+    "url": "https://www.youtube.com/watch?v=7LtTWr_d8u4",
+    "location": "featured-films-like",
+    "pathname": "/",
+    "timestamp": "2026-04-10T10:13:05.934Z"
+  },
+  {
+    "label": "Matrimandir & I : ‘Matrimandir gardens is an art gallery.’ - Oliver | Auroras Eye Films like",
+    "url": "https://www.youtube.com/watch?v=7LtTWr_d8u4",
+    "location": "featured-films-like",
+    "pathname": "/",
+    "timestamp": "2026-04-10T12:36:30.649Z"
+  }
+]

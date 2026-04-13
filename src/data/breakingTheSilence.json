@@ -1,0 +1,66 @@
+{
+  "heroFrame": {
+    "imageUrl": "/uploads/1775657695735-file_000000006dc471fabd4a6595e1ca28ed.png",
+    "imageAlt": "Breaking the Silence hero frame",
+    "linkUrl": "https://www.youtube.com/watch?v=bNnKqnkzzSY",
+    "linkLabel": "Watch the teaser"
+  },
+  "mediaWall": {
+    "eyebrow": "Behind the Film",
+    "title": "A wall of voices, places, and moments",
+    "items": [
+      {
+        "id": "wall-1",
+        "type": "image",
+        "title": "Listening circle",
+        "caption": "Holding space for truth",
+        "imageUrl": "/uploads/1775379012809-Polish_20250321_232822407.jpg",
+        "imageAlt": "Group in conversation",
+        "linkUrl": ""
+      },
+      {
+        "id": "wall-2",
+        "type": "video",
+        "title": "A survivor speaks",
+        "caption": "Excerpt from a testimony",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/bNnKqnkzzSY?rel=0",
+        "linkUrl": "https://www.youtube.com/watch?v=bNnKqnkzzSY"
+      },
+      {
+        "id": "wall-3",
+        "type": "image",
+        "title": "On set",
+        "caption": "Capturing quiet resilience",
+        "imageUrl": "/uploads/1775379018860-Polish_20260402_161858799.jpg",
+        "imageAlt": "Film crew at work",
+        "linkUrl": ""
+      },
+      {
+        "id": "wall-4",
+        "type": "video",
+        "title": "The journey to healing",
+        "caption": "Conversation with an expert",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/59osVIL-ebw?rel=0",
+        "linkUrl": "https://www.youtube.com/watch?v=59osVIL-ebw"
+      },
+      {
+        "id": "wall-5",
+        "type": "image",
+        "title": "Field notes",
+        "caption": "Research and interviews",
+        "imageUrl": "/uploads/1775379025543-Polish_20260402_171738463.jpg",
+        "imageAlt": "Notes and camera equipment",
+        "linkUrl": ""
+      },
+      {
+        "id": "wall-6",
+        "type": "image",
+        "title": "After the screening",
+        "caption": "A conversation that continues",
+        "imageUrl": "/uploads/1775379032931-Polish_20250504_183332768.jpg",
+        "imageAlt": "Audience gathering",
+        "linkUrl": ""
+      }
+    ]
+  }
+}

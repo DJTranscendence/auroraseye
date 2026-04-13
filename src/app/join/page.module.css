@@ -1,0 +1,134 @@
+.main {
+  min-height: 100vh;
+  padding: calc(var(--nav-height) + 3rem + 5mm) 0 5rem;
+  background: radial-gradient(circle at 20% 15%, rgba(66, 197, 192, 0.18), transparent 45%),
+    radial-gradient(circle at 75% 20%, rgba(59, 130, 246, 0.18), transparent 40%);
+}
+
+.header {
+  max-width: 720px;
+  margin-bottom: 2.5rem;
+}
+
+.header h1 {
+  font-size: 2.8rem;
+  margin: 0.6rem 0;
+}
+
+.header p {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(66, 197, 192, 0.16);
+  border: 1px solid rgba(66, 197, 192, 0.4);
+  color: #7fe9e6;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.55rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.formCard,
+.galleryCard {
+  background: linear-gradient(140deg, rgba(9, 15, 26, 0.9), rgba(7, 23, 28, 0.88));
+  border: 1px solid rgba(66, 197, 192, 0.3);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  display: grid;
+  gap: 1.4rem;
+}
+
+.formCard h2,
+.galleryCard h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form label {
+  display: grid;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.form input,
+.form textarea {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(12, 20, 34, 0.7);
+  color: var(--foreground);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.95rem;
+}
+
+.submitButton {
+  border-radius: 999px;
+  border: none;
+  padding: 0.85rem 1.4rem;
+  background: #35d3d1;
+  color: #04111f;
+  font-weight: 800;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.8rem;
+}
+
+.submitButton:hover {
+  background: #3fe0dd;
+}
+
+.formNote {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.galleryGrid {
+  column-count: 2;
+  column-gap: 0.9rem;
+}
+
+.galleryImage {
+  width: 100%;
+  display: block;
+  border-radius: 1rem;
+  border: 1px solid rgba(66, 197, 192, 0.2);
+  background: rgba(12, 20, 34, 0.7);
+  margin: 0 0 0.9rem;
+  break-inside: avoid;
+}
+
+@media (max-width: 960px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .galleryGrid {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 720px) {
+  .galleryGrid {
+    column-count: 2;
+  }
+}

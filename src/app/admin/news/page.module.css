@@ -1,0 +1,135 @@
+.main {
+  padding-top: calc(var(--nav-height) + 40px);
+  padding-bottom: 80px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.titleInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.titleInfo h1 {
+  margin: 0;
+}
+
+.titleInfo p {
+  color: var(--text-muted);
+  margin: 0.3rem 0 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.formCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.field label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.85rem;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+.formActions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.8rem;
+}
+
+.list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.item h3 {
+  margin: 0;
+}
+
+.item p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.itemActions {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.notice {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 900px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .actions,
+  .formActions {
+    flex-wrap: wrap;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,99 @@
+.ticker {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  background: rgba(5, 12, 24, 0.82);
+  box-shadow: 0 14px 32px rgba(2, 6, 23, 0.24);
+  backdrop-filter: blur(14px);
+  text-align: left;
+  min-width: 10.5rem;
+}
+
+.liveDot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45);
+  animation: pulse 2s infinite;
+  margin-top: 0.45rem;
+  flex: 0 0 auto;
+}
+
+.copy {
+  display: grid;
+  gap: 0.16rem;
+}
+
+.label {
+  color: #93c5fd;
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.value {
+  color: #f8fafc;
+  font-size: 0.96rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.meta {
+  color: rgba(226, 232, 240, 0.68);
+  font-size: 0.54rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.odometer {
+  --digit-height: 1.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.03rem;
+}
+
+.odometerDigit {
+  width: 0.68em;
+  height: var(--digit-height);
+  overflow: hidden;
+  border-radius: 0.14rem;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), inset 0 -1px 0 rgba(2, 6, 23, 0.28);
+}
+
+.odometerDigitInner {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc(var(--digit) * var(--digit-height) * -1));
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.odometerDigitInner span {
+  display: block;
+  height: var(--digit-height);
+  line-height: var(--digit-height);
+  text-align: center;
+}
+
+.odometerComma {
+  width: 0.24em;
+  text-align: center;
+  opacity: 0.72;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+@media (max-width: 1100px) {
+  .ticker {
+    display: none;
+  }
+}

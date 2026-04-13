@@ -1,0 +1,104 @@
+{
+  "projectLinks": {
+    "instagram": "https://www.instagram.com/auroras_eye_films/",
+    "facebook": "https://www.facebook.com/karsha.nunnery/about",
+    "website": "https://www.cjnunnery.com/"
+  },
+  "hero": {
+    "title": "From Zanskar to Auroville: A Journey of Spirit and Discovery",
+    "paragraphs": [
+      "Set in the remote Himalayan region of Zanskar in Ladakh, this documentary follows the lives of the Karsha nuns, women who live and practice in quiet devotion at one of the oldest nunneries in the region.",
+      "Through intimate, observational footage, we witness their daily routines, rituals, and the profound stillness that defines their mountain existence. But this is only the beginning of the story.",
+      "The film then follows an extraordinary journey as a group of ten nuns leave their secluded village, many for the first time, and travel south to Auroville. What unfolds is not just a physical journey, but a transformative crossing of landscapes, cultures, and inner worlds."
+    ],
+    "ctaText": "Watch The Documentary Path",
+    "imageUrl": "https://auroraseyefilms.com/wp-content/uploads/2025/07/Karsha-Nun-1.jpeg",
+    "imageAlt": "Karsha nun portrait"
+  },
+  "documentary": {
+    "eyebrow": "The Documentary",
+    "title": "A film about the Karsha nuns, their world, and a rare journey south",
+    "intro": "This project follows the Karsha nuns from their high-altitude Himalayan home in Zanskar to Auroville, tracing a powerful encounter between devotion, ecological awareness, cultural exchange, and inner discovery.",
+    "mainVideo": {
+      "title": "From Zanskar to Auroville",
+      "embedUrl": "https://www.youtube-nocookie.com/embed/jII25meOkKI?rel=0",
+      "watchUrl": "https://www.youtube.com/watch?v=jII25meOkKI",
+      "description1": "Through the eyes of the nuns, we see Auroville anew: their open-hearted curiosity, humble wonder, and quiet strength offer viewers a rare and touching lens through which to reflect on both traditions and the future.",
+      "description2": "This documentary is more than a record. It is a bridge between communities, a shared archive of cultural and spiritual exchange, and the beginning of something deeper."
+    },
+    "followUps": [
+      {
+        "title": "Arrival: The Nuns Enter Auroville",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/I-75uMhWdbQ?rel=0",
+        "watchUrl": "https://www.youtube.com/watch?v=I-75uMhWdbQ",
+        "summary": "A first look at the nuns' arrival, their early impressions, and the emotions of stepping into Auroville."
+      },
+      {
+        "title": "Exchange: Cultures Meet in Practice",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/0j_CmfdGdnA?rel=0",
+        "watchUrl": "https://www.youtube.com/watch?v=0j_CmfdGdnA",
+        "summary": "Shared practices and day-to-day interactions reveal how two communities learn from each other in real time."
+      },
+      {
+        "title": "Reflection: Quiet Moments of Meaning",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/C6gV25HjNUg?rel=0",
+        "watchUrl": "https://www.youtube.com/watch?v=C6gV25HjNUg",
+        "summary": "A contemplative close focused on stillness, personal insight, and what the journey leaves behind."
+      }
+    ]
+  },
+  "history": {
+    "eyebrow": "How it All Began",
+    "title": "A promise that became a mission",
+    "paragraphs": [
+      "When Norbu came to pick Serena up at the end of her stay, she asked him to explain the concept of Auroville to the nuns. Their eyes lit up. They were fascinated by the idea of such a place and asked, with quiet hope, if one day they might visit.",
+      "That request became a mission. It took two years of dedication and coordination, but eventually ten nuns from Karsha Nunnery travelled to Auroville in one of the most meaningful exchanges of Serena's life."
+    ],
+    "imageUrl": "https://auroraseyefilms.com/wp-content/uploads/2025/08/Serena-on-her-Zanskar-Journey.jpg",
+    "imageAlt": "Serena on her Zanskar journey"
+  },
+  "visit": {
+    "eyebrow": "Nuns' Visit to Auroville",
+    "title": "A spiritual and cultural exchange like no other",
+    "paragraphs": [
+      "For generations, the nuns lived quietly in rhythms of prayer, service, and mountain life. Their visit to Auroville opened a space of encounter with sustainability, experimentation, and a different expression of spiritual community.",
+      "The contrast was not superficial. It created a rare space of recognition, humility, and mutual learning, allowing both communities to see themselves more clearly through the presence of the other."
+    ],
+    "imageUrl": "https://auroraseyefilms.com/wp-content/uploads/2025/08/Nuns-at-Matrimandir-gardens.jpeg",
+    "imageAlt": "Karsha nuns at Matrimandir gardens"
+  },
+  "eco": {
+    "eyebrow": "Eco Nuns",
+    "title": "From Zanskar to Auroville: learning, empowerment and sisterhood",
+    "paragraphs": [
+      "In December 2024, a group of ten nuns from the remote Himalayan region of Karsha, Zanskar, embarked on an extraordinary journey to Auroville. The exchange was built on open-hearted coordination and a belief that cross-cultural learning can create long-term transformation.",
+      "The visit connected ecological practice, feminine resilience, and spiritual discipline, turning a single trip into the beginning of a deeper relationship."
+    ],
+    "imageUrl": "https://auroraseyefilms.com/wp-content/uploads/2025/08/Eco-nun-pad-2.jpeg",
+    "imageAlt": "Eco Nuns in Auroville"
+  },
+  "nunnery": {
+    "eyebrow": "About the Nunnery",
+    "title": "Keepers of a sacred tradition",
+    "cards": [
+      {
+        "title": "The Karsha Nunnery",
+        "body": "Chuchik Jal Kha Choe Drupling Nunnery, in the Zanskar region of Ladakh, is a community of Tibetan Buddhist nuns carrying forward sacred rituals, chants, and meditative practices within a spiritual space women fought to preserve.",
+        "imageUrl": "https://auroraseyefilms.com/wp-content/uploads/2025/08/Nuns-Praying-1.jpg",
+        "imageAlt": "Nuns praying"
+      },
+      {
+        "title": "Education and continuity",
+        "body": "In 2004 the nuns established a small school for local children, helping the nunnery grow into both a spiritual and educational hub.",
+        "imageUrl": "https://auroraseyefilms.com/wp-content/uploads/2025/08/Nun-reading-scripture.jpg",
+        "imageAlt": "Nun reading scripture"
+      },
+      {
+        "title": "Daily life in the Himalayas",
+        "body": "Life is rooted in simplicity and work: tending fields, collecting fuel, carrying water uphill, and facing the physical realities of mountain seasons.",
+        "imageUrl": "https://auroraseyefilms.com/wp-content/uploads/2025/08/Nuns-working-in-Green-house-1.jpg",
+        "imageAlt": "Nuns working in greenhouse"
+      }
+    ]
+  }
+}

@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import styles from "./Footer.module.css";
-import { Github, Youtube, Instagram, Mail, MapPin, Linkedin } from "lucide-react";
 import { useState, useEffect } from 'react';
-import { getConfig } from "@/utils/cms"; // Wait, I can't use node utils in client component easily, I'll fetch it.
 
 export default function Footer() {
   const [config, setConfig] = useState<any>(null);
 
   useEffect(() => {
-    fetch('/api/cms?type=config').then(res => res.json()).then(setConfig);
+    fetch(`/api/cms?type=config&t=${Date.now()}`, { cache: 'no-store' })
+      .then(res => res.json())
+      .then(setConfig)
+      .catch(() => undefined);
   }, []);
 
   return (
@@ -24,20 +25,18 @@ export default function Footer() {
           <p>
             {config?.contact?.address || 'Anitya community, Auroville, Tamil Nadu 605101, India'}
           </p>
-          <div className={styles.social}>
-            <Link href={config?.contact?.youtube || "https://youtube.com/@AuroraEyeFilms"}><Youtube size={20} /></Link>
-            <Link href={config?.contact?.instagram || "https://instagram.com/auroraseyefilms"}><Instagram size={20} /></Link>
-            <Link href={config?.contact?.linkedin || "#"}><Linkedin size={20} /></Link>
-          </div>
         </div>
 
         
         <div className={styles.nav}>
           <h4>Categories</h4>
           <Link href="/documentaries">Documentaries</Link>
-          <Link href="/news">News</Link>
           <Link href="/team">Our Team</Link>
+          <Link href="/contact">Contact</Link>
+          <Link href="/login">Login</Link>
           <Link href="/donate">Donate</Link>
+          <Link href="/gallery">Gallery</Link>
+          <Link href="/news">News</Link>
         </div>
 
         <div className={styles.newsletter}>

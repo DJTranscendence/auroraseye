@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "title": "BLACK AMERICA: What's Really Changing?",
+    "subtitle": "Inside the shifting racial reality in the U.S.",
+    "viewerFit": "For viewers curious about race, identity, and social change in contemporary America.",
+    "engagement": "32K watching • 1K already engaged",
+    "image": "https://auroraseyefilms.com/wp-content/uploads/2021/11/Jc4NJqRBlrM-MQ-300x169.jpg",
+    "videoUrl": "https://www.youtube.com/watch?v=Jc4NJqRBlrM",
+    "facebookUrl": "",
+    "previewStartSeconds": 20,
+    "previewEnabled": false
+  },
+  {
+    "id": 2,
+    "title": "FROM FARM TO FUTURE: The Cashew Story",
+    "subtitle": "A raw look at people, process, and impact",
+    "viewerFit": "Best for anyone interested in sustainable agriculture, livelihoods, and local food systems.",
+    "engagement": "32K views • 1K reactions",
+    "image": "https://auroraseyefilms.com/wp-content/uploads/2021/11/59osVIL-ebw-HD-300x169.jpg",
+    "videoUrl": "https://www.youtube.com/watch?v=59osVIL-ebw",
+    "facebookUrl": "",
+    "previewStartSeconds": 20,
+    "previewEnabled": true
+  },
+  {
+    "id": 3,
+    "title": "LET'S TALK ABOUT DEATH (Honestly)",
+    "subtitle": "Danielle opens the conversation we avoid",
+    "viewerFit": "Meaningful for viewers exploring grief, mortality, and honest conversations about dying.",
+    "engagement": "32K watching • 1K responses",
+    "image": "https://auroraseyefilms.com/wp-content/uploads/2021/10/ogJPuKSbjcc-HD-300x169.jpg",
+    "videoUrl": "https://www.youtube.com/watch?v=bNnKqnkzzSY",
+    "facebookUrl": "",
+    "previewStartSeconds": 20,
+    "previewEnabled": true
+  },
+  {
+    "id": 4,
+    "title": "THE FUTURE OF WATER STARTS HERE",
+    "subtitle": "Real solutions. Real urgency.",
+    "viewerFit": "Great for those focused on water security, climate resilience, and practical action.",
+    "engagement": "Tap to explore",
+    "image": "https://auroraseyefilms.com/wp-content/uploads/2021/11/dteNLfkc0kA-HD-300x169.jpg",
+    "videoUrl": "https://www.youtube.com/watch?v=Miz1m8IpQ88",
+    "facebookUrl": "",
+    "previewStartSeconds": 20,
+    "previewEnabled": true
+  },
+  {
+    "id": 5,
+    "title": "RESTORATION: Can We Reverse the Damage?",
+    "subtitle": "A ground-level look at recovery in action",
+    "viewerFit": "Perfect for viewers interested in ecological restoration and hands-on recovery efforts.",
+    "engagement": "Watch the journey",
+    "image": "https://auroraseyefilms.com/wp-content/uploads/2021/11/FBzaSLlPfB4-HD-300x169.jpg",
+    "videoUrl": "https://www.youtube.com/watch?v=FBzaSLlPfB4",
+    "facebookUrl": "",
+    "previewStartSeconds": 20,
+    "previewEnabled": true
+  },
+  {
+    "id": 6,
+    "title": "RETHINKING WATER: A NEW VISION",
+    "subtitle": "Where sustainability meets reality",
+    "viewerFit": "Recommended for people looking at future-ready water design and sustainability innovation.",
+    "engagement": "See what’s possible",
+    "image": "https://auroraseyefilms.com/wp-content/uploads/2021/11/9OCBMlfeBlU-HD-300x169.jpg",
+    "videoUrl": "https://www.youtube.com/watch?v=9OCBMlfeBlU",
+    "facebookUrl": "",
+    "previewStartSeconds": 20,
+    "previewEnabled": true
+  }
+]

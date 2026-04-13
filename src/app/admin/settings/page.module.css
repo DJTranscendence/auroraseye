@@ -1,5 +1,5 @@
 .main {
-  padding-top: calc(var(--nav-height) + 40px);
+  padding-top: calc(var(--nav-height) + 40px + 1cm);
   padding-bottom: 80px;
 }
 
@@ -23,6 +23,15 @@
 
 .titleInfo p {
   color: var(--text-muted);
+}
+
+.errorMessage {
+  margin-bottom: 1.5rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.6rem;
+  border: 1px solid #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  color: #fecaca;
 }
 
 .settingsGrid {
@@ -54,6 +63,11 @@
   margin: 0;
 }
 
+.cardDescription {
+  margin-top: -0.5rem;
+  color: var(--text-muted);
+}
+
 .formGroup {
   display: flex;
   flex-direction: column;
@@ -66,7 +80,7 @@
   color: var(--foreground);
 }
 
-.formGroup input, .formGroup textarea {
+.formGroup input, .formGroup textarea, .formGroup select {
   padding: 1rem 1.25rem;
   background: var(--background);
   border: 1px solid var(--border);
@@ -75,10 +89,147 @@
   font-size: 1rem;
 }
 
-.formGroup input:focus, .formGroup textarea:focus {
+.colorFieldRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.colorField {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.colorField input[type="color"] {
+  width: 100%;
+  height: 44px;
+  padding: 0.3rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+  background: var(--background);
+}
+
+.formGroup input:focus, .formGroup textarea:focus, .formGroup select:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.presetHint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.presetRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.6rem;
+}
+
+.presetButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.5);
+  color: var(--foreground);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.presetButton:hover {
+  border-color: rgba(66, 197, 192, 0.6);
+  transform: translateY(-1px);
+}
+
+.presetSwatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.presetSwatch span {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.colorControl {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.colorControl label {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+.swatchRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.swatch {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.swatch:hover {
+  transform: translateY(-1px);
+}
+
+.swatchActive {
+  border-color: var(--accent);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 0 0 2px rgba(66, 197, 192, 0.35);
+}
+
+.formGroup input[type="range"] {
+  padding: 0;
+}
+
+.themePreview {
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: linear-gradient(130deg, var(--surface), var(--surface-muted));
+  padding: 1rem;
+}
+
+.previewHeader {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.previewButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.previewButton {
+  pointer-events: none;
 }
 
 .footerActions button {
@@ -102,7 +253,10 @@
 
 .footerActions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
   justify-content: center;
+  align-items: center;
   padding-top: 4rem;
   border-top: 1px solid var(--border);
 }

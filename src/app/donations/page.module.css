@@ -1,0 +1,125 @@
+.main {
+  min-height: 100vh;
+  padding: calc(var(--nav-height) + 3rem) 0 5rem;
+  background: radial-gradient(circle at 20% 15%, rgba(66, 197, 192, 0.18), transparent 45%),
+    radial-gradient(circle at 75% 20%, rgba(59, 130, 246, 0.18), transparent 40%);
+}
+
+.header {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+  margin-bottom: 2rem;
+  margin-top: 0.5cm;
+}
+
+.header h1 {
+  font-size: 2.8rem;
+  margin: 0.6rem 0;
+}
+
+.header p {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(66, 197, 192, 0.16);
+  border: 1px solid rgba(66, 197, 192, 0.4);
+  color: #7fe9e6;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.55rem;
+}
+
+.tabs {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 0.35rem;
+  align-items: flex-end;
+  margin: 0.5cm 0 0;
+  padding: 0;
+  background: transparent;
+  border-bottom: none;
+}
+
+.tab,
+.tabActive {
+  border: 1px solid var(--tab-border, rgba(66, 197, 192, 0.3));
+  border-bottom: none;
+  background: var(--tab-bg, #1a2432);
+  color: var(--tab-text, #cbd5e1);
+  padding: 0.5rem 1.1rem 0.45rem;
+  font-weight: 700;
+  cursor: pointer;
+  position: relative;
+  border-radius: 10px 10px 0 0;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.tabActive {
+  background: var(--tab-bg-active, #0f172a);
+  color: var(--tab-text-active, #ffffff);
+  border-color: var(--tab-border-active, rgba(66, 197, 192, 0.3));
+  border-left: none;
+  z-index: 2;
+  transform: translateY(0);
+  margin-bottom: -1px;
+  border-bottom: none;
+}
+
+.tab:hover {
+  background: var(--tab-bg-hover, #202b3b);
+  color: var(--tab-text-hover, #e2e8f0);
+  border-color: var(--tab-border-hover, rgba(66, 197, 192, 0.45));
+}
+
+.tab[data-project='matrimandir-and-i'] {
+  --tab-bg: rgba(8, 31, 36, 0.95);
+  --tab-bg-hover: rgba(10, 40, 46, 0.95);
+  --tab-bg-active: rgba(6, 24, 28, 0.98);
+  --tab-border: rgba(79, 213, 206, 0.55);
+  --tab-border-hover: rgba(123, 234, 229, 0.75);
+  --tab-border-active: rgba(123, 234, 229, 0.75);
+  --tab-text: #b9f4f1;
+  --tab-text-hover: #e6fffe;
+  --tab-text-active: #ffffff;
+}
+
+.tab[data-project='karsha-nuns'] {
+  --tab-bg: rgba(39, 28, 10, 0.95);
+  --tab-bg-hover: rgba(52, 36, 12, 0.95);
+  --tab-bg-active: rgba(30, 22, 8, 0.98);
+  --tab-border: rgba(240, 190, 90, 0.55);
+  --tab-border-hover: rgba(255, 215, 120, 0.8);
+  --tab-border-active: rgba(255, 215, 120, 0.8);
+  --tab-text: #f4d89a;
+  --tab-text-hover: #fff2cf;
+  --tab-text-active: #ffffff;
+}
+
+.tab[data-project='child-protection'] {
+  --tab-bg: rgba(16, 22, 38, 0.95);
+  --tab-bg-hover: rgba(20, 28, 48, 0.95);
+  --tab-bg-active: rgba(12, 18, 32, 0.98);
+  --tab-border: rgba(110, 158, 255, 0.55);
+  --tab-border-hover: rgba(144, 188, 255, 0.8);
+  --tab-border-active: rgba(144, 188, 255, 0.8);
+  --tab-text: #c7d7ff;
+  --tab-text-hover: #e7f0ff;
+  --tab-text-active: #ffffff;
+}
+
+.tabPanel {
+  margin-top: 0;
+  padding-top: 0;
+  border: none;
+  position: relative;
+  border-left: none;
+}

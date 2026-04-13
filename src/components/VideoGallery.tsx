@@ -1,101 +1,433 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './VideoGallery.module.css';
-import { Play, Plus, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { ExternalLink, Play, ThumbsUp } from 'lucide-react';
+import { trackYouTubeClick } from '@/utils/youtubeAnalytics';
+import fallbackFeaturedFilms from '@/data/featuredFilms.json';
 
-const PROJECTS = [
-  {
-    id: 1,
-    title: "Karsha Nuns",
-    category: "Arts",
-    description: "A documentary about the lives of nuns in Zanskar. Witness their journey of empowerment and spirituality.",
-    img: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=2670&auto=format&fit=crop",
-    video: "https://assets.mixkit.co/videos/preview/mixkit-cinematic-view-of-a-mountain-lake-4853-large.mp4",
-    href: "/karsha-nuns"
-  },
-  {
-    id: 2,
-    title: "Forest Breath",
-    category: "Environmental",
-    description: "Documenting the re-forestation efforts across the dry tropical belt of Auroville's Green Belt.",
-    img: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?q=80&w=2671&auto=format&fit=crop",
-    video: "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-dense-green-forest-4850-large.mp4",
-    href: "/films/2"
-  },
+type SocialStatsMap = Record<number, { engagementText?: string; viewCount?: number }>;
 
-  {
-    id: 3,
-    title: "Golden Hour Spirits",
-    category: "Social Experiment",
-    description: "A series exploring the unique spiritual and communal life of the international township of Auroville.",
-    img: "https://images.unsplash.com/photo-1460518451285-97b6aa326961?q=80&w=2670&auto=format&fit=crop",
-    video: "https://assets.mixkit.co/videos/preview/mixkit-young-woman-looking-at-the-ocean-during-golden-hour-4852-large.mp4",
-    href: "/films/3"
-  },
-  {
-    id: 4,
-    title: "Eternal Dawn",
-    category: "Philosophy",
-    description: "Interviews with early pioneers of the City of Dawn, sharing their visions of a human unity.",
-    img: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=2670&auto=format&fit=crop",
-    video: "https://assets.mixkit.co/videos/preview/mixkit-man-walking-on-a-dock-at-sunrise-4851-large.mp4",
-    href: "/films/4"
+type VideoCard = (typeof fallbackFeaturedFilms)[number];
+
+const LATEST_UPLOAD_ID = 999999;
+
+function getVideoIdFromUrl(url: string) {
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.hostname.replace("www.", "").includes("youtu.be")) {
+      return parsedUrl.pathname.slice(1);
+    }
+    if (parsedUrl.searchParams.get("v")) return parsedUrl.searchParams.get("v")!;
+    if (parsedUrl.pathname.startsWith("/shorts/")) return parsedUrl.pathname.split("/shorts/")[1]?.split("/")[0] ?? null;
+    if (parsedUrl.pathname.startsWith("/embed/")) return parsedUrl.pathname.split("/embed/")[1]?.split("/")[0] ?? null;
+    return null;
+  } catch {
+    return null;
   }
-];
+}
 
+function getYouTubeVideoId(url: string) {
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname.replace('www.', '');
+
+    if (hostname === 'youtu.be') {
+      return parsedUrl.pathname.slice(1) || null;
+    }
+
+    if (hostname.includes('youtube.com')) {
+      if (parsedUrl.pathname.startsWith('/shorts/')) {
+        return parsedUrl.pathname.split('/shorts/')[1]?.split('/')[0] || null;
+      }
+
+      if (parsedUrl.pathname.startsWith('/embed/')) {
+        return parsedUrl.pathname.split('/embed/')[1]?.split('/')[0] || null;
+      }
+
+      return parsedUrl.searchParams.get('v');
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function getPreviewEmbedUrl(url: string, startSeconds = 20, endSeconds = 28) {
+  const videoId = getYouTubeVideoId(url);
+
+  if (!videoId) {
+    return null;
+  }
+
+  return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0&loop=1&playlist=${videoId}&start=${startSeconds}&end=${endSeconds}`;
+}
+
+function getCommentsUrl(url: string) {
+  const videoId = getYouTubeVideoId(url);
+  if (!videoId) {
+    return url;
+  }
+
+  return `https://www.youtube.com/watch?v=${videoId}#comments`;
+}
 
 export default function VideoGallery() {
-  const [activeId, setActiveId] = useState<number | null>(null);
+  const [socialStats, setSocialStats] = useState<SocialStatsMap>({});
+  const [featuredFilms, setFeaturedFilms] = useState<VideoCard[]>(fallbackFeaturedFilms as VideoCard[]);
+  const [cards, setCards] = useState<VideoCard[]>(fallbackFeaturedFilms as VideoCard[]);
+  const [statsStatus, setStatsStatus] = useState<"loading" | "ready" | "unavailable">("loading");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isEditing, setIsEditing] = useState<VideoCard | null>(null);
+  const [editUrl, setEditUrl] = useState("");
+  const [activePlayerId, setActivePlayerId] = useState<string | null>(null);
+  const [likedVideos, setLikedVideos] = useState<Record<string, boolean>>({});
+
+  const fallbackFilms = useMemo(() => fallbackFeaturedFilms as VideoCard[], []);
+
+  const refreshFeaturedFilms = async (shouldUpdate?: () => boolean) => {
+    const baseFilms = await (async () => {
+      try {
+        const response = await fetch('/api/cms?type=featuredFilms', { cache: 'no-store' });
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length) {
+            return data as VideoCard[];
+          }
+        }
+      } catch {
+        // Fall back to bundled data.
+      }
+
+      return fallbackFilms;
+    })();
+
+    if (shouldUpdate && !shouldUpdate()) return;
+    setFeaturedFilms(baseFilms);
+    setStatsStatus("loading");
+    const latestResult = await fetch("/api/youtube/latest-upload", { method: "GET" });
+    let nextLatest: Partial<VideoCard> | null = null;
+
+      if (latestResult.ok) {
+        const latest = (await latestResult.json()) as any;
+        const latestVideoUrl = latest?.videoUrl as string | undefined;
+        const latestVideoId = latestVideoUrl ? getVideoIdFromUrl(latestVideoUrl) : null;
+
+        nextLatest = {
+          id: LATEST_UPLOAD_ID,
+          title: latest?.title ?? "Latest upload",
+          subtitle: latest?.subtitle ?? "New video from Aurora's Eye Films",
+          viewerFit: latest?.viewerFit ?? 'Best for viewers who want the newest story from Aurora\'s Eye Films.',
+          engagement: latest?.engagementText || "Tap to explore",
+          image: latest?.image ?? "",
+          videoUrl: latestVideoUrl ?? channelUrlForLatestFallback(),
+          facebookUrl: "",
+          previewStartSeconds: 0,
+          previewEnabled: true,
+        } as VideoCard;
+
+        // Ensure the latest card doesn't accidentally keep an old preview embed.
+        if (nextLatest && !nextLatest.image) {
+          // No-op: we still render the card and links.
+        }
+
+        // If thumbnail isn't available but we have a video id, we can still render a thumbnail.
+        if (nextLatest && !nextLatest.image && latestVideoId) {
+          nextLatest.image = `https://i.ytimg.com/vi/${latestVideoId}/hqdefault.jpg`;
+        }
+      }
+
+    const statsItems = [
+      ...baseFilms.map((film) => ({
+        id: film.id,
+        youtubeUrl: film.videoUrl,
+        facebookUrl: film.facebookUrl,
+      })),
+      ...(nextLatest
+        ? [
+            {
+              id: LATEST_UPLOAD_ID,
+              youtubeUrl: (nextLatest as VideoCard).videoUrl,
+              facebookUrl: "",
+            },
+          ]
+        : []),
+    ];
+
+    const nextSocialStats: SocialStatsMap = {};
+    let nextStatsStatus: typeof statsStatus = "unavailable";
+
+    try {
+      const statsResponse = await fetch("/api/social-stats", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ items: statsItems }),
+      });
+
+      if (statsResponse.ok) {
+        const data = await statsResponse.json();
+        Object.assign(nextSocialStats, data.stats ?? {});
+        nextStatsStatus = Object.keys(nextSocialStats).length > 0 ? "ready" : "unavailable";
+      }
+    } catch {
+      nextStatsStatus = "unavailable";
+    }
+
+    if (shouldUpdate && !shouldUpdate()) return;
+    setSocialStats(nextSocialStats);
+    setStatsStatus(nextStatsStatus);
+
+    const sortedFeatured = [...baseFilms].sort((a, b) => {
+      const viewsA = nextSocialStats[a.id]?.viewCount ?? 0;
+      const viewsB = nextSocialStats[b.id]?.viewCount ?? 0;
+      return viewsB - viewsA;
+    });
+
+    if (nextLatest) {
+      // Per request: replace the first (top-left) card with the latest upload.
+      sortedFeatured[0] = nextLatest as VideoCard;
+    }
+
+    if (shouldUpdate && !shouldUpdate()) return;
+    setCards(sortedFeatured);
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    refreshFeaturedFilms(() => isMounted).catch(() => {
+      if (!isMounted) return;
+      setSocialStats({});
+      setFeaturedFilms(fallbackFilms);
+      setCards(fallbackFilms);
+      setStatsStatus("unavailable");
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [fallbackFilms]);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('user');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        setIsAdmin(parsed?.role === 'admin');
+      }
+    } catch {
+      setIsAdmin(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('featured-films-likes');
+      if (raw) {
+        const parsed = JSON.parse(raw) as Record<string, boolean>;
+        if (parsed && typeof parsed === 'object') {
+          setLikedVideos(parsed);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('featured-films-likes', JSON.stringify(likedVideos));
+  }, [likedVideos]);
+
+  const handleEdit = (film: VideoCard) => {
+    setIsEditing(film);
+    setEditUrl(film.videoUrl ?? '');
+  };
+
+  const handleSaveEdit = async () => {
+    if (!isEditing) return;
+
+    const nextVideoId = getYouTubeVideoId(editUrl);
+    const nextImage = nextVideoId ? `https://i.ytimg.com/vi/${nextVideoId}/hqdefault.jpg` : isEditing.image;
+
+    const updatedFilms = featuredFilms.map((film) =>
+      film.id === isEditing.id
+        ? {
+            ...film,
+            videoUrl: editUrl,
+            image: nextImage,
+          }
+        : film
+    );
+
+    await fetch('/api/cms?type=featuredFilms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedFilms),
+    });
+
+    setIsEditing(null);
+    setEditUrl('');
+    setFeaturedFilms(updatedFilms);
+    refreshFeaturedFilms().catch(() => undefined);
+  };
 
   return (
     <section className={styles.gallerySection}>
       <div className="container">
-        <div className={styles.header}>
-          <div className="badge">Project Series</div>
-          <h2 className="title">Visual Narrative <span className="text-primary">Series</span></h2>
-        </div>
-      </div>
-      
-      <div className={styles.carouselContainer} onMouseLeave={() => setActiveId(null)}>
-        <div className={styles.carouselTrack}>
-          {PROJECTS.map((project) => (
-            <div 
-              key={project.id}
-              className={`${styles.card} ${activeId === project.id ? styles.active : ''} ${activeId !== null && activeId !== project.id ? styles.inactive : ''}`}
-              onMouseEnter={() => setActiveId(project.id)}
-            >
-              <div className={styles.videoWrapper}>
-                <video 
-                  src={project.video}
-                  poster={project.img}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
+        {isEditing ? (
+          <div className={styles.adminEditOverlay}>
+            <div className={styles.adminEditModal}>
+              <h3>Edit Featured Film</h3>
+              <p className={styles.adminEditMeta}>{isEditing.title}</p>
+              <div className={styles.adminEditField}>
+                <label htmlFor="featured-film-url">YouTube link</label>
+                <input
+                  id="featured-film-url"
+                  value={editUrl}
+                  onChange={(event) => setEditUrl(event.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=..."
                 />
               </div>
-              
-              <div className={styles.overlay}>
-                <div className={styles.content}>
-                  <span className={styles.category}>{project.category}</span>
-                  <h3 className={styles.cardTitle}>{project.title}</h3>
-                  <div className={styles.extraInfo}>
-                    <p>{project.description}</p>
-                    <Link href={project.href} className={styles.playLink}>
-                      <span className={styles.playIcon}><Play size={16} fill="white" /></span>
-                      See Their Story
-                    </Link>
-
-
-                  </div>
-                </div>
+              <div className={styles.adminEditActions}>
+                <button type="button" className="btn btn-outline" onClick={() => setIsEditing(null)}>
+                  Cancel
+                </button>
+                <button type="button" className="btn btn-primary" onClick={handleSaveEdit}>
+                  Save
+                </button>
               </div>
             </div>
-          ))}
+          </div>
+        ) : null}
+        <div className={styles.header}>
+          <div className="badge">Latest Work</div>
+          <h2 className="title">Featured Films</h2>
+        </div>
+        <div className={styles.posterGrid}>
+          {cards.map((film) => {
+            const isLatestCard = Number(film.id) === LATEST_UPLOAD_ID;
+            const engagementText = socialStats[film.id]?.engagementText
+              ? socialStats[film.id]?.engagementText
+              : statsStatus === "loading"
+                ? "Loading live stats…"
+                : "Live stats unavailable";
+
+            const videoId = getYouTubeVideoId(film.videoUrl) ?? '';
+            const isPlaying = videoId && activePlayerId === videoId;
+            const isLiked = videoId ? likedVideos[videoId] : false;
+            const youtubeWatchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : film.videoUrl;
+
+            return (
+              <article key={film.id} className={styles.posterCard} data-video-id={videoId}>
+                <div className={styles.posterImage}>
+                  {isPlaying ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
+                      title={`${film.title} video`}
+                      className={styles.posterInlineFrame}
+                      allow="autoplay; encrypted-media; picture-in-picture"
+                      allowFullScreen
+                      referrerPolicy="strict-origin-when-cross-origin"
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.posterThumbButton}
+                      onClick={() => {
+                        if (!videoId) {
+                          return;
+                        }
+                        setActivePlayerId(videoId);
+                      }}
+                    >
+                      <img src={film.image} alt={film.title} className={styles.posterImg} />
+                      {film.previewEnabled && getPreviewEmbedUrl(film.videoUrl, film.previewStartSeconds) && (
+                        <iframe
+                          src={getPreviewEmbedUrl(film.videoUrl, film.previewStartSeconds) as string}
+                          title={`${film.title} preview`}
+                          className={styles.posterPreview}
+                          allow="autoplay; encrypted-media; picture-in-picture"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          tabIndex={-1}
+                        />
+                      )}
+                      {isLatestCard && <span className={styles.latestBadge}>NEW</span>}
+                      <span className={styles.posterTag}>A film by Serena Aurora</span>
+                      {isAdmin && !isLatestCard ? (
+                        <button
+                          type="button"
+                          className={`${styles.adminEditLink} ${isLatestCard ? styles.adminEditLinkShifted : ''}`}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            handleEdit(film);
+                          }}
+                        >
+                          Edit
+                        </button>
+                      ) : null}
+                      <span className={styles.posterPlay}>
+                        <Play size={24} fill="currentColor" />
+                      </span>
+                      {videoId ? (
+                        <button
+                          type="button"
+                          className={`${styles.posterLikeButton} ${isLiked ? styles.posterLikeButtonActive : ''}`}
+                          aria-label={isLiked ? 'Liked' : 'Like this video'}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            setLikedVideos((prev) => ({ ...prev, [videoId]: true }));
+                            trackYouTubeClick({
+                              label: `${film.title} like`,
+                              url: youtubeWatchUrl,
+                              location: 'featured-films-like',
+                            });
+                            window.open(youtubeWatchUrl, '_blank', 'noopener,noreferrer');
+                          }}
+                        >
+                          <ThumbsUp size={18} />
+                          <span className={styles.posterLikeTooltip}>
+                            Click here and then Click Like on Youtube
+                          </span>
+                        </button>
+                      ) : null}
+                    </button>
+                  )}
+                </div>
+                <div className={styles.posterMeta}>
+                  <h3 className={styles.posterTitle}>{film.title}</h3>
+                  <p className={styles.posterSubtitle}>{film.subtitle}</p>
+                  <p className={styles.posterWhy}>{film.viewerFit}</p>
+                  <div className={styles.posterActions}>
+                    <button
+                      type="button"
+                      className={styles.posterActionPrimary}
+                      onClick={() => {
+                        trackYouTubeClick({
+                          label: `${film.title} watch`,
+                          url: youtubeWatchUrl,
+                          location: 'featured-films-watch-button',
+                        });
+                        window.open(youtubeWatchUrl, '_blank', 'noopener,noreferrer');
+                      }}
+                    >
+                      Watch on YouTube <ExternalLink size={16} />
+                    </button>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>
   );
+}
+
+function channelUrlForLatestFallback() {
+  // Keep a safe default in case the API returns no `videoUrl`.
+  return "https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw";
 }

@@ -10,5 +10,23 @@
     "email": "indispirit@gmail.com",
     "password": "1Ndispirit",
     "role": "admin"
+  },
+  {
+    "id": "1774524001000",
+    "email": "serena_aurora@auroville.org.in",
+    "password": "Serena",
+    "role": "admin"
+  },
+  {
+    "id": "1774523663183",
+    "email": "testuser_1@example.com",
+    "password": "Secret123",
+    "role": "user"
+  },
+  {
+    "id": "1774523717334",
+    "email": "testuser_fix@example.com",
+    "password": "Secret123",
+    "role": "user"
   }
 ]

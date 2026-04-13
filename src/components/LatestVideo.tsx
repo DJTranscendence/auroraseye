@@ -15,7 +15,7 @@ export default function LatestVideo() {
             <h2 className={styles.title}>Latest from our Channel</h2>
             <p className="text-muted">Fresh stories, updated weekly.</p>
           </div>
-          <Link href="https://youtube.com/@AuroraEyeFilms" className="btn btn-outline">
+          <Link href="https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw" className="btn btn-outline">
             Visit YouTube <Youtube size={18} />
           </Link>
         </div>

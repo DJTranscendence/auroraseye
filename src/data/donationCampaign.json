@@ -1,0 +1,32 @@
+{
+  "episodeNumber": 7,
+  "episodeName": "Many Eyes, One Heart",
+  "campaignName": "Help Fund Episode 7 – Many Eyes, One Heart",
+  "fundedPercent": 42,
+  "shootBeginsInDays": 18,
+  "liveSupporterName": "Ananya",
+  "liveSupporterContribution": "Costume Design",
+  "donationUrl": "https://pay.auroville.org/aef/checkout/8524a867-97ee-4516-9b18-1976eb3b60f9",
+  "previewClipUrl": "https://www.youtube.com/watch?v=X-3ZBsQZY0E",
+  "previewStartSeconds": 12,
+  "previewEndSeconds": 20,
+  "previewThumbnail": "https://img.youtube.com/vi/X-3ZBsQZY0E/hqdefault.jpg",
+  "summary": "Help the next Matrimandir & I episode move from edit desk to production by funding the pieces audiences can feel on screen.",
+  "tiers": [
+    {
+      "amount": 500,
+      "label": "Feed the crew",
+      "detail": "1 day"
+    },
+    {
+      "amount": 2000,
+      "label": "Sound design",
+      "detail": "1 scene"
+    },
+    {
+      "amount": 10000,
+      "label": "Actor / location",
+      "detail": "Key production day"
+    }
+  ]
+}

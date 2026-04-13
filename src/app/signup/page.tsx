@@ -27,20 +27,30 @@ export default function Signup() {
     }
 
     setLoading(true);
-    const res = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
-    setLoading(false);
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
 
-    if (res.ok) {
-      setSuccess(true);
-      setTimeout(() => router.push('/login'), 2000);
-    } else {
-      alert(data.error || "Signup failed");
+      if (res.ok) {
+        setSuccess(true);
+        setTimeout(() => router.push('/login'), 2000);
+      } else {
+        alert(data?.error || "Signup failed");
+      }
+    } catch {
+      alert('Unable to reach signup service. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 

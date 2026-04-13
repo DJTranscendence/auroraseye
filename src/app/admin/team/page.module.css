@@ -1,5 +1,5 @@
 .main {
-  padding-top: calc(var(--nav-height) + 40px);
+  padding-top: calc(var(--nav-height) + 80px);
   padding-bottom: 80px;
 }
 

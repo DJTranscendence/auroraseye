@@ -1,15 +1,75 @@
 {
   "hero": {
     "title": "Storytelling through Light & Life",
-    "description": "Aurora's Eye Films is an independent documentary film production house based in Auroville, dedicated to telling stories that matter—focusing on culture, environment, and the human spirit.",
-    "videoUrl": "https://www.youtube.com/watch?v=irjXPzzv6iU&pp=0gcJCcUKAYcqIYzv",
-    "bgImage": "https://images.unsplash.com/photo-1492691523567-6170c8675fa8?q=80&w=2670&auto=format&fit=crop"
+    "description": "",
+    "videoUrl": "https://www.youtube.com/watch?v=CFDiUQfuxdA",
+    "bgImage": "https://images.unsplash.com/photo-1492691523567-6170c8675fa8?q=80&w=2670&auto=format&fit=crop",
+    "controls": {
+      "iframeTopPercent": 6,
+      "iframeTopCm": -0.5,
+      "iframeLeftPercent": -4,
+      "iframeWidthPercent": 108,
+      "iframeHeightPercent": 110,
+      "videoScale": 0.87,
+      "containerTopPx": 0,
+      "containerPadPx": 0,
+      "actionsOffsetX": 4,
+      "actionsOffsetY": 21,
+      "actionsFadeOutFrom": 36.98,
+      "actionsFadeOutDuration": 2.5,
+      "actionsFadeInAt": 6,
+      "actionsFadeInDuration": 3,
+      "scrollOffsetX": 0,
+      "scrollOffsetY": 265,
+      "scrollFadeOutFrom": 36.98,
+      "scrollFadeOutDuration": 2.5,
+      "scrollFadeInAt": 6,
+      "scrollFadeInDuration": 3,
+      "supportCtaOffsetX": 0,
+      "supportCtaOffsetY": 0,
+      "recruitmentOffsetX": 0,
+      "recruitmentOffsetY": 0
+    },
+    "controlsMobile": {
+      "iframeTopPercent": 13,
+      "iframeTopCm": -0.5,
+      "iframeLeftPercent": -4,
+      "iframeWidthPercent": 108,
+      "iframeHeightPercent": 110,
+      "videoScale": 0.96,
+      "containerTopPx": 0,
+      "containerPadPx": 0,
+      "actionsOffsetX": 0,
+      "actionsOffsetY": 80,
+      "scrollOffsetX": 0,
+      "scrollOffsetY": 265,
+      "supportCtaOffsetX": 0,
+      "supportCtaOffsetY": 0,
+      "recruitmentOffsetX": 0,
+      "recruitmentOffsetY": 0
+    }
   },
   "contact": {
     "email": "Serena_aurora@auroville.org.in",
+    "phone": "+91 00000 00000",
     "address": "Anitya community, Auroville, Tamil Nadu 605101, India",
-    "youtube": "https://youtube.com/@AuroraEyeFilms",
-    "instagram": "https://instagram.com/auroraseyefilms",
+    "youtube": "https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw",
+    "instagram": "https://www.instagram.com/auroras_eye_films/",
     "linkedin": "https://linkedin.com/company/auroras-eye-films"
+  },
+  "theme": {
+    "headerBackground": "#c755dd",
+    "background": "#1b1512",
+    "foreground": "#f5efe7",
+    "primary": "#9a6446",
+    "primaryGlow": "#9a644633",
+    "surface": "#2c221c",
+    "surfaceMuted": "#3a2c23",
+    "textMuted": "#ceb8a8",
+    "border": "#6e5345",
+    "accent": "#42c5c0"
+  },
+  "typography": {
+    "fontFamily": "default"
   }
 }

@@ -157,40 +157,39 @@ export default function ManageFilms() {
               </div>
             </div>
             <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Thumbnail</th>
-                    <th>Title</th>
-                    <th>Category</th>
-                    <th>Year</th>
-                    <th className={styles.textRight}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <tr><td colSpan={5} className={styles.empty}>Loading catalog...</td></tr>
-                  ) : films.length === 0 ? (
-                    <tr><td colSpan={5} className={styles.empty}>No films found. Click &quot;Add New Film&quot; to start.</td></tr>
-                  ) : films.map(film => (
-                    <tr key={film.id}>
-                      <td className={styles.tdThumb}>
-                        <img src={film.thumbnail} alt={film.title} />
-                      </td>
-                      <td className={styles.tdTitle}>
-                        <strong>{film.title}</strong>
-                        <p>{film.description?.substring(0, 60)}...</p>
-                      </td>
-                      <td><span className={styles.badge}>{film.category}</span></td>
-                      <td>{film.year}</td>
-                      <td className={styles.tdActions}>
-                        <button onClick={() => handleEdit(film)} title="Edit"><Edit size={18} /></button>
-                        <button onClick={() => handleDelete(film.id)} title="Delete" className={styles.deleteBtn}><Trash2 size={18} /></button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className={styles.rowHeader}>
+                <span>Thumbnail</span>
+                <span>Title</span>
+                <span>Category</span>
+                <span>Year</span>
+                <span>Actions</span>
+              </div>
+
+              <div className={styles.rowList}>
+                {loading ? (
+                  <div className={styles.empty}>Loading catalog...</div>
+                ) : films.length === 0 ? (
+                  <div className={styles.empty}>No films found. Click "Add New Film" to start.</div>
+                ) : films.map(film => (
+                  <div key={film.id} className={styles.rowCard}>
+                    <div className={styles.rowThumb}>
+                      <img src={film.thumbnail} alt={film.title} />
+                    </div>
+                    <div className={styles.rowTitle}>
+                      <strong>{film.title}</strong>
+                      <p>{film.description?.substring(0, 60)}...</p>
+                    </div>
+                    <div className={styles.rowCategory}>
+                      <span className={styles.badge}>{film.category}</span>
+                    </div>
+                    <div className={styles.rowYear}>{film.year}</div>
+                    <div className={styles.rowActions}>
+                      <button onClick={() => handleEdit(film)} title="Edit"><Edit size={18} /></button>
+                      <button onClick={() => handleDelete(film.id)} title="Delete" className={styles.deleteBtn}><Trash2 size={18} /></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
