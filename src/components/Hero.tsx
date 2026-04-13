@@ -728,9 +728,19 @@ export default function Hero() {
     if (!controlsHydrated) {
       return;
     }
-    writeHeroControlState(buildControlState());
+    const nextDesktopState = buildControlState();
+    writeHeroControlState(nextDesktopState);
+
+    // Keep hero positioning consistent across screen sizes by default.
+    // This mirrors desktop adjustments into the mobile control state so
+    // switching displays does not appear to "reset" positions.
+    if (!isMobileViewport) {
+      writeMobileControlState(nextDesktopState);
+      setMobileControls(nextDesktopState);
+    }
   }, [
     controlsHydrated,
+    isMobileViewport,
     iframeTopPercent,
     iframeTopCm,
     iframeLeftPercent,

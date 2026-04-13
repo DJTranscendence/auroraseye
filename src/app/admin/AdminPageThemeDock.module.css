@@ -1,0 +1,84 @@
+.dock {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 10500;
+  max-width: min(340px, calc(100vw - 2rem));
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.5);
+  color: #e2e8f0;
+}
+
+.collapsed {
+  padding: 0.5rem 0.75rem;
+}
+
+.panel {
+  padding: 0.85rem 1rem 1rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: grab;
+  user-select: none;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #94a3b8;
+}
+
+.toggle,
+.clear {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(30, 41, 59, 0.9);
+  color: #f1f5f9;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.row label {
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.row input[type='color'] {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: #0f172a;
+  padding: 0.12rem;
+}
+
+.clear {
+  font-size: 0.62rem;
+  padding: 0.2rem 0.45rem;
+}
+
+.panel p {
+  margin: 0.15rem 0 0;
+  font-size: 0.68rem;
+  color: #94a3b8;
+}

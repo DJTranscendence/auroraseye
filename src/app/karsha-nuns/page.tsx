@@ -105,12 +105,14 @@ export default function KarshaNunsPage() {
                     but a transformative crossing of landscapes, cultures, and inner worlds.
                   </p>
                 </div>
-                <a href="#documentary" className="btn btn-primary">
-                  <Play size={20} fill="white" /> Watch The Documentary Path
-                </a>
-                <a href="/discussion?project=karsha-nuns" className="btn btn-primary">
-                  Join the Conversation - In our Chatroom!
-                </a>
+                <div className={styles.heroActions}>
+                  <a href="#documentary" className="btn btn-primary">
+                    <Play size={20} fill="white" /> Watch The Documentary Path
+                  </a>
+                  <a href="/discussion?project=karsha-nuns" className="btn btn-primary">
+                    ❤️ Join the conversation - In our chatroom 💬
+                  </a>
+                </div>
               </div>
 
               <div className={styles.heroVisual}>

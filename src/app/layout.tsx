@@ -23,6 +23,7 @@ const patrickHand = Patrick_Hand({
 
 
 import ThemeRuntime from "@/components/ThemeRuntime";
+import AdminGlobalThemeDock from "@/components/AdminGlobalThemeDock";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://auroras-eye-films.vercel.app";
 const defaultTitle = "Aurora's Eye Films";
@@ -123,6 +124,7 @@ export default async function RootLayout({
           }}
         />
         {children}
+        <AdminGlobalThemeDock />
       </body>
     </html>
   );

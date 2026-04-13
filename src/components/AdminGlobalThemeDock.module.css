@@ -1,0 +1,157 @@
+.dock {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 10510;
+  max-width: min(340px, calc(100vw - 2rem));
+  max-height: min(78vh, 640px);
+  overflow: auto;
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 18px 48px rgba(2, 6, 23, 0.55);
+  color: #e2e8f0;
+  font-size: 0.78rem;
+}
+
+.dockCollapsed {
+  padding: 0.45rem 0.75rem;
+}
+
+.dockExpanded {
+  padding: 0.85rem 1rem 1rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.dockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: grab;
+  user-select: none;
+}
+
+.dockTitle {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.toggleBtn,
+.saveBtn,
+.clearBtn {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(30, 41, 59, 0.9);
+  color: #f1f5f9;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.saveBtn {
+  border-color: rgba(66, 197, 192, 0.55);
+  background: rgba(66, 197, 192, 0.15);
+  color: #b6f0eb;
+}
+
+.saveBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.clearBtn {
+  padding: 0.2rem 0.45rem;
+  font-size: 0.65rem;
+  color: #cbd5e1;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.row label {
+  font-weight: 600;
+  color: #cbd5e1;
+  font-size: 0.76rem;
+}
+
+.picker {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0.15rem;
+  border-radius: 0.4rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: #0f172a;
+  cursor: pointer;
+}
+
+.glowInput {
+  grid-column: 2 / -1;
+  width: 100%;
+  min-width: 0;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.9);
+  color: #e2e8f0;
+  font-size: 0.72rem;
+  font-family: ui-monospace, monospace;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.68rem;
+  line-height: 1.45;
+  color: #94a3b8;
+}
+
+.statusOk {
+  color: #6ee7b7;
+  font-weight: 700;
+  font-size: 0.72rem;
+}
+
+.statusErr {
+  color: #fca5a5;
+  font-size: 0.72rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.sectionLabel {
+  margin: 0.35rem 0 0;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.glowBlock {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.glowBlock label {
+  font-weight: 600;
+  color: #cbd5e1;
+  font-size: 0.76rem;
+}

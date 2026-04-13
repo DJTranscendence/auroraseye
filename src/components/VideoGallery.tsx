@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import styles from './VideoGallery.module.css';
 import Link from 'next/link';
 import { ExternalLink, Play, ThumbsUp } from 'lucide-react';
@@ -10,6 +10,14 @@ import fallbackFeaturedFilms from '@/data/featuredFilms.json';
 type SocialStatsMap = Record<number, { engagementText?: string; viewCount?: number }>;
 
 type VideoCard = (typeof fallbackFeaturedFilms)[number];
+type FeaturedFilmThemeOverrides = {
+  sectionBg?: string;
+  cardBg?: string;
+  titleColor?: string;
+  subtitleColor?: string;
+  pillBg?: string;
+  buttonBg?: string;
+};
 
 const LATEST_UPLOAD_ID = 999999;
 
@@ -84,6 +92,8 @@ export default function VideoGallery() {
   const [editUrl, setEditUrl] = useState("");
   const [activePlayerId, setActivePlayerId] = useState<string | null>(null);
   const [likedVideos, setLikedVideos] = useState<Record<string, boolean>>({});
+  const [themeOverrides, setThemeOverrides] = useState<FeaturedFilmThemeOverrides>({});
+  const [showThemeDock, setShowThemeDock] = useState(false);
 
   const fallbackFilms = useMemo(() => fallbackFeaturedFilms as VideoCard[], []);
 
@@ -240,6 +250,48 @@ export default function VideoGallery() {
     localStorage.setItem('featured-films-likes', JSON.stringify(likedVideos));
   }, [likedVideos]);
 
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('featured-films-theme-overrides');
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as FeaturedFilmThemeOverrides;
+      if (parsed && typeof parsed === 'object') {
+        setThemeOverrides(parsed);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('featured-films-theme-overrides', JSON.stringify(themeOverrides));
+    } catch {
+      // ignore
+    }
+  }, [themeOverrides]);
+
+  const updateThemeColor = (key: keyof FeaturedFilmThemeOverrides, value: string) => {
+    setThemeOverrides((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const clearThemeColor = (key: keyof FeaturedFilmThemeOverrides) => {
+    setThemeOverrides((prev) => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  };
+
+  const galleryStyle: CSSProperties = {};
+  const galleryStyleVars = galleryStyle as Record<string, string>;
+  if (themeOverrides.sectionBg) galleryStyleVars['--featured-gallery-bg'] = themeOverrides.sectionBg;
+  if (themeOverrides.cardBg) galleryStyleVars['--featured-card-bg'] = themeOverrides.cardBg;
+  if (themeOverrides.titleColor) galleryStyleVars['--featured-title-color'] = themeOverrides.titleColor;
+  if (themeOverrides.subtitleColor) galleryStyleVars['--featured-subtitle-color'] = themeOverrides.subtitleColor;
+  if (themeOverrides.pillBg) galleryStyleVars['--featured-pill-bg'] = themeOverrides.pillBg;
+  if (themeOverrides.buttonBg) galleryStyleVars['--featured-button-bg'] = themeOverrides.buttonBg;
+
   const handleEdit = (film: VideoCard) => {
     setIsEditing(film);
     setEditUrl(film.videoUrl ?? '');
@@ -274,8 +326,49 @@ export default function VideoGallery() {
   };
 
   return (
-    <section className={styles.gallerySection}>
+    <section className={styles.gallerySection} style={galleryStyle}>
       <div className="container">
+        {isAdmin ? (
+          <div className={styles.themeDock}>
+            <button type="button" className={styles.themeDockToggle} onClick={() => setShowThemeDock((prev) => !prev)}>
+              {showThemeDock ? 'Hide colors' : 'Section colors'}
+            </button>
+            {showThemeDock ? (
+              <div className={styles.themeDockPanel}>
+                <label>
+                  Section
+                  <input type="color" value={themeOverrides.sectionBg ?? '#f59e0b'} onChange={(e) => updateThemeColor('sectionBg', e.target.value)} />
+                  <button type="button" onClick={() => clearThemeColor('sectionBg')}>Clear</button>
+                </label>
+                <label>
+                  Cards
+                  <input type="color" value={themeOverrides.cardBg ?? '#09111f'} onChange={(e) => updateThemeColor('cardBg', e.target.value)} />
+                  <button type="button" onClick={() => clearThemeColor('cardBg')}>Clear</button>
+                </label>
+                <label>
+                  Title text
+                  <input type="color" value={themeOverrides.titleColor ?? '#f5efe7'} onChange={(e) => updateThemeColor('titleColor', e.target.value)} />
+                  <button type="button" onClick={() => clearThemeColor('titleColor')}>Clear</button>
+                </label>
+                <label>
+                  Body text
+                  <input type="color" value={themeOverrides.subtitleColor ?? '#ceb8a8'} onChange={(e) => updateThemeColor('subtitleColor', e.target.value)} />
+                  <button type="button" onClick={() => clearThemeColor('subtitleColor')}>Clear</button>
+                </label>
+                <label>
+                  Viewer-fit pill
+                  <input type="color" value={themeOverrides.pillBg ?? '#f8ede3'} onChange={(e) => updateThemeColor('pillBg', e.target.value)} />
+                  <button type="button" onClick={() => clearThemeColor('pillBg')}>Clear</button>
+                </label>
+                <label>
+                  Watch button
+                  <input type="color" value={themeOverrides.buttonBg ?? '#f59e0b'} onChange={(e) => updateThemeColor('buttonBg', e.target.value)} />
+                  <button type="button" onClick={() => clearThemeColor('buttonBg')}>Clear</button>
+                </label>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
         {isEditing ? (
           <div className={styles.adminEditOverlay}>
             <div className={styles.adminEditModal}>

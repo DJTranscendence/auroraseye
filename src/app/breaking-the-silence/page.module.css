@@ -1,5 +1,5 @@
 .wrapper {
-  background: var(--background);
+  background: var(--bts-page-bg, var(--background));
   min-height: 100vh;
 }
 
@@ -9,8 +9,8 @@
 }
 
 .projectHeader {
-  background: transparent;
-  color: var(--foreground);
+  background: var(--bts-project-header-bg, transparent);
+  color: var(--bts-foreground, var(--foreground));
   margin-top: calc(5.15rem + 1cm);
   padding: 0.15rem 0 0;
 }
@@ -24,7 +24,7 @@
 }
 
 .projectTitle {
-  color: #475569;
+  color: var(--bts-text-muted, #475569);
   font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -129,6 +129,7 @@
 
 .hero {
   padding: 0 0 3.5rem;
+  background: var(--bts-hero-bg, transparent);
 }
 
 .heroGrid {
@@ -145,7 +146,7 @@
 .kicker,
 .sectionEyebrow {
   margin: 0 0 0.8rem;
-  color: #fbbf24;
+  color: var(--bts-accent-text, #fbbf24);
   font-size: 0.8rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -154,6 +155,7 @@
 
 .heroContent h1 {
   margin: 0;
+  color: var(--bts-foreground, var(--foreground));
   font-size: clamp(2rem, 4.6vw, 3.6rem);
   line-height: 1.05;
   letter-spacing: -0.04em;
@@ -167,7 +169,7 @@
 
 .heroCopy p {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--bts-text-muted, var(--text-muted));
   line-height: 1.75;
 }
 
@@ -177,7 +179,7 @@
   gap: 0.5rem;
   margin: 0;
   padding: 0;
-  color: var(--text-muted);
+  color: var(--bts-text-muted, var(--text-muted));
   font-weight: 600;
 }
 
@@ -251,7 +253,7 @@
   display: grid;
   gap: 0.5rem;
   text-align: left;
-  color: var(--text-muted);
+  color: var(--bts-text-muted, var(--text-muted));
   line-height: 1.6;
 }
 
@@ -263,11 +265,12 @@
   margin: 0;
   font-size: 1.3rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--bts-foreground, #f8fafc);
 }
 
 .mediaWallSection {
   padding: 1rem 0 4rem;
+  background: var(--bts-media-wall-bg, transparent);
 }
 
 .mediaWallHeader {
@@ -282,7 +285,7 @@
 }
 
 .mediaTile {
-  background: rgba(10, 11, 18, 0.7);
+  background: var(--bts-media-tile-bg, rgba(10, 11, 18, 0.7));
   border: 1px solid rgba(148, 163, 184, 0.14);
   border-radius: 1.1rem;
   overflow: hidden;
@@ -329,7 +332,7 @@
 
 .mediaCaption {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--bts-text-muted, var(--text-muted));
   line-height: 1.6;
 }
 
@@ -383,14 +386,17 @@
 
 .sectionIntro p {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--bts-text-muted, var(--text-muted));
   line-height: 1.75;
 }
 
 .callout {
   padding: 1.5rem;
   border-radius: 1.2rem;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.45));
+  background: var(
+    --bts-callout-bg,
+    linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.45))
+  );
   border: 1px solid rgba(148, 163, 184, 0.16);
   display: grid;
   gap: 0.75rem;
@@ -402,7 +408,7 @@
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-size: 0.75rem;
-  color: #fde68a;
+  color: var(--bts-accent-text, #fde68a);
 }
 
 .partnerGrid {
@@ -415,7 +421,7 @@
   padding: 1.4rem;
   border-radius: 1.25rem;
   border: 1px solid rgba(148, 163, 184, 0.14);
-  background: #533762;
+  background: var(--bts-partner-card-bg, #533762);
   display: grid;
   gap: 0.9rem;
 }
@@ -423,20 +429,20 @@
 .partnerCard h3 {
   margin: 0;
   font-size: 1.2rem;
-  color: #f8fafc;
+  color: var(--bts-foreground, #f8fafc);
 }
 
 .partnerCard ul {
   margin: 0;
   padding-left: 1.1rem;
-  color: rgba(248, 250, 252, 0.85);
+  color: var(--bts-text-muted, rgba(248, 250, 252, 0.85));
   display: grid;
   gap: 0.4rem;
 }
 
 .partnerNote {
   margin: 0;
-  color: #fcd34d;
+  color: var(--bts-accent-text, #fcd34d);
   font-weight: 700;
 }
 
@@ -446,7 +452,7 @@
   gap: 2rem;
   padding: 2rem;
   border-radius: 1.5rem;
-  background: rgba(10, 11, 18, 0.78);
+  background: var(--bts-contact-box-bg, rgba(10, 11, 18, 0.78));
   border: 1px solid rgba(148, 163, 184, 0.16);
 }
 
@@ -454,7 +460,7 @@
   margin-top: 1rem;
   display: grid;
   gap: 0.4rem;
-  color: var(--text-muted);
+  color: var(--bts-text-muted, var(--text-muted));
 }
 
 .finalLine {
@@ -463,7 +469,7 @@
   border-radius: 1.2rem;
   background: rgba(8, 12, 20, 0.7);
   border: 1px solid rgba(148, 163, 184, 0.14);
-  color: #f8fafc;
+  color: var(--bts-foreground, #f8fafc);
   font-weight: 600;
   line-height: 1.6;
 }
@@ -471,7 +477,10 @@
 .donateCard {
   padding: 2rem;
   border-radius: 1.5rem;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.4));
+  background: var(
+    --bts-donate-card-bg,
+    linear-gradient(180deg, rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.4))
+  );
   border: 1px solid rgba(148, 163, 184, 0.16);
   display: grid;
   gap: 1.5rem;

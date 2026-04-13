@@ -24,13 +24,13 @@ export default async function Team() {
       <main className={styles.main}>
         <header className={styles.header}>
           <div className="container">
-            <div className="badge">Our People</div>
+            <div className={`badge ${styles.heroBadge}`}>Our People</div>
             <h1>The Visionaries Behind the Lens</h1>
             <p className={styles.subtitle}>Meet the documentary filmmakers and storytellers of Aurora&apos;s Eye Films.</p>
           </div>
         </header>
 
-        <section className="section">
+        <section className={`section ${styles.membersSection}`}>
           <div className="container">
             <div className={styles.grid}>
               {teamData.map((member) => (

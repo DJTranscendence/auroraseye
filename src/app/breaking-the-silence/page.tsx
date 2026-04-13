@@ -7,6 +7,7 @@ import styles from "./page.module.css";
 import fallbackContent from "@/data/breakingTheSilence.json";
 import { getBreakingTheSilence } from "@/utils/cms";
 import { BreakingHeroFrameClient, BreakingMediaWallClient } from "./BreakingMediaClient";
+import BreakingPageThemeDock from "./BreakingPageThemeDock";
 
 export const metadata: Metadata = {
   title: "Breaking the Silence",
@@ -69,7 +70,10 @@ export default async function BreakingTheSilencePage() {
   const mediaWall = content.mediaWall ?? (fallbackContent as BreakingContent).mediaWall;
 
   return (
-    <div className={styles.wrapper}>
+    <BreakingPageThemeDock
+      initialPageColors={content.pageColors}
+      initialPayload={{ ...(content as Record<string, unknown>) }}
+    >
       <Navbar />
 
       <main className={styles.main}>
@@ -170,7 +174,7 @@ export default async function BreakingTheSilencePage() {
 
             <div className={styles.conversationCta}>
               <a className="btn btn-primary" href="/discussion?project=breaking-the-silence">
-                Join the Conversation - In our Chatroom!
+                ❤️ Join the conversation - In our chatroom 💬
               </a>
             </div>
 
@@ -239,6 +243,6 @@ export default async function BreakingTheSilencePage() {
       </main>
 
       <Footer />
-    </div>
+    </BreakingPageThemeDock>
   );
 }

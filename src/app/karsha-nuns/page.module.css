@@ -234,6 +234,13 @@
   gap: 1rem;
 }
 
+.heroActions {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .heroCopy p,
 .sectionIntro p,
 .storyGrid p,

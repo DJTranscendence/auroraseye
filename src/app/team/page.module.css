@@ -3,9 +3,19 @@
 }
 
 .header {
-  padding: 80px 0 40px;
+  padding: 80px 0 24px;
   background: linear-gradient(to bottom, var(--surface) 0%, var(--background) 100%);
   text-align: center;
+}
+
+/* Tighter handoff from hero to member cards (global .section uses 120px top) */
+.membersSection {
+  padding-top: 2.5rem;
+}
+
+.heroBadge {
+  font-size: 2rem;
+  white-space: nowrap;
 }
 
 .header h1 {
@@ -16,7 +26,6 @@
 .subtitle {
   font-size: 1.25rem;
   color: var(--text-muted);
-  max-width: 600px;
   margin: 0 auto;
 }
 

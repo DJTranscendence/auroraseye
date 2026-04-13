@@ -79,8 +79,8 @@ export default function KarshaNunsClientPage() {
                 <a href="#documentary" className="btn btn-primary">
                   <Play size={20} fill="white" /> Watch The Documentary Path
                 </a>
-                <a href="/discussion?project=karsha-nuns" className="btn btn-outline">
-                  Join the Conversation
+                <a href="/discussion?project=karsha-nuns" className="btn btn-primary">
+                  ❤️ Join the conversation - In our chatroom 💬
                 </a>
               </div>
 

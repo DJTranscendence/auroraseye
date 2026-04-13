@@ -25,6 +25,7 @@ type TypographyConfig = {
 };
 
 type SwatchKey =
+  | 'headerBackground'
   | 'background'
   | 'surface'
   | 'surfaceMuted'
@@ -242,6 +243,7 @@ const THEME_VARIABLES: Record<keyof ThemeConfig, string> = {
 };
 
 const SWATCH_KEYS: SwatchKey[] = [
+  'headerBackground',
   'background',
   'surface',
   'surfaceMuted',
@@ -251,6 +253,18 @@ const SWATCH_KEYS: SwatchKey[] = [
   'accent',
   'border',
 ];
+
+const SWATCH_LABELS: Record<SwatchKey, string> = {
+  headerBackground: 'Header (nav bar)',
+  background: 'Page background',
+  surface: 'Surface',
+  surfaceMuted: 'Surface muted',
+  foreground: 'Text',
+  textMuted: 'Text muted',
+  primary: 'Primary (brown)',
+  accent: 'Accent (aqua)',
+  border: 'Border',
+};
 
 const SWATCH_OPTIONS: Record<SwatchKey, string[]> = SWATCH_KEYS.reduce((accumulator, key) => {
   accumulator[key] = Array.from(new Set(THEME_PRESETS.map((preset) => preset.theme[key])));
@@ -263,6 +277,13 @@ const ensureTheme = (theme: Partial<ThemeConfig> | undefined): ThemeConfig => ({
 });
 
 const HEX_COLOR_PATTERN = /^#([\da-f]{6}|[\da-f]{8})$/i;
+
+function toHex7ForColorInput(hex: string): string {
+  if (typeof hex !== 'string' || !HEX_COLOR_PATTERN.test(hex)) {
+    return '#000000';
+  }
+  return hex.slice(0, 7);
+}
 
 function hexToHsl(hexColor: string) {
   const red = Number.parseInt(hexColor.slice(1, 3), 16) / 255;
@@ -416,6 +437,62 @@ const VIBE_LABELS: Record<'all' | ThemePreset['vibe'], string> = {
   earthy: 'Earthy and Feminine',
   bold: 'Bold and Cinematic',
 };
+
+function BackgroundPresetRow({
+  preset,
+  onPaletteChange,
+}: {
+  preset: BackgroundPreset;
+  onPaletteChange: (main: string, header: string) => void;
+}) {
+  const [header, setHeader] = useState(preset.header);
+  const [main, setMain] = useState(preset.main);
+
+  useEffect(() => {
+    setHeader(preset.header);
+    setMain(preset.main);
+  }, [preset.id, preset.header, preset.main]);
+
+  return (
+    <div className={styles.presetWithPickers}>
+      <button type="button" className={styles.presetButton} onClick={() => onPaletteChange(main, header)}>
+        <span className={styles.presetSwatch}>
+          <span style={{ background: header }} />
+          <span style={{ background: main }} />
+        </span>
+        {preset.label}
+      </button>
+      <div className={styles.presetPickerRow}>
+        <label className={styles.presetPickerLabel}>
+          Header
+          <input
+            type="color"
+            value={toHex7ForColorInput(header)}
+            onChange={(event) => {
+              const next = event.target.value;
+              setHeader(next);
+              onPaletteChange(main, next);
+            }}
+            aria-label={`${preset.label} header background`}
+          />
+        </label>
+        <label className={styles.presetPickerLabel}>
+          Main
+          <input
+            type="color"
+            value={toHex7ForColorInput(main)}
+            onChange={(event) => {
+              const next = event.target.value;
+              setMain(next);
+              onPaletteChange(next, header);
+            }}
+            aria-label={`${preset.label} main background`}
+          />
+        </label>
+      </div>
+    </div>
+  );
+}
 
 export default function ManageSettings() {
   const [config, setConfig] = useState<SiteConfig | null>(null);
@@ -797,18 +874,7 @@ export default function ManageSettings() {
                 </div>
                 <div className={styles.presetRow}>
                   {BACKGROUND_PRESETS.map((preset) => (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      className={styles.presetButton}
-                      onClick={() => applyHarmoniousPalette(preset.main, preset.header)}
-                    >
-                      <span className={styles.presetSwatch}>
-                        <span style={{ background: preset.header }} />
-                        <span style={{ background: preset.main }} />
-                      </span>
-                      {preset.label}
-                    </button>
+                    <BackgroundPresetRow key={preset.id} preset={preset} onPaletteChange={applyHarmoniousPalette} />
                   ))}
                 </div>
                 <p className={styles.presetHint}>
@@ -882,126 +948,32 @@ export default function ManageSettings() {
               </div>
 
               <div className={styles.colorGrid}>
-                <div className={styles.colorControl}>
-                  <label>Background</label>
-                  <div className={styles.swatchRow}>
-                    {SWATCH_OPTIONS.background.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        className={`${styles.swatch} ${effectiveSeedTheme.background.toLowerCase() === color.toLowerCase() ? styles.swatchActive : ''}`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => updateTheme('background', color)}
-                        aria-label={`Background ${color}`}
+                {SWATCH_KEYS.map((swatchKey) => (
+                  <div key={swatchKey} className={styles.colorControl}>
+                    <label>{SWATCH_LABELS[swatchKey]}</label>
+                    <div className={styles.colorControlRow}>
+                      <div className={styles.swatchRow}>
+                        {SWATCH_OPTIONS[swatchKey].map((color) => (
+                          <button
+                            key={color}
+                            type="button"
+                            className={`${styles.swatch} ${effectiveSeedTheme[swatchKey].toLowerCase() === color.toLowerCase() ? styles.swatchActive : ''}`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => updateTheme(swatchKey, color)}
+                            aria-label={`${SWATCH_LABELS[swatchKey]} ${color}`}
+                          />
+                        ))}
+                      </div>
+                      <input
+                        type="color"
+                        className={styles.colorPickerCompact}
+                        value={toHex7ForColorInput(effectiveSeedTheme[swatchKey])}
+                        onChange={(event) => updateTheme(swatchKey, event.target.value)}
+                        aria-label={`${SWATCH_LABELS[swatchKey]} custom color`}
                       />
-                    ))}
+                    </div>
                   </div>
-                </div>
-                <div className={styles.colorControl}>
-                  <label>Surface</label>
-                  <div className={styles.swatchRow}>
-                    {SWATCH_OPTIONS.surface.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        className={`${styles.swatch} ${effectiveSeedTheme.surface.toLowerCase() === color.toLowerCase() ? styles.swatchActive : ''}`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => updateTheme('surface', color)}
-                        aria-label={`Surface ${color}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className={styles.colorControl}>
-                  <label>Surface Muted</label>
-                  <div className={styles.swatchRow}>
-                    {SWATCH_OPTIONS.surfaceMuted.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        className={`${styles.swatch} ${effectiveSeedTheme.surfaceMuted.toLowerCase() === color.toLowerCase() ? styles.swatchActive : ''}`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => updateTheme('surfaceMuted', color)}
-                        aria-label={`Surface muted ${color}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className={styles.colorControl}>
-                  <label>Text</label>
-                  <div className={styles.swatchRow}>
-                    {SWATCH_OPTIONS.foreground.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        className={`${styles.swatch} ${effectiveSeedTheme.foreground.toLowerCase() === color.toLowerCase() ? styles.swatchActive : ''}`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => updateTheme('foreground', color)}
-                        aria-label={`Text ${color}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className={styles.colorControl}>
-                  <label>Text Muted</label>
-                  <div className={styles.swatchRow}>
-                    {SWATCH_OPTIONS.textMuted.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        className={`${styles.swatch} ${effectiveSeedTheme.textMuted.toLowerCase() === color.toLowerCase() ? styles.swatchActive : ''}`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => updateTheme('textMuted', color)}
-                        aria-label={`Text muted ${color}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className={styles.colorControl}>
-                  <label>Primary (Brown)</label>
-                  <div className={styles.swatchRow}>
-                    {SWATCH_OPTIONS.primary.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        className={`${styles.swatch} ${effectiveSeedTheme.primary.toLowerCase() === color.toLowerCase() ? styles.swatchActive : ''}`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => updateTheme('primary', color)}
-                        aria-label={`Primary ${color}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className={styles.colorControl}>
-                  <label>Accent (Aqua)</label>
-                  <div className={styles.swatchRow}>
-                    {SWATCH_OPTIONS.accent.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        className={`${styles.swatch} ${effectiveSeedTheme.accent.toLowerCase() === color.toLowerCase() ? styles.swatchActive : ''}`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => updateTheme('accent', color)}
-                        aria-label={`Accent ${color}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className={styles.colorControl}>
-                  <label>Border</label>
-                  <div className={styles.swatchRow}>
-                    {SWATCH_OPTIONS.border.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        className={`${styles.swatch} ${effectiveSeedTheme.border.toLowerCase() === color.toLowerCase() ? styles.swatchActive : ''}`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => updateTheme('border', color)}
-                        aria-label={`Border ${color}`}
-                      />
-                    ))}
-                  </div>
-                </div>
+                ))}
               </div>
 
               <div className={styles.formGroup}>

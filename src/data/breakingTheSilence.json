@@ -1,4 +1,14 @@
 {
+  "pageColors": {
+    "pageBackground": "#c4b7dc",
+    "textColor": "#6381a1",
+    "textMutedColor": "#335e8e",
+    "accentTextColor": "#fdd898",
+    "mediaTileBackground": "#0b1456",
+    "partnerCardBackground": "#430a61",
+    "contactBoxBackground": "#ea5394",
+    "donateCardBackground": "#697eb0"
+  },
   "heroFrame": {
     "imageUrl": "/uploads/1775657695735-file_000000006dc471fabd4a6595e1ca28ed.png",
     "imageAlt": "Breaking the Silence hero frame",

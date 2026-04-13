@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { GripHorizontal, Heart } from "lucide-react";
+import { Hand, Heart } from "lucide-react";
 import styles from "./page.module.css";
 
 const NAV_LINKS = [
@@ -37,7 +37,7 @@ export default function BreakingFloatingNav() {
 
     const navWidth = navRef.current?.offsetWidth ?? 760;
     const centeredLeft = Math.max(16, Math.round((window.innerWidth - navWidth) / 2));
-    const defaultTop = 125;
+    const defaultTop = 96;
     setPosition({ left: centeredLeft, top: defaultTop });
   }, []);
 
@@ -94,7 +94,7 @@ export default function BreakingFloatingNav() {
 
       setPosition({
         left: Math.min(Math.max(12, nextLeft), window.innerWidth - navWidth - 12),
-        top: Math.min(Math.max(110, nextTop), window.innerHeight - navHeight - 12),
+        top: Math.min(Math.max(92, nextTop), window.innerHeight - navHeight - 12),
       });
     };
 
@@ -153,15 +153,6 @@ export default function BreakingFloatingNav() {
         ref={navRef}
         className={`${styles.floatingNavInner} ${isDragging ? styles.floatingNavDragging : ""}`}
       >
-        <button
-          type="button"
-          className={styles.navHandle}
-          onPointerDown={handleDragStart}
-          aria-label="Drag floating section menu"
-        >
-          <GripHorizontal size={14} />
-          <span>Drag</span>
-        </button>
         <nav className={styles.projectNav} aria-label="Breaking the Silence section navigation">
           {NAV_LINKS.map((link) => {
             const isExternal = link.href.startsWith("http");
@@ -183,6 +174,14 @@ export default function BreakingFloatingNav() {
             );
           })}
         </nav>
+        <button
+          type="button"
+          className={styles.navHandle}
+          onPointerDown={handleDragStart}
+          aria-label="Drag floating section menu"
+        >
+          <Hand size={14} />
+        </button>
       </div>
     </div>
   );
