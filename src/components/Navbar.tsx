@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from 'next/navigation';
@@ -8,14 +8,22 @@ import styles from "./Navbar.module.css";
 import { Youtube, Menu, Settings, LogOut, ChevronDown, House, Instagram, Linkedin, RotateCcw } from "lucide-react";
 import { trackYouTubeClick } from '@/utils/youtubeAnalytics';
 import YouTubeViewsTicker from './YouTubeViewsTicker';
-
-const DEFAULT_NAV_WIDGET_OFFSETS = { ticker: { x: -49, y: 0 }, donate: { x: 0, y: 0 } };
+import {
+  DEFAULT_NAVBAR_DRAGGABLE,
+  mergeNavbarDraggableFromApi,
+  type NavDragId,
+  type NavbarDraggableOffsets,
+} from '@/config/navbar-draggable-defaults';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDonateRingSpinning, setIsDonateRingSpinning] = useState(false);
-  const [navOffsets, setNavOffsets] = useState(DEFAULT_NAV_WIDGET_OFFSETS);
-  const [draggingId, setDraggingId] = useState<"ticker" | "donate" | null>(null);
+  const [navOffsets, setNavOffsets] = useState<NavbarDraggableOffsets>(DEFAULT_NAVBAR_DRAGGABLE);
+  const [draggingId, setDraggingId] = useState<NavDragId | null>(null);
+  const navOffsetsRef = useRef<NavbarDraggableOffsets>(DEFAULT_NAVBAR_DRAGGABLE);
+  const adminConfigRef = useRef<Record<string, unknown> | null>(null);
+  /** Pointerup clears dragStateRef before click fires; use this to suppress navigation after a drag. */
+  const skipNextNavClickRef = useRef(false);
   const [user, setUser] = useState<any>(null);
   const [adminConfig, setAdminConfig] = useState<any>(null);
   const [adminBaseTheme, setAdminBaseTheme] = useState<ThemePalette | null>(null);
@@ -29,7 +37,7 @@ export default function Navbar() {
   const donateRingRef = useRef<SVGSVGElement | null>(null);
   const donateRingStopTimeoutRef = useRef<number | null>(null);
   const dragStateRef = useRef<{
-    id: "ticker" | "donate";
+    id: NavDragId;
     pointerId: number;
     startX: number;
     startY: number;
@@ -37,6 +45,14 @@ export default function Navbar() {
     originY: number;
     moved: boolean;
   } | null>(null);
+
+  useEffect(() => {
+    navOffsetsRef.current = navOffsets;
+  }, [navOffsets]);
+
+  useEffect(() => {
+    adminConfigRef.current = adminConfig;
+  }, [adminConfig]);
   const router = useRouter();
   const pathname = usePathname();
   const isAdmin = user?.role === 'admin';
@@ -171,6 +187,9 @@ export default function Navbar() {
       .then((res) => res.json())
       .then((data) => {
         setAdminConfig(data);
+        const merged = mergeNavbarDraggableFromApi(data?.navbarDraggable);
+        setNavOffsets(merged);
+        navOffsetsRef.current = merged;
         if (data?.theme?.headerBackground) {
           setAdminHeaderColor(data.theme.headerBackground);
         }
@@ -236,14 +255,48 @@ export default function Navbar() {
     }
   }, [isAdmin, adminBaseTheme, adminHeaderColor]);
 
+  const persistNavbarDraggable = useCallback(async (offsets: NavbarDraggableOffsets) => {
+    const cfg = adminConfigRef.current as Record<string, unknown> | null;
+    if (!cfg || user?.role !== 'admin') {
+      return;
+    }
+    const body = { ...cfg, navbarDraggable: offsets };
+    try {
+      const res = await fetch('/api/cms?type=config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        setAdminConfig(body);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [user?.role]);
+
   useEffect(() => {
     if (!isAdmin) {
       return;
     }
 
     const resetWidgetPositions = () => {
-      setNavOffsets(DEFAULT_NAV_WIDGET_OFFSETS);
-      window.localStorage.removeItem('navbar-draggable-offsets');
+      setNavOffsets(DEFAULT_NAVBAR_DRAGGABLE);
+      navOffsetsRef.current = DEFAULT_NAVBAR_DRAGGABLE;
+      const cfg = adminConfigRef.current as Record<string, unknown> | null;
+      if (!cfg) {
+        return;
+      }
+      const body = { ...cfg, navbarDraggable: DEFAULT_NAVBAR_DRAGGABLE };
+      void fetch('/api/cms?type=config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }).then((res) => {
+        if (res.ok) {
+          setAdminConfig(body);
+        }
+      });
     };
 
     window.addEventListener('auroras-reset-navbar-widget-positions', resetWidgetPositions);
@@ -251,41 +304,6 @@ export default function Navbar() {
       window.removeEventListener('auroras-reset-navbar-widget-positions', resetWidgetPositions);
     };
   }, [isAdmin]);
-
-  useEffect(() => {
-    if (!isAdmin) {
-      return;
-    }
-
-    const savedOffsets = window.localStorage.getItem('navbar-draggable-offsets');
-    if (!savedOffsets) {
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(savedOffsets) as typeof navOffsets;
-      if (
-        parsed?.ticker &&
-        parsed?.donate &&
-        Number.isFinite(parsed.ticker.x) &&
-        Number.isFinite(parsed.ticker.y) &&
-        Number.isFinite(parsed.donate.x) &&
-        Number.isFinite(parsed.donate.y)
-      ) {
-        setNavOffsets(parsed);
-      }
-    } catch {
-      window.localStorage.removeItem('navbar-draggable-offsets');
-    }
-  }, [isAdmin]);
-
-  useEffect(() => {
-    if (!isAdmin) {
-      return;
-    }
-
-    window.localStorage.setItem('navbar-draggable-offsets', JSON.stringify(navOffsets));
-  }, [navOffsets, isAdmin]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -334,6 +352,7 @@ export default function Navbar() {
     const nextConfig = {
       ...adminConfig,
       theme: nextTheme,
+      navbarDraggable: navOffsetsRef.current,
     };
 
     await fetch('/api/cms?type=config', {
@@ -341,6 +360,7 @@ export default function Navbar() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(nextConfig),
     });
+    setAdminConfig(nextConfig);
   };
 
   useEffect(() => {
@@ -360,13 +380,19 @@ export default function Navbar() {
         dragState.moved = true;
       }
 
-      setNavOffsets((prev) => ({
-        ...prev,
-        [dragState.id]: {
-          x: dragState.originX + deltaX,
-          y: dragState.originY + deltaY,
-        },
-      }));
+      const nextY = dragState.id === 'donate' ? dragState.originY + deltaY : dragState.originY;
+
+      setNavOffsets((prev) => {
+        const next = {
+          ...prev,
+          [dragState.id]: {
+            x: dragState.originX + deltaX,
+            y: nextY,
+          },
+        };
+        navOffsetsRef.current = next;
+        return next;
+      });
     };
 
     const handlePointerUp = (event: PointerEvent) => {
@@ -375,9 +401,21 @@ export default function Navbar() {
         return;
       }
 
+      const { moved } = dragState;
       dragStateRef.current = null;
       setDraggingId(null);
       document.body.style.userSelect = '';
+
+      if (moved) {
+        skipNextNavClickRef.current = true;
+        window.setTimeout(() => {
+          skipNextNavClickRef.current = false;
+        }, 0);
+      }
+
+      if (moved && user?.role === 'admin') {
+        void persistNavbarDraggable(navOffsetsRef.current);
+      }
     };
 
     window.addEventListener('pointermove', handlePointerMove);
@@ -387,20 +425,25 @@ export default function Navbar() {
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
     };
-  }, [draggingId]);
+  }, [draggingId, persistNavbarDraggable, user?.role]);
 
-  const handleDragStart = (id: "ticker" | "donate", event: React.PointerEvent<HTMLDivElement>) => {
+  const handleDragStart = (id: NavDragId, event: React.PointerEvent<HTMLDivElement>) => {
     if (!isAdmin) {
       return;
     }
 
+    if (id === 'socialIcons' && typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches) {
+      return;
+    }
+
+    const origin = navOffsetsRef.current[id];
     dragStateRef.current = {
       id,
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      originX: navOffsets[id].x,
-      originY: navOffsets[id].y,
+      originX: origin.x,
+      originY: origin.y,
       moved: false,
     };
     setDraggingId(id);
@@ -467,12 +510,26 @@ export default function Navbar() {
             type="button"
             className={styles.adminBarButton}
             onClick={() => {
-              setNavOffsets(DEFAULT_NAV_WIDGET_OFFSETS);
-              window.localStorage.removeItem('navbar-draggable-offsets');
+              setNavOffsets(DEFAULT_NAVBAR_DRAGGABLE);
+              navOffsetsRef.current = DEFAULT_NAVBAR_DRAGGABLE;
+              const cfg = adminConfigRef.current as Record<string, unknown> | null;
+              if (!cfg) {
+                return;
+              }
+              const body = { ...cfg, navbarDraggable: DEFAULT_NAVBAR_DRAGGABLE };
+              void fetch('/api/cms?type=config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+              }).then((res) => {
+                if (res.ok) {
+                  setAdminConfig(body);
+                }
+              });
             }}
           >
             <RotateCcw size={14} aria-hidden />
-            Reset ticker / donate positions
+            Reset nav positions (saved for all visitors)
           </button>
         </div>
       ) : null}
@@ -498,68 +555,102 @@ export default function Navbar() {
         </Link>
 
         <div className={`${styles.links} ${isOpen ? styles.active : ''}`}>
-          <Link
-            href="/"
-            className={styles.homeIconLink}
-            onClick={() => setIsOpen(false)}
-            aria-label="Home"
-          >
-            <House size={16} />
-          </Link>
+          <div className={styles.linksDraggableRow}>
+            <div
+              className={`${styles.draggableItem} ${isAdmin ? styles.draggableAdmin : ''} ${draggingId === 'homeIcon' ? styles.draggableActive : ''}`}
+              style={{ transform: `translate(${navOffsets.homeIcon.x}px, ${navOffsets.homeIcon.y}px)` }}
+              onPointerDown={(event) => handleDragStart('homeIcon', event)}
+            >
+              <Link
+                href="/"
+                className={styles.homeIconLink}
+                onClick={(event) => {
+                  if (skipNextNavClickRef.current) {
+                    event.preventDefault();
+                    return;
+                  }
+                  setIsOpen(false);
+                }}
+                aria-label="Home"
+              >
+                <House size={16} />
+              </Link>
+            </div>
 
-          <div className={styles.dropdown}>
-            <span className={styles.dropTrigger}>Documentaries ▾</span>
-            <div className={styles.dropdownMenu}>
-              <Link href="/documentaries" onClick={() => setIsOpen(false)}>All Documentaries</Link>
-              <div className={styles.dropdownSection}>
-                <span className={styles.dropdownSectionLabel}>Current Projects</span>
-                <div className={styles.dropdownSectionList}>
-                  <Link href="/breaking-the-silence" onClick={() => setIsOpen(false)}>Breaking the Silence</Link>
-                  <Link href="/karsha-nuns" onClick={() => setIsOpen(false)}>Karsha Nuns</Link>
-                  <Link href="/matrimandir-and-i" onClick={() => setIsOpen(false)}>Matrimandir &amp; I</Link>
+            <div
+              className={`${styles.draggableItem} ${isAdmin ? styles.draggableAdmin : ''} ${draggingId === 'navLinks' ? styles.draggableActive : ''}`}
+              style={{ transform: `translate(${navOffsets.navLinks.x}px, ${navOffsets.navLinks.y}px)` }}
+              onPointerDown={(event) => handleDragStart('navLinks', event)}
+            >
+              <div
+                className={styles.navLinksCluster}
+                onClickCapture={(event) => {
+                  if (skipNextNavClickRef.current) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                }}
+              >
+                <div className={styles.dropdown}>
+                  <span className={styles.dropTrigger}>Documentaries ▾</span>
+                  <div className={styles.dropdownMenu}>
+                    <Link href="/documentaries" onClick={() => setIsOpen(false)}>All Documentaries</Link>
+                    <div className={styles.dropdownSection}>
+                      <span className={styles.dropdownSectionLabel}>Current Projects</span>
+                      <div className={styles.dropdownSectionList}>
+                        <Link href="/breaking-the-silence" onClick={() => setIsOpen(false)}>Breaking the Silence</Link>
+                        <Link href="/karsha-nuns" onClick={() => setIsOpen(false)}>Karsha Nuns</Link>
+                        <Link href="/matrimandir-and-i" onClick={() => setIsOpen(false)}>Matrimandir &amp; I</Link>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
+                <Link href="/team" onClick={() => setIsOpen(false)}>Our Team</Link>
+                <Link href="/news" onClick={() => setIsOpen(false)}>News</Link>
+                <Link href="/donations" className={styles.mobileOnly} onClick={() => setIsOpen(false)}>Donate</Link>
+                {user ? (
+                  <button
+                    type="button"
+                    className={styles.menuAction}
+                    onClick={() => {
+                      handleLogout();
+                      setIsOpen(false);
+                    }}
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    className={`${styles.menuAction} ${styles.mobileOnly}`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Login
+                  </Link>
+                )}
+                <Link
+                  href={youtubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.youtubeAction}
+                  onClick={(event) => {
+                    if (skipNextNavClickRef.current) {
+                      event.preventDefault();
+                      return;
+                    }
+                    trackYouTubeClick({
+                      label: 'Navbar watch CTA',
+                      url: youtubeUrl,
+                      location: 'navbar-action',
+                    });
+                  }}
+                >
+                  <Youtube size={18} />
+                </Link>
               </div>
             </div>
           </div>
-
-          <Link href="/team" onClick={() => setIsOpen(false)}>Our Team</Link>
-          <Link href="/news" onClick={() => setIsOpen(false)}>News</Link>
-          <Link href="/donations" className={styles.mobileOnly} onClick={() => setIsOpen(false)}>Donate</Link>
-          {user ? (
-            <button
-              type="button"
-              className={styles.menuAction}
-              onClick={() => {
-                handleLogout();
-                setIsOpen(false);
-              }}
-            >
-              Logout
-            </button>
-          ) : (
-            <Link
-              href="/login"
-              className={`${styles.menuAction} ${styles.mobileOnly}`}
-              onClick={() => setIsOpen(false)}
-            >
-              Login
-            </Link>
-          )}
-          <Link
-            href={youtubeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.youtubeAction}
-            onClick={() =>
-              trackYouTubeClick({
-                label: 'Navbar watch CTA',
-                url: youtubeUrl,
-                location: 'navbar-action',
-              })
-            }
-          >
-            <Youtube size={18} />
-          </Link>
         </div>
 
         <div className={styles.actions}>
@@ -588,7 +679,7 @@ export default function Navbar() {
               onMouseEnter={handleDonateRingEnter}
               onMouseLeave={handleDonateRingLeave}
               onClick={(event) => {
-                if (dragStateRef.current?.moved) {
+                if (skipNextNavClickRef.current) {
                   event.preventDefault();
                 }
               }}
@@ -614,13 +705,39 @@ export default function Navbar() {
               </span>
             </Link>
           </div>
-          <div className={styles.socialLinks} aria-label="Social links">
-            <Link href={instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <Instagram size={18} />
-            </Link>
-            <Link href={linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-              <Linkedin size={18} />
-            </Link>
+          <div
+            className={`${styles.draggableItem} ${isAdmin ? styles.draggableAdmin : ''} ${draggingId === 'socialIcons' ? styles.draggableActive : ''}`}
+            style={{ transform: `translate(${navOffsets.socialIcons.x}px, ${navOffsets.socialIcons.y}px)` }}
+            onPointerDown={(event) => handleDragStart('socialIcons', event)}
+          >
+            <div className={styles.socialLinks} aria-label="Social links">
+              <Link
+                href={instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                onClick={(event) => {
+                  if (skipNextNavClickRef.current) {
+                    event.preventDefault();
+                  }
+                }}
+              >
+                <Instagram size={18} />
+              </Link>
+              <Link
+                href={linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                onClick={(event) => {
+                  if (skipNextNavClickRef.current) {
+                    event.preventDefault();
+                  }
+                }}
+              >
+                <Linkedin size={18} />
+              </Link>
+            </div>
           </div>
           <div
             className={styles.menuToggle}

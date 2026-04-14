@@ -13,8 +13,16 @@ type DonationProjectsPayload = {
   projects: DonationProject[];
 };
 
+const initialPayload: DonationProjectsPayload = {
+  heading: '',
+  intro: '',
+  projects: Array.isArray((fallbackProjects as { projects?: DonationProject[] }).projects)
+    ? (fallbackProjects as { projects: DonationProject[] }).projects
+    : [],
+};
+
 export default function DonationsPage() {
-  const [payload, setPayload] = useState<DonationProjectsPayload>(fallbackProjects as DonationProjectsPayload);
+  const [payload, setPayload] = useState<DonationProjectsPayload>(initialPayload);
   const [activeId, setActiveId] = useState(payload.projects[0]?.id ?? '');
 
   useEffect(() => {

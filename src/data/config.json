@@ -71,5 +71,27 @@
   },
   "typography": {
     "fontFamily": "default"
+  },
+  "navbarDraggable": {
+    "homeIcon": {
+      "x": 0,
+      "y": 0
+    },
+    "navLinks": {
+      "x": -5.2890625,
+      "y": 0
+    },
+    "ticker": {
+      "x": -49,
+      "y": 0
+    },
+    "donate": {
+      "x": 0,
+      "y": 0
+    },
+    "socialIcons": {
+      "x": 0,
+      "y": 0
+    }
   }
 }

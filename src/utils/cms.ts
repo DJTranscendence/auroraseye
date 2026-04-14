@@ -1,6 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { DEFAULT_NAVBAR_DRAGGABLE } from '@/config/navbar-draggable-defaults';
 
 const DATA_DIR = path.join(process.cwd(), 'src/data');
 const TMP_DATA_DIR = path.join(os.tmpdir(), 'auroras-eye-films-data');
@@ -84,6 +85,13 @@ const DEFAULT_CONFIG = {
   typography: {
     fontFamily: 'default',
   },
+  navbarDraggable: {
+    homeIcon: { ...DEFAULT_NAVBAR_DRAGGABLE.homeIcon },
+    navLinks: { ...DEFAULT_NAVBAR_DRAGGABLE.navLinks },
+    ticker: { ...DEFAULT_NAVBAR_DRAGGABLE.ticker },
+    donate: { ...DEFAULT_NAVBAR_DRAGGABLE.donate },
+    socialIcons: { ...DEFAULT_NAVBAR_DRAGGABLE.socialIcons },
+  },
 };
 
 type SiteConfig = typeof DEFAULT_CONFIG;
@@ -142,8 +150,15 @@ function normalizeConfig(config: unknown): SiteConfig {
   const contactCandidate = isObject(candidate.contact) ? candidate.contact : {};
   const themeCandidate = isObject(candidate.theme) ? candidate.theme : {};
   const typographyCandidate = isObject(candidate.typography) ? candidate.typography : {};
+  const navbarDraggableCandidate = isObject(candidate.navbarDraggable) ? candidate.navbarDraggable : {};
   const normalizedFontFamily = asString(typographyCandidate.fontFamily, DEFAULT_CONFIG.typography.fontFamily);
   const fontFamily = normalizedFontFamily === 'patrick-hand' ? 'patrick-hand' : 'default';
+
+  const homeIconPt = isObject(navbarDraggableCandidate.homeIcon) ? navbarDraggableCandidate.homeIcon : {};
+  const navLinksPt = isObject(navbarDraggableCandidate.navLinks) ? navbarDraggableCandidate.navLinks : {};
+  const tickerPt = isObject(navbarDraggableCandidate.ticker) ? navbarDraggableCandidate.ticker : {};
+  const donatePt = isObject(navbarDraggableCandidate.donate) ? navbarDraggableCandidate.donate : {};
+  const socialIconsPt = isObject(navbarDraggableCandidate.socialIcons) ? navbarDraggableCandidate.socialIcons : {};
 
   return {
     hero: {
@@ -278,6 +293,28 @@ function normalizeConfig(config: unknown): SiteConfig {
     },
     typography: {
       fontFamily,
+    },
+    navbarDraggable: {
+      homeIcon: {
+        x: asNumber(homeIconPt.x, DEFAULT_CONFIG.navbarDraggable.homeIcon.x),
+        y: asNumber(homeIconPt.y, DEFAULT_CONFIG.navbarDraggable.homeIcon.y),
+      },
+      navLinks: {
+        x: asNumber(navLinksPt.x, DEFAULT_CONFIG.navbarDraggable.navLinks.x),
+        y: asNumber(navLinksPt.y, DEFAULT_CONFIG.navbarDraggable.navLinks.y),
+      },
+      ticker: {
+        x: asNumber(tickerPt.x, DEFAULT_CONFIG.navbarDraggable.ticker.x),
+        y: asNumber(tickerPt.y, DEFAULT_CONFIG.navbarDraggable.ticker.y),
+      },
+      donate: {
+        x: asNumber(donatePt.x, DEFAULT_CONFIG.navbarDraggable.donate.x),
+        y: asNumber(donatePt.y, DEFAULT_CONFIG.navbarDraggable.donate.y),
+      },
+      socialIcons: {
+        x: asNumber(socialIconsPt.x, DEFAULT_CONFIG.navbarDraggable.socialIcons.x),
+        y: asNumber(socialIconsPt.y, DEFAULT_CONFIG.navbarDraggable.socialIcons.y),
+      },
     },
   };
 }

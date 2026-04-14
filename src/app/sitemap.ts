@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://auroras-eye-films.vercel.app";
+import { getSiteUrl } from "@/config/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const siteUrl = getSiteUrl();
   const now = new Date();
   const routes = [
     "",

@@ -167,6 +167,24 @@
   overflow: visible;
 }
 
+.linksDraggableRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.navLinksCluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2.5rem;
+}
+
 .mobileDocLink {
   display: none;
   font-size: 0.85rem;
@@ -186,6 +204,11 @@
   transition: var(--transition-smooth);
   display: inline-flex;
   align-items: center;
+}
+
+/* Hide Contact in the header even if an old cached bundle still renders it */
+.nav a[href="/contact"] {
+  display: none !important;
 }
 
 .contactIconLink {
@@ -495,6 +518,13 @@
     animation: slideDown 0.3s ease-out;
     z-index: 2600;
     overflow-y: auto;
+  }
+
+  .links.active .linksDraggableRow {
+    flex-direction: column;
+    align-items: stretch;
+    flex: 0;
+    width: 100%;
   }
 
   @keyframes slideDown {

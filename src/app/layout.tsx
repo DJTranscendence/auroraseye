@@ -24,8 +24,9 @@ const patrickHand = Patrick_Hand({
 
 import ThemeRuntime from "@/components/ThemeRuntime";
 import AdminGlobalThemeDock from "@/components/AdminGlobalThemeDock";
+import { getSiteUrl } from "@/config/site";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://auroras-eye-films.vercel.app";
+const siteUrl = getSiteUrl();
 const defaultTitle = "Aurora's Eye Films";
 const defaultDescription =
   "Documentary filmmaking and visual storytelling from Auroville by Serena Aurora and Aurora's Eye Films.";
