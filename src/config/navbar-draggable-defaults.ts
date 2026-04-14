@@ -1,31 +1,69 @@
-/** Shared defaults for navbar drag offsets (server + client). One cluster = menu + widgets after logo. */
+/** Shared defaults for navbar drag offsets (server + client). Each key is one horizontal group in the header. */
 
-export type NavDragId = 'navCluster';
+export const NAVBAR_DRAG_IDS = [
+  'homeIcon',
+  'documentaries',
+  'ourTeam',
+  'news',
+  'youtubeNav',
+  'ticker',
+  'donate',
+  'instagram',
+  'linkedin',
+] as const;
 
-export type NavbarDraggableOffsets = {
-  navCluster: { x: number; y: number };
-};
+export type NavDragId = (typeof NAVBAR_DRAG_IDS)[number];
 
-export const DEFAULT_NAVBAR_DRAGGABLE: NavbarDraggableOffsets = {
-  navCluster: { x: 0, y: 0 },
-};
+export type NavbarDraggableOffsets = Record<NavDragId, { x: number; y: number }>;
+
+const zero = (): { x: number; y: number } => ({ x: 0, y: 0 });
+
+export const DEFAULT_NAVBAR_DRAGGABLE: NavbarDraggableOffsets = NAVBAR_DRAG_IDS.reduce(
+  (acc, id) => {
+    acc[id] = zero();
+    return acc;
+  },
+  {} as NavbarDraggableOffsets,
+);
+
+function readPoint(raw: unknown): { x: number; y: number } | null {
+  if (!raw || typeof raw !== 'object') {
+    return null;
+  }
+  const p = raw as Record<string, unknown>;
+  const x = Number(p.x);
+  const y = Number(p.y);
+  if (Number.isFinite(x) && Number.isFinite(y)) {
+    return { x, y };
+  }
+  return null;
+}
 
 export function mergeNavbarDraggableFromApi(raw: unknown): NavbarDraggableOffsets {
-  const out: NavbarDraggableOffsets = {
-    navCluster: { ...DEFAULT_NAVBAR_DRAGGABLE.navCluster },
-  };
+  const out: NavbarDraggableOffsets = NAVBAR_DRAG_IDS.reduce((acc, id) => {
+    acc[id] = { ...DEFAULT_NAVBAR_DRAGGABLE[id] };
+    return acc;
+  }, {} as NavbarDraggableOffsets);
+
   if (!raw || typeof raw !== 'object') {
     return out;
   }
   const o = raw as Record<string, unknown>;
-  const nc = o.navCluster;
-  if (nc && typeof nc === 'object') {
-    const p = nc as Record<string, unknown>;
-    const x = Number(p.x);
-    const y = Number(p.y);
-    if (Number.isFinite(x) && Number.isFinite(y)) {
-      out.navCluster = { x, y };
+
+  for (const id of NAVBAR_DRAG_IDS) {
+    const pt = readPoint(o[id]);
+    if (pt) {
+      out[id] = pt;
     }
   }
+
+  const allZero = NAVBAR_DRAG_IDS.every((id) => out[id].x === 0 && out[id].y === 0);
+  const nc = readPoint(o.navCluster);
+  if (allZero && nc && (nc.x !== 0 || nc.y !== 0)) {
+    for (const id of NAVBAR_DRAG_IDS) {
+      out[id] = { ...nc };
+    }
+  }
+
   return out;
 }

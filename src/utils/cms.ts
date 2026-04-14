@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { DEFAULT_NAVBAR_DRAGGABLE } from '@/config/navbar-draggable-defaults';
+import { DEFAULT_NAVBAR_DRAGGABLE, mergeNavbarDraggableFromApi } from '@/config/navbar-draggable-defaults';
 
 const DATA_DIR = path.join(process.cwd(), 'src/data');
 const TMP_DATA_DIR = path.join(os.tmpdir(), 'auroras-eye-films-data');
@@ -85,9 +85,7 @@ const DEFAULT_CONFIG = {
   typography: {
     fontFamily: 'default',
   },
-  navbarDraggable: {
-    navCluster: { ...DEFAULT_NAVBAR_DRAGGABLE.navCluster },
-  },
+  navbarDraggable: { ...DEFAULT_NAVBAR_DRAGGABLE },
 };
 
 type SiteConfig = typeof DEFAULT_CONFIG;
@@ -149,8 +147,6 @@ function normalizeConfig(config: unknown): SiteConfig {
   const navbarDraggableCandidate = isObject(candidate.navbarDraggable) ? candidate.navbarDraggable : {};
   const normalizedFontFamily = asString(typographyCandidate.fontFamily, DEFAULT_CONFIG.typography.fontFamily);
   const fontFamily = normalizedFontFamily === 'patrick-hand' ? 'patrick-hand' : 'default';
-
-  const navClusterPt = isObject(navbarDraggableCandidate.navCluster) ? navbarDraggableCandidate.navCluster : {};
 
   return {
     hero: {
@@ -286,12 +282,7 @@ function normalizeConfig(config: unknown): SiteConfig {
     typography: {
       fontFamily,
     },
-    navbarDraggable: {
-      navCluster: {
-        x: asNumber(navClusterPt.x, DEFAULT_CONFIG.navbarDraggable.navCluster.x),
-        y: asNumber(navClusterPt.y, DEFAULT_CONFIG.navbarDraggable.navCluster.y),
-      },
-    },
+    navbarDraggable: mergeNavbarDraggableFromApi(navbarDraggableCandidate),
   };
 }
 

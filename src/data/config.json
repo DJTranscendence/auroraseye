@@ -73,9 +73,14 @@
     "fontFamily": "default"
   },
   "navbarDraggable": {
-    "navCluster": {
-      "x": 0,
-      "y": 0
-    }
+    "homeIcon": { "x": 0, "y": 0 },
+    "documentaries": { "x": 0, "y": 0 },
+    "ourTeam": { "x": 0, "y": 0 },
+    "news": { "x": 0, "y": 0 },
+    "youtubeNav": { "x": 0, "y": 0 },
+    "ticker": { "x": 0, "y": 0 },
+    "donate": { "x": 0, "y": 0 },
+    "instagram": { "x": 0, "y": 0 },
+    "linkedin": { "x": 0, "y": 0 }
   }
 }

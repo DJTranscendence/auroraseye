@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from 'next/navigation';
@@ -483,6 +483,25 @@ export default function Navbar() {
     }, 700);
   };
 
+  const navDragPiece = (id: NavDragId, children: ReactNode, bodyClassName?: string) => (
+    <div
+      className={`${styles.navDragPiece} ${draggingId === id ? styles.draggableActive : ''}`.trim()}
+      style={{ transform: `translate(${navOffsets[id].x}px, ${navOffsets[id].y}px)` }}
+    >
+      {isAdmin ? (
+        <button
+          type="button"
+          className={styles.navDragHandleMini}
+          aria-label={`Drag to move this header control horizontally (${id})`}
+          title="Drag handle — position is saved for all visitors"
+          onPointerDown={(event) => handleDragStart(id, event)}
+        >
+          <GripVertical size={12} aria-hidden />
+        </button>
+      ) : null}
+      <div className={[styles.navDragPieceBody, bodyClassName].filter(Boolean).join(' ')}>{children}</div>
+    </div>
+  );
 
   return (
 
@@ -542,22 +561,7 @@ export default function Navbar() {
 
         </Link>
 
-        <div
-          className={`${styles.navMenuCluster} ${draggingId === 'navCluster' ? styles.draggableActive : ''}`}
-          style={{ transform: `translate(${navOffsets.navCluster.x}px, ${navOffsets.navCluster.y}px)` }}
-        >
-          {isAdmin ? (
-            <button
-              type="button"
-              className={styles.navDragHandle}
-              aria-label="Drag to move the entire menu and header widgets horizontally"
-              title="Drag handle — position is saved for all visitors"
-              onPointerDown={(event) => handleDragStart('navCluster', event)}
-            >
-              <GripVertical size={16} aria-hidden />
-            </button>
-          ) : null}
-
+        <div className={styles.navMenuCluster}>
           <Link
             href="/documentaries"
             className={styles.mobileDocLink}
@@ -567,31 +571,34 @@ export default function Navbar() {
           </Link>
 
           <div className={`${styles.links} ${isOpen ? styles.active : ''}`}>
-            <div className={styles.linksDraggableRow}>
-              <Link
-                href="/"
-                className={styles.homeIconLink}
-                onClick={(event) => {
-                  if (skipNextNavClickRef.current) {
-                    event.preventDefault();
-                    return;
-                  }
-                  setIsOpen(false);
-                }}
-                aria-label="Home"
-              >
-                <House size={16} />
-              </Link>
-
-              <div
-                className={styles.navLinksCluster}
-                onClickCapture={(event) => {
-                  if (skipNextNavClickRef.current) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                  }
-                }}
-              >
+            <div
+              className={styles.linksDraggableRow}
+              onClickCapture={(event) => {
+                if (skipNextNavClickRef.current) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+              }}
+            >
+              {navDragPiece(
+                'homeIcon',
+                <Link
+                  href="/"
+                  className={styles.homeIconLink}
+                  onClick={(event) => {
+                    if (skipNextNavClickRef.current) {
+                      event.preventDefault();
+                      return;
+                    }
+                    setIsOpen(false);
+                  }}
+                  aria-label="Home"
+                >
+                  <House size={16} />
+                </Link>,
+              )}
+              {navDragPiece(
+                'documentaries',
                 <div className={styles.dropdown}>
                   <span className={styles.dropTrigger}>Documentaries ▾</span>
                   <div className={styles.dropdownMenu}>
@@ -605,10 +612,17 @@ export default function Navbar() {
                       </div>
                     </div>
                   </div>
-                </div>
-
-                <Link href="/team" onClick={() => setIsOpen(false)}>Our Team</Link>
-                <Link href="/news" onClick={() => setIsOpen(false)}>News</Link>
+                </div>,
+              )}
+              {navDragPiece(
+                'ourTeam',
+                <Link href="/team" onClick={() => setIsOpen(false)}>Our Team</Link>,
+              )}
+              {navDragPiece(
+                'news',
+                <Link href="/news" onClick={() => setIsOpen(false)}>News</Link>,
+              )}
+              <div className={styles.navAuthExtras}>
                 <Link href="/donations" className={styles.mobileOnly} onClick={() => setIsOpen(false)}>Donate</Link>
                 {user ? (
                   <button
@@ -630,6 +644,9 @@ export default function Navbar() {
                     Login
                   </Link>
                 )}
+              </div>
+              {navDragPiece(
+                'youtubeNav',
                 <Link
                   href={youtubeUrl}
                   target="_blank"
@@ -648,59 +665,67 @@ export default function Navbar() {
                   }}
                 >
                   <Youtube size={18} />
-                </Link>
-              </div>
+                </Link>,
+              )}
             </div>
           </div>
 
           <div className={styles.actions}>
-            <div>
-              <YouTubeViewsTicker />
-            </div>
+            {navDragPiece(
+              'ticker',
+              <div>
+                <YouTubeViewsTicker />
+              </div>,
+            )}
             {user?.role === 'admin' ? (
               <Link href="/admin" className={styles.adminNavLink} title="Go to Dashboard">
                 <Settings size={18} />
               </Link>
             ) : null}
-            <div data-role="donate">
-              <Link
-                href="/donations"
-                className={styles.donateAction}
-                aria-label="Support and Donate"
-                onMouseEnter={handleDonateRingEnter}
-                onMouseLeave={handleDonateRingLeave}
-                onClick={(event) => {
-                  if (skipNextNavClickRef.current) {
-                    event.preventDefault();
-                  }
-                }}
-              >
-                <span className={styles.donateActionBadge}>
-                  <span className={styles.donateActionIcon} aria-hidden="true" />
-                  <svg
-                    ref={donateRingRef}
-                    className={`${styles.donateActionRing} ${isDonateRingSpinning ? styles.donateActionRingSpinning : ''}`}
-                    viewBox="0 0 200 200"
-                    aria-hidden="true"
-                  >
-                    <defs>
-                      <path
-                        id="donateActionCirclePath"
-                        d="M 100, 100 m -78, 0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0"
-                      />
-                    </defs>
-                    <text>
-                      <textPath href="#donateActionCirclePath">SUPPORT AND DONATE</textPath>
-                    </text>
-                  </svg>
-                </span>
-              </Link>
-            </div>
-            <div className={styles.socialLinks} aria-label="Social links">
+            {navDragPiece(
+              'donate',
+              <div data-role="donate">
+                <Link
+                  href="/donations"
+                  className={styles.donateAction}
+                  aria-label="Support and Donate"
+                  onMouseEnter={handleDonateRingEnter}
+                  onMouseLeave={handleDonateRingLeave}
+                  onClick={(event) => {
+                    if (skipNextNavClickRef.current) {
+                      event.preventDefault();
+                    }
+                  }}
+                >
+                  <span className={styles.donateActionBadge}>
+                    <span className={styles.donateActionIcon} aria-hidden="true" />
+                    <svg
+                      ref={donateRingRef}
+                      className={`${styles.donateActionRing} ${isDonateRingSpinning ? styles.donateActionRingSpinning : ''}`}
+                      viewBox="0 0 200 200"
+                      aria-hidden="true"
+                    >
+                      <defs>
+                        <path
+                          id="donateActionCirclePath"
+                          d="M 100, 100 m -78, 0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0"
+                        />
+                      </defs>
+                      <text>
+                        <textPath href="#donateActionCirclePath">SUPPORT AND DONATE</textPath>
+                      </text>
+                    </svg>
+                  </span>
+                </Link>
+              </div>,
+            )}
+            {navDragPiece(
+              'instagram',
               <Link
                 href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                className={styles.socialIconLink}
                 aria-label="Instagram"
                 onClick={(event) => {
                   if (skipNextNavClickRef.current) {
@@ -709,11 +734,16 @@ export default function Navbar() {
                 }}
               >
                 <Instagram size={18} />
-              </Link>
+              </Link>,
+              styles.navDragPieceBodyInstagram,
+            )}
+            {navDragPiece(
+              'linkedin',
               <Link
                 href={linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                className={styles.socialIconLink}
                 aria-label="LinkedIn"
                 onClick={(event) => {
                   if (skipNextNavClickRef.current) {
@@ -722,8 +752,8 @@ export default function Navbar() {
                 }}
               >
                 <Linkedin size={18} />
-              </Link>
-            </div>
+              </Link>,
+            )}
             <div
               className={styles.menuToggle}
               onPointerDown={(event) => {
