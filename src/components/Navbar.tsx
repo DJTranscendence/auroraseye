@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from 'next/navigation';
 import styles from "./Navbar.module.css";
-import { Youtube, Menu, Settings, LogOut, ChevronDown, House, Instagram, Linkedin, RotateCcw } from "lucide-react";
+import { Youtube, Menu, Settings, House, Instagram, Linkedin, RotateCcw, GripVertical } from "lucide-react";
 import { trackYouTubeClick } from '@/utils/youtubeAnalytics';
 import YouTubeViewsTicker from './YouTubeViewsTicker';
 import {
@@ -380,7 +380,7 @@ export default function Navbar() {
         dragState.moved = true;
       }
 
-      const nextY = dragState.id === 'donate' ? dragState.originY + deltaY : dragState.originY;
+      const nextY = dragState.originY;
 
       setNavOffsets((prev) => {
         const next = {
@@ -427,12 +427,8 @@ export default function Navbar() {
     };
   }, [draggingId, persistNavbarDraggable, user?.role]);
 
-  const handleDragStart = (id: NavDragId, event: React.PointerEvent<HTMLDivElement>) => {
+  const handleDragStart = (id: NavDragId, event: React.PointerEvent<Element>) => {
     if (!isAdmin) {
-      return;
-    }
-
-    if (id === 'socialIcons' && typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches) {
       return;
     }
 
@@ -546,21 +542,32 @@ export default function Navbar() {
 
         </Link>
 
-        <Link
-          href="/documentaries"
-          className={styles.mobileDocLink}
-          onClick={() => setIsOpen(false)}
+        <div
+          className={`${styles.navMenuCluster} ${draggingId === 'navCluster' ? styles.draggableActive : ''}`}
+          style={{ transform: `translate(${navOffsets.navCluster.x}px, ${navOffsets.navCluster.y}px)` }}
         >
-          Documentaries
-        </Link>
-
-        <div className={`${styles.links} ${isOpen ? styles.active : ''}`}>
-          <div className={styles.linksDraggableRow}>
-            <div
-              className={`${styles.draggableItem} ${isAdmin ? styles.draggableAdmin : ''} ${draggingId === 'homeIcon' ? styles.draggableActive : ''}`}
-              style={{ transform: `translate(${navOffsets.homeIcon.x}px, ${navOffsets.homeIcon.y}px)` }}
-              onPointerDown={(event) => handleDragStart('homeIcon', event)}
+          {isAdmin ? (
+            <button
+              type="button"
+              className={styles.navDragHandle}
+              aria-label="Drag to move the entire menu and header widgets horizontally"
+              title="Drag handle — position is saved for all visitors"
+              onPointerDown={(event) => handleDragStart('navCluster', event)}
             >
+              <GripVertical size={16} aria-hidden />
+            </button>
+          ) : null}
+
+          <Link
+            href="/documentaries"
+            className={styles.mobileDocLink}
+            onClick={() => setIsOpen(false)}
+          >
+            Documentaries
+          </Link>
+
+          <div className={`${styles.links} ${isOpen ? styles.active : ''}`}>
+            <div className={styles.linksDraggableRow}>
               <Link
                 href="/"
                 className={styles.homeIconLink}
@@ -575,13 +582,7 @@ export default function Navbar() {
               >
                 <House size={16} />
               </Link>
-            </div>
 
-            <div
-              className={`${styles.draggableItem} ${isAdmin ? styles.draggableAdmin : ''} ${draggingId === 'navLinks' ? styles.draggableActive : ''}`}
-              style={{ transform: `translate(${navOffsets.navLinks.x}px, ${navOffsets.navLinks.y}px)` }}
-              onPointerDown={(event) => handleDragStart('navLinks', event)}
-            >
               <div
                 className={styles.navLinksCluster}
                 onClickCapture={(event) => {
@@ -651,65 +652,50 @@ export default function Navbar() {
               </div>
             </div>
           </div>
-        </div>
 
-        <div className={styles.actions}>
-          <div
-            className={`${styles.draggableItem} ${isAdmin ? styles.draggableAdmin : ''} ${draggingId === 'ticker' ? styles.draggableActive : ''}`}
-            style={{ transform: `translate(${navOffsets.ticker.x}px, ${navOffsets.ticker.y}px)` }}
-            onPointerDown={(event) => handleDragStart('ticker', event)}
-          >
-            <YouTubeViewsTicker />
-          </div>
-          {user?.role === 'admin' ? (
-            <Link href="/admin" className={styles.adminNavLink} title="Go to Dashboard">
-              <Settings size={18} />
-            </Link>
-          ) : null}
-          <div
-            className={`${styles.draggableItem} ${isAdmin ? styles.draggableAdmin : ''} ${draggingId === 'donate' ? styles.draggableActive : ''}`}
-            data-role="donate"
-            style={{ transform: `translate(${navOffsets.donate.x}px, ${navOffsets.donate.y}px)` }}
-            onPointerDown={(event) => handleDragStart('donate', event)}
-          >
-            <Link
-              href="/donations"
-              className={styles.donateAction}
-              aria-label="Support and Donate"
-              onMouseEnter={handleDonateRingEnter}
-              onMouseLeave={handleDonateRingLeave}
-              onClick={(event) => {
-                if (skipNextNavClickRef.current) {
-                  event.preventDefault();
-                }
-              }}
-            >
-              <span className={styles.donateActionBadge}>
-                <span className={styles.donateActionIcon} aria-hidden="true" />
-                <svg
-                  ref={donateRingRef}
-                  className={`${styles.donateActionRing} ${isDonateRingSpinning ? styles.donateActionRingSpinning : ''}`}
-                  viewBox="0 0 200 200"
-                  aria-hidden="true"
-                >
-                  <defs>
-                    <path
-                      id="donateActionCirclePath"
-                      d="M 100, 100 m -78, 0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0"
-                    />
-                  </defs>
-                  <text>
-                    <textPath href="#donateActionCirclePath">SUPPORT AND DONATE</textPath>
-                  </text>
-                </svg>
-              </span>
-            </Link>
-          </div>
-          <div
-            className={`${styles.draggableItem} ${isAdmin ? styles.draggableAdmin : ''} ${draggingId === 'socialIcons' ? styles.draggableActive : ''}`}
-            style={{ transform: `translate(${navOffsets.socialIcons.x}px, ${navOffsets.socialIcons.y}px)` }}
-            onPointerDown={(event) => handleDragStart('socialIcons', event)}
-          >
+          <div className={styles.actions}>
+            <div>
+              <YouTubeViewsTicker />
+            </div>
+            {user?.role === 'admin' ? (
+              <Link href="/admin" className={styles.adminNavLink} title="Go to Dashboard">
+                <Settings size={18} />
+              </Link>
+            ) : null}
+            <div data-role="donate">
+              <Link
+                href="/donations"
+                className={styles.donateAction}
+                aria-label="Support and Donate"
+                onMouseEnter={handleDonateRingEnter}
+                onMouseLeave={handleDonateRingLeave}
+                onClick={(event) => {
+                  if (skipNextNavClickRef.current) {
+                    event.preventDefault();
+                  }
+                }}
+              >
+                <span className={styles.donateActionBadge}>
+                  <span className={styles.donateActionIcon} aria-hidden="true" />
+                  <svg
+                    ref={donateRingRef}
+                    className={`${styles.donateActionRing} ${isDonateRingSpinning ? styles.donateActionRingSpinning : ''}`}
+                    viewBox="0 0 200 200"
+                    aria-hidden="true"
+                  >
+                    <defs>
+                      <path
+                        id="donateActionCirclePath"
+                        d="M 100, 100 m -78, 0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0"
+                      />
+                    </defs>
+                    <text>
+                      <textPath href="#donateActionCirclePath">SUPPORT AND DONATE</textPath>
+                    </text>
+                  </svg>
+                </span>
+              </Link>
+            </div>
             <div className={styles.socialLinks} aria-label="Social links">
               <Link
                 href={instagramUrl}
@@ -738,15 +724,15 @@ export default function Navbar() {
                 <Linkedin size={18} />
               </Link>
             </div>
-          </div>
-          <div
-            className={styles.menuToggle}
-            onPointerDown={(event) => {
-              event.stopPropagation();
-              setIsOpen((current) => !current);
-            }}
-          >
-            <Menu size={24} />
+            <div
+              className={styles.menuToggle}
+              onPointerDown={(event) => {
+                event.stopPropagation();
+                setIsOpen((current) => !current);
+              }}
+            >
+              <Menu size={24} />
+            </div>
           </div>
         </div>
 
