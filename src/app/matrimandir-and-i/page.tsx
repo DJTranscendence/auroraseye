@@ -196,7 +196,10 @@ export default function MatrimandirAndIPage() {
         className={styles.main} 
         style={{ 
           position: 'relative', 
-          cursor: isBackgroundDragEnabled ? (dragStateRef.current ? 'grabbing' : 'grab') : 'auto' 
+          cursor: isBackgroundDragEnabled ? (dragStateRef.current ? 'grabbing' : 'grab') : 'auto',
+          background: bgImage
+            ? 'linear-gradient(180deg, rgba(18, 24, 38, 0.58) 0%, rgba(10, 16, 28, 0.52) 45%, rgba(9, 14, 24, 0.62) 100%)'
+            : undefined,
         }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -211,7 +214,7 @@ export default function MatrimandirAndIPage() {
             backgroundSize: 'cover',
             backgroundPosition: `calc(50% + ${backgroundOffset.x}px) calc(50% + ${backgroundOffset.y}px)`,
             backgroundAttachment: 'fixed',
-            opacity: 0.2,
+            opacity: 0.44,
             zIndex: 0,
             pointerEvents: 'none'
           }} />

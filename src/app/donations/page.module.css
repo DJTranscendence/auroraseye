@@ -81,38 +81,39 @@
 }
 
 .tab[data-project='matrimandir-and-i'] {
-  --tab-bg: rgba(8, 31, 36, 0.95);
-  --tab-bg-hover: rgba(10, 40, 46, 0.95);
-  --tab-bg-active: rgba(6, 24, 28, 0.98);
-  --tab-border: rgba(79, 213, 206, 0.55);
-  --tab-border-hover: rgba(123, 234, 229, 0.75);
-  --tab-border-active: rgba(123, 234, 229, 0.75);
-  --tab-text: #b9f4f1;
-  --tab-text-hover: #e6fffe;
+  --tab-bg: rgba(88, 52, 92, 0.93);
+  --tab-bg-hover: rgba(102, 60, 108, 0.95);
+  --tab-bg-active: rgba(74, 42, 79, 0.98);
+  --tab-border: rgba(238, 182, 219, 0.62);
+  --tab-border-hover: rgba(255, 211, 238, 0.82);
+  --tab-border-active: rgba(255, 211, 238, 0.86);
+  --tab-text: #ffd8ec;
+  --tab-text-hover: #ffeaf6;
   --tab-text-active: #ffffff;
 }
 
 .tab[data-project='karsha-nuns'] {
-  --tab-bg: rgba(39, 28, 10, 0.95);
-  --tab-bg-hover: rgba(52, 36, 12, 0.95);
-  --tab-bg-active: rgba(30, 22, 8, 0.98);
-  --tab-border: rgba(240, 190, 90, 0.55);
-  --tab-border-hover: rgba(255, 215, 120, 0.8);
-  --tab-border-active: rgba(255, 215, 120, 0.8);
-  --tab-text: #f4d89a;
-  --tab-text-hover: #fff2cf;
+  --tab-bg: rgba(86, 61, 21, 0.93);
+  --tab-bg-hover: rgba(102, 72, 24, 0.95);
+  --tab-bg-active: rgba(71, 49, 16, 0.98);
+  --tab-border: rgba(251, 191, 36, 0.68);
+  --tab-border-hover: rgba(252, 211, 77, 0.86);
+  --tab-border-active: rgba(252, 211, 77, 0.9);
+  --tab-text: #fcd985;
+  --tab-text-hover: #ffefbe;
   --tab-text-active: #ffffff;
 }
 
+.tab[data-project='breaking-the-silence'],
 .tab[data-project='child-protection'] {
-  --tab-bg: rgba(16, 22, 38, 0.95);
-  --tab-bg-hover: rgba(20, 28, 48, 0.95);
-  --tab-bg-active: rgba(12, 18, 32, 0.98);
-  --tab-border: rgba(110, 158, 255, 0.55);
-  --tab-border-hover: rgba(144, 188, 255, 0.8);
-  --tab-border-active: rgba(144, 188, 255, 0.8);
-  --tab-text: #c7d7ff;
-  --tab-text-hover: #e7f0ff;
+  --tab-bg: rgba(16, 50, 63, 0.93);
+  --tab-bg-hover: rgba(20, 63, 78, 0.95);
+  --tab-bg-active: rgba(12, 42, 54, 0.98);
+  --tab-border: rgba(127, 233, 230, 0.66);
+  --tab-border-hover: rgba(166, 246, 244, 0.86);
+  --tab-border-active: rgba(166, 246, 244, 0.9);
+  --tab-text: #bff8f5;
+  --tab-text-hover: #e8fffe;
   --tab-text-active: #ffffff;
 }
 

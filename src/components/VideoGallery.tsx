@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import styles from './VideoGallery.module.css';
 import Link from 'next/link';
-import { ExternalLink, Play, ThumbsUp } from 'lucide-react';
+import { ExternalLink, Play, ThumbsUp, SendHorizontal } from 'lucide-react';
 import { trackYouTubeClick } from '@/utils/youtubeAnalytics';
 import fallbackFeaturedFilms from '@/data/featuredFilms.json';
 
@@ -73,19 +73,54 @@ function getPreviewEmbedUrl(url: string, startSeconds = 20, endSeconds = 28) {
   return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0&loop=1&playlist=${videoId}&start=${startSeconds}&end=${endSeconds}`;
 }
 
-function getCommentsUrl(url: string) {
+/** Watch URL tuned for “go comment” — no `#comments` (YouTube often ignores it). Mobile uses m.youtube.com where the thread sits closer under the player. */
+function getYouTubeWatchUrlForComments(url: string) {
   const videoId = getYouTubeVideoId(url);
   if (!videoId) {
     return url;
   }
+  const id = encodeURIComponent(videoId);
+  if (typeof navigator !== 'undefined') {
+    const ua = navigator.userAgent;
+    const narrow =
+      typeof window !== 'undefined' && window.matchMedia?.('(max-width: 768px)')?.matches;
+    if (/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || narrow) {
+      return `https://m.youtube.com/watch?v=${id}`;
+    }
+  }
+  return `https://www.youtube.com/watch?v=${id}`;
+}
 
-  return `https://www.youtube.com/watch?v=${videoId}#comments`;
+async function copyTextToClipboard(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    /* fall through */
+  }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    return false;
+  }
 }
 
 export default function VideoGallery() {
   const [socialStats, setSocialStats] = useState<SocialStatsMap>({});
   const [featuredFilms, setFeaturedFilms] = useState<VideoCard[]>(fallbackFeaturedFilms as VideoCard[]);
   const [cards, setCards] = useState<VideoCard[]>(fallbackFeaturedFilms as VideoCard[]);
+  const [hoveredCardId, setHoveredCardId] = useState<number | null>(null);
   const [statsStatus, setStatsStatus] = useState<"loading" | "ready" | "unavailable">("loading");
   const [isAdmin, setIsAdmin] = useState(false);
   const [isEditing, setIsEditing] = useState<VideoCard | null>(null);
@@ -94,6 +129,10 @@ export default function VideoGallery() {
   const [likedVideos, setLikedVideos] = useState<Record<string, boolean>>({});
   const [themeOverrides, setThemeOverrides] = useState<FeaturedFilmThemeOverrides>({});
   const [showThemeDock, setShowThemeDock] = useState(false);
+  const [youtubeCommentDrafts, setYoutubeCommentDrafts] = useState<Record<number, string>>({});
+  const [youtubeCommentSendConfirmed, setYoutubeCommentSendConfirmed] = useState<Record<number, boolean>>({});
+  const [copyCommentErrorId, setCopyCommentErrorId] = useState<number | null>(null);
+  const [pasteCommentToastId, setPasteCommentToastId] = useState<number | null>(null);
 
   const fallbackFilms = useMemo(() => fallbackFeaturedFilms as VideoCard[], []);
 
@@ -401,42 +440,41 @@ export default function VideoGallery() {
         <div className={styles.posterGrid}>
           {cards.map((film) => {
             const isLatestCard = Number(film.id) === LATEST_UPLOAD_ID;
-            const engagementText = socialStats[film.id]?.engagementText
-              ? socialStats[film.id]?.engagementText
-              : statsStatus === "loading"
-                ? "Loading live stats…"
-                : "Live stats unavailable";
-
             const videoId = getYouTubeVideoId(film.videoUrl) ?? '';
             const isPlaying = videoId && activePlayerId === videoId;
             const isLiked = videoId ? likedVideos[videoId] : false;
             const youtubeWatchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : film.videoUrl;
 
             return (
-              <article key={film.id} className={styles.posterCard} data-video-id={videoId}>
-                <div className={styles.posterImage}>
-                  {isPlaying ? (
-                    <iframe
-                      src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
-                      title={`${film.title} video`}
-                      className={styles.posterInlineFrame}
-                      allow="autoplay; encrypted-media; picture-in-picture"
-                      allowFullScreen
-                      referrerPolicy="strict-origin-when-cross-origin"
-                    />
-                  ) : (
-                    <button
-                      type="button"
-                      className={styles.posterThumbButton}
-                      onClick={() => {
-                        if (!videoId) {
-                          return;
-                        }
-                        setActivePlayerId(videoId);
-                      }}
-                    >
-                      <img src={film.image} alt={film.title} className={styles.posterImg} />
-                      {film.previewEnabled && getPreviewEmbedUrl(film.videoUrl, film.previewStartSeconds) && (
+              <article
+                key={film.id}
+                className={styles.posterCard}
+                onMouseEnter={() => setHoveredCardId(Number(film.id))}
+                onMouseLeave={() => setHoveredCardId(null)}
+              >
+                <Link
+                  href={youtubeWatchUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.posterImageLink}
+                  onClick={(event) => {
+                    if (videoId) {
+                      trackYouTubeClick({
+                        label: `${film.title} watch`,
+                        url: youtubeWatchUrl,
+                        location: 'featured-films-frame',
+                      });
+                    }
+                  }}
+                >
+                  <div className={styles.posterImage}>
+                  <div className={styles.posterThumbButton}>
+                      <img
+                        src={film.image || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+                        alt={film.title}
+                        className={styles.posterImg}
+                      />
+                      {film.previewEnabled && hoveredCardId === Number(film.id) && getPreviewEmbedUrl(film.videoUrl, film.previewStartSeconds) && (
                         <iframe
                           src={getPreviewEmbedUrl(film.videoUrl, film.previewStartSeconds) as string}
                           title={`${film.title} preview`}
@@ -474,9 +512,9 @@ export default function VideoGallery() {
                             event.stopPropagation();
                             setLikedVideos((prev) => ({ ...prev, [videoId]: true }));
                             trackYouTubeClick({
-                              label: `${film.title} like`,
-                              url: youtubeWatchUrl,
-                              location: 'featured-films-like',
+                                label: `${film.title} like`,
+                                url: youtubeWatchUrl,
+                                location: 'featured-films-like',
                             });
                             window.open(youtubeWatchUrl, '_blank', 'noopener,noreferrer');
                           }}
@@ -487,28 +525,134 @@ export default function VideoGallery() {
                           </span>
                         </button>
                       ) : null}
-                    </button>
-                  )}
-                </div>
+                    </div>
+                  </div>
+                </Link>
                 <div className={styles.posterMeta}>
-                  <h3 className={styles.posterTitle}>{film.title}</h3>
+                  <h3 className={styles.posterTitle}>
+                    <Link
+                      href={youtubeWatchUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(event) => {
+                        if (videoId) {
+                          trackYouTubeClick({
+                            label: `${film.title} watch`,
+                            url: youtubeWatchUrl,
+                            location: 'featured-films-title',
+                          });
+                        }
+                      }}
+                    >
+                      {film.title}
+                    </Link>
+                  </h3>
                   <p className={styles.posterSubtitle}>{film.subtitle}</p>
                   <p className={styles.posterWhy}>{film.viewerFit}</p>
                   <div className={styles.posterActions}>
-                    <button
-                      type="button"
-                      className={styles.posterActionPrimary}
-                      onClick={() => {
-                        trackYouTubeClick({
-                          label: `${film.title} watch`,
-                          url: youtubeWatchUrl,
-                          location: 'featured-films-watch-button',
-                        });
-                        window.open(youtubeWatchUrl, '_blank', 'noopener,noreferrer');
-                      }}
-                    >
-                      Watch on YouTube <ExternalLink size={16} />
-                    </button>
+                    <div className={styles.posterYoutubeComment}>
+                      {!youtubeCommentSendConfirmed[film.id] ? (
+                        <div className={styles.posterYoutubeComposer}>
+                          <textarea
+                            id={`featured-yt-comment-${film.id}`}
+                            className={styles.posterYoutubeCommentField}
+                            rows={3}
+                            maxLength={5000}
+                            placeholder="Write a short note for the filmmakers…"
+                            aria-label="Comment for YouTube"
+                            value={youtubeCommentDrafts[film.id] ?? ''}
+                            onChange={(event) => {
+                              event.stopPropagation();
+                              setYoutubeCommentDrafts((prev) => ({
+                                ...prev,
+                                [film.id]: event.target.value,
+                              }));
+                              setCopyCommentErrorId((id) => (id === film.id ? null : id));
+                              setYoutubeCommentSendConfirmed((prev) =>
+                                prev[film.id] ? { ...prev, [film.id]: false } : prev,
+                              );
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <button
+                            type="button"
+                            className={styles.posterYoutubeCommentSendIcon}
+                            disabled={!videoId}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCopyCommentErrorId(null);
+                              if (!videoId) return;
+                              const draft = (youtubeCommentDrafts[film.id] ?? '').trim();
+                              if (!draft) {
+                                setCopyCommentErrorId(film.id);
+                                return;
+                              }
+                              setYoutubeCommentSendConfirmed((prev) => ({ ...prev, [film.id]: true }));
+                            }}
+                          >
+                            <SendHorizontal size={20} strokeWidth={1.75} />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <p className={styles.posterYoutubePasteLine}>
+                            Also{' '}
+                            <button
+                              type="button"
+                               disabled={!videoId}
+                               onClick={async (e) => {
+                                 e.stopPropagation();
+                                setCopyCommentErrorId(null);
+                                const draft = (youtubeCommentDrafts[film.id] ?? '').trim();
+                                if (!videoId || !draft) {
+                                  setCopyCommentErrorId(film.id);
+                                  return;
+                                }
+                                const copied = await copyTextToClipboard(draft);
+                                if (!copied) {
+                                  setCopyCommentErrorId(film.id);
+                                  return;
+                                }
+                                const commentsUrl = getYouTubeWatchUrlForComments(film.videoUrl);
+                                trackYouTubeClick({
+                                  label: `${film.title} copy-comment-open-comments`,
+                                  url: commentsUrl,
+                                  location: 'featured-films-youtube-comment',
+                                });
+                                window.open(commentsUrl, '_blank', 'noopener,noreferrer');
+                                setPasteCommentToastId(film.id);
+                                window.setTimeout(() => {
+                                  setPasteCommentToastId((current) => (current === film.id ? null : current));
+                                }, 6000);
+                               }}
+                             >
+                               click here to paste this comment to YouTube
+                             </button>
+                            . It really helps us!
+                          </p>
+                          <p className={styles.posterYoutubeFrictionNote}>
+                            YouTube may ask you to sign in with Google to comment—that is required by YouTube, not this
+                            site. After the page opens, scroll to the <strong>Comments</strong> block (under the player on
+                            phones, below the description on desktop), tap the comment field, then paste.
+                          </p>
+                        </>
+                      )}
+                      {copyCommentErrorId === film.id ? (
+                        <p className={styles.posterYoutubeCommentError} role="alert">
+                          {!videoId
+                            ? 'Add a valid YouTube video link for this film (admin edit).'
+                            : !(youtubeCommentDrafts[film.id] ?? '').trim()
+                              ? 'Write something in the box first, then try again.'
+                              : 'Could not copy to the clipboard. Try again or copy manually.'}
+                        </p>
+                      ) : null}
+                      {pasteCommentToastId === film.id ? (
+                        <p className={styles.posterYoutubeCommentToast} aria-live="polite">
+                          Copied — scroll to <strong>Comments</strong>, click &quot;Add a comment…&quot;, then paste
+                           (⌘V / Ctrl+V).
+                        </p>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               </article>

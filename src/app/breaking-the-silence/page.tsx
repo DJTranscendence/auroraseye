@@ -156,10 +156,15 @@ export default async function BreakingTheSilencePage() {
                 in communities, in groups, in safe spaces where people can finally speak.
               </p>
             </div>
+            <div id="conversation" className={`${styles.conversationCta} ${styles.conversationAnchor}`}>
+              <a className="btn btn-primary" href="/discussion?project=breaking-the-silence">
+                ❤️ Join the conversation - In our chatroom 💬
+              </a>
+            </div>
           </div>
         </section>
 
-        <section id="conversation" className={`section ${styles.section}`}>
+        <section id="conversation-starter" className={`section ${styles.section} ${styles.conversationSection}`}>
           <div className="container">
             <div className={styles.sectionIntro}>
               <p className={styles.sectionEyebrow}>🌱 More Than a Film — a Conversation Starter</p>
@@ -170,12 +175,6 @@ export default async function BreakingTheSilencePage() {
                 connection, and safe spaces can lead to healing. But for this to happen, we need people who are ready to
                 hold that space.
               </p>
-            </div>
-
-            <div className={styles.conversationCta}>
-              <a className="btn btn-primary" href="/discussion?project=breaking-the-silence">
-                ❤️ Join the conversation - In our chatroom 💬
-              </a>
             </div>
 
             <div className={styles.partnerGrid}>

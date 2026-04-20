@@ -24,6 +24,18 @@ const HERO_ACTIONS_HIDE_FROM_SECONDS = 36.98;
 const HERO_ACTIONS_SHOW_AT_SECONDS = 6;
 const HERO_YOUTUBE_LOOP_SECONDS = 49;
 
+/** Baseline mobile framing when `controlsMobile` omits a field (avoid inheriting desktop crop). */
+const MOBILE_HERO_MEDIA_DEFAULTS = {
+  containerTopPx: 0,
+  containerPadPx: 0,
+  iframeTopPercent: 0,
+  iframeLeftPercent: 0,
+  iframeWidthPercent: 100,
+  iframeHeightPercent: 100,
+  videoScale: 1,
+  iframeTopCm: 0,
+} as const;
+
 const getYouTubeId = (url: string) => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
@@ -99,8 +111,8 @@ export default function Hero() {
   const [controlsMode, setControlsMode] = useState<'desktop' | 'mobile'>('desktop');
   const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [panelOpacity, setPanelOpacity] = useState(0.8);
-  const [iframeTopPercent, setIframeTopPercent] = useState(-1);
-  const [iframeTopCm, setIframeTopCm] = useState(5);
+  const [iframeTopPercent, setIframeTopPercent] = useState(5);
+  const [iframeTopCm, setIframeTopCm] = useState(-5);
   const [iframeLeftPercent, setIframeLeftPercent] = useState(-10);
   const [iframeWidthPercent, setIframeWidthPercent] = useState(110);
   const [iframeHeightPercent, setIframeHeightPercent] = useState(110);
@@ -137,6 +149,20 @@ export default function Hero() {
   const pickOverride = (override: number | undefined, fallback: number) =>
     isMobileViewport && Number.isFinite(override) ? (override as number) : fallback;
 
+  const pickMobileHeroMedia = (
+    key: keyof typeof MOBILE_HERO_MEDIA_DEFAULTS,
+    override: number | undefined,
+    desktopValue: number,
+  ): number => {
+    if (!isMobileViewport) {
+      return desktopValue;
+    }
+    if (Number.isFinite(override)) {
+      return override as number;
+    }
+    return MOBILE_HERO_MEDIA_DEFAULTS[key];
+  };
+
   const buildControlState = (): HeroControlState => ({
     iframeTopPercent,
     iframeTopCm,
@@ -164,16 +190,42 @@ export default function Hero() {
     recruitmentOffsetY,
   });
 
-  const buildMobileControlState = (): HeroControlState => ({ ...mobileControls });
+  const buildMobileControlState = (): HeroControlState => ({
+    ...MOBILE_HERO_MEDIA_DEFAULTS,
+    ...mobileControls,
+  });
 
-  const effectiveIframeTopPercent = pickOverride(mobileControls.iframeTopPercent, iframeTopPercent);
-  const effectiveIframeTopCm = pickOverride(mobileControls.iframeTopCm, iframeTopCm);
-  const effectiveIframeLeftPercent = pickOverride(mobileControls.iframeLeftPercent, iframeLeftPercent);
-  const effectiveIframeWidthPercent = pickOverride(mobileControls.iframeWidthPercent, iframeWidthPercent);
-  const effectiveIframeHeightPercent = pickOverride(mobileControls.iframeHeightPercent, iframeHeightPercent);
-  const effectiveVideoScale = pickOverride(mobileControls.videoScale, videoScale);
-  const effectiveContainerTopPx = pickOverride(mobileControls.containerTopPx, containerTopPx);
-  const effectiveContainerPadPx = pickOverride(mobileControls.containerPadPx, containerPadPx);
+  const effectiveContainerTopPx = pickMobileHeroMedia(
+    'containerTopPx',
+    mobileControls.containerTopPx,
+    containerTopPx,
+  );
+  const effectiveContainerPadPx = pickMobileHeroMedia(
+    'containerPadPx',
+    mobileControls.containerPadPx,
+    containerPadPx,
+  );
+  const effectiveIframeTopPercent = pickMobileHeroMedia(
+    'iframeTopPercent',
+    mobileControls.iframeTopPercent,
+    iframeTopPercent,
+  );
+  const effectiveIframeLeftPercent = pickMobileHeroMedia(
+    'iframeLeftPercent',
+    mobileControls.iframeLeftPercent,
+    iframeLeftPercent,
+  );
+  const effectiveIframeWidthPercent = pickMobileHeroMedia(
+    'iframeWidthPercent',
+    mobileControls.iframeWidthPercent,
+    iframeWidthPercent,
+  );
+  const effectiveIframeHeightPercent = pickMobileHeroMedia(
+    'iframeHeightPercent',
+    mobileControls.iframeHeightPercent,
+    iframeHeightPercent,
+  );
+  const effectiveVideoScale = pickMobileHeroMedia('videoScale', mobileControls.videoScale, videoScale);
   const effectiveActionsOffsetX = pickOverride(mobileControls.actionsOffsetX, actionsOffsetX);
   const effectiveActionsOffsetY = pickOverride(mobileControls.actionsOffsetY, actionsOffsetY);
   const effectiveRecruitmentOffsetX = pickOverride(mobileControls.recruitmentOffsetX, recruitmentOffsetX);
@@ -248,6 +300,22 @@ export default function Hero() {
   };
 
   const centerVideo = () => {
+    if (controlsMode === 'mobile') {
+      const w =
+        mobileControls.iframeWidthPercent ?? MOBILE_HERO_MEDIA_DEFAULTS.iframeWidthPercent;
+      const h =
+        mobileControls.iframeHeightPercent ?? MOBILE_HERO_MEDIA_DEFAULTS.iframeHeightPercent;
+      const nextLeft = (100 - w) / 2;
+      const nextTop = (100 - h) / 2;
+      setMobileControls((prev) => ({
+        ...prev,
+        iframeLeftPercent: Number.isFinite(nextLeft) ? nextLeft : 0,
+        iframeTopPercent: Number.isFinite(nextTop) ? nextTop : 0,
+        iframeTopCm: 0,
+      }));
+      return;
+    }
+
     const nextLeft = (100 - iframeWidthPercent) / 2;
     const nextTop = (100 - iframeHeightPercent) / 2;
     setIframeLeftPercent(Number.isFinite(nextLeft) ? nextLeft : 0);
@@ -260,6 +328,9 @@ export default function Hero() {
   };
 
   useEffect(() => {
+    if (!isAdmin) {
+      return;
+    }
     const savedState = readControlState();
     if (savedState) {
       if (savedState.actionsOffsetX) setActionsOffsetX(savedState.actionsOffsetX);
@@ -269,11 +340,10 @@ export default function Hero() {
       if (savedState.supportCtaOffsetX) setSupportCtaOffsetX(savedState.supportCtaOffsetX);
       if (savedState.supportCtaOffsetY) setSupportCtaOffsetY(savedState.supportCtaOffsetY);
     }
-    setControlsHydrated(true);
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
-    if (controlsHydrated) {
+    if (controlsHydrated && isAdmin) {
       const state: HeroControlState = {
         iframeTopPercent,
         iframeTopCm,
@@ -308,6 +378,7 @@ export default function Hero() {
     supportCtaOffsetX,
     supportCtaOffsetY,
     controlsHydrated,
+    isAdmin,
   ]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -524,6 +595,10 @@ export default function Hero() {
   }, [controlsVisible, panelPosition]);
 
   useEffect(() => {
+    if (!isAdmin) {
+      setHasLocalControlState(false);
+      return;
+    }
     const saved = readHeroControlState();
     if (!saved) {
       setHasLocalControlState(false);
@@ -604,9 +679,13 @@ export default function Hero() {
     }
     setHasLocalControlState(true);
     setControlsHydrated(true);
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
+    if (!isAdmin) {
+      setHasLocalMobileControlState(false);
+      return;
+    }
     const savedMobile = readMobileControlState();
     if (!savedMobile) {
       setHasLocalMobileControlState(false);
@@ -616,7 +695,7 @@ export default function Hero() {
     setMobileControls(savedMobile);
     setHasLocalMobileControlState(true);
     setMobileControlsHydrated(true);
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
     if (hasLocalControlState !== false || controlsHydrated) {
@@ -728,19 +807,14 @@ export default function Hero() {
     if (!controlsHydrated) {
       return;
     }
+    if (!isAdmin) {
+      return;
+    }
     const nextDesktopState = buildControlState();
     writeHeroControlState(nextDesktopState);
-
-    // Keep hero positioning consistent across screen sizes by default.
-    // This mirrors desktop adjustments into the mobile control state so
-    // switching displays does not appear to "reset" positions.
-    if (!isMobileViewport) {
-      writeMobileControlState(nextDesktopState);
-      setMobileControls(nextDesktopState);
-    }
   }, [
+    isAdmin,
     controlsHydrated,
-    isMobileViewport,
     iframeTopPercent,
     iframeTopCm,
     iframeLeftPercent,
@@ -771,8 +845,11 @@ export default function Hero() {
     if (!mobileControlsHydrated) {
       return;
     }
+    if (!isAdmin) {
+      return;
+    }
     writeMobileControlState(buildMobileControlState());
-  }, [mobileControls, mobileControlsHydrated]);
+  }, [mobileControls, mobileControlsHydrated, isAdmin]);
 
   const handlePublishLayout = async () => {
     if (!isAdmin || isPublishingLayout) {
@@ -1152,13 +1229,14 @@ export default function Hero() {
       style={
         {
           backgroundImage: `url(${config.hero.bgImage})`,
-          '--video-top': `${effectiveIframeTopPercent}%`,
-          '--video-left': `${effectiveIframeLeftPercent}%`,
-          '--video-width': `${effectiveIframeWidthPercent}%`,
-          '--video-height': `${effectiveIframeHeightPercent}%`,
-          '--video-scale': effectiveVideoScale.toString(),
           '--video-container-top': `${effectiveContainerTopPx}px`,
           '--video-container-height-offset': `${effectiveContainerPadPx}px`,
+          '--hero-media-top': `${effectiveIframeTopPercent}%`,
+          '--hero-media-top-cm': `${iframeTopCm}cm`,
+          '--hero-media-left': `${effectiveIframeLeftPercent}%`,
+          '--hero-media-width': `${effectiveIframeWidthPercent}%`,
+          '--hero-media-height': `${effectiveIframeHeightPercent}%`,
+          '--hero-media-scale': `${effectiveVideoScale}`,
         } as React.CSSProperties
       }
     >
@@ -1437,7 +1515,7 @@ export default function Hero() {
                 marginBottom: '0.35rem',
               }}
             >
-              {isPublishingLayout ? 'Publishing...' : 'Publish Layout to Site'}
+              {isPublishingLayout ? 'Publishing...' : 'Publish Layout to Site (Saves for all visitors)'}
             </button>
             {layoutStatus ? (
               <span style={{ fontSize: '0.75rem', opacity: 0.75 }}>{layoutStatus}</span>
@@ -1467,6 +1545,19 @@ export default function Hero() {
                     style={{ width: '120px' }}
                   />
                   <span style={{ width: '30px', textAlign: 'right' }}>{iframeTopPercent}</span>
+                </label>
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+                  Video Y (cm)
+                  <input
+                    type="range"
+                    min="-20"
+                    max="20"
+                    step="0.5"
+                    value={iframeTopCm}
+                    onChange={(e) => setIframeTopCm(Number(e.target.value))}
+                    style={{ width: '120px' }}
+                  />
+                  <span style={{ width: '30px', textAlign: 'right' }}>{iframeTopCm}</span>
                 </label>
                 <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
                   Video Scale
@@ -1534,17 +1625,41 @@ export default function Hero() {
             )}
             {controlsMode === 'mobile' && (
               <>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setMobileControls((prev) => ({
+                      ...prev,
+                      ...MOBILE_HERO_MEDIA_DEFAULTS,
+                    }))
+                  }
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                    padding: '0.45rem 0.6rem',
+                    borderRadius: '0.35rem',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    fontSize: '0.75rem',
+                    marginBottom: '0.35rem',
+                  }}
+                >
+                  Reset mobile framing
+                </button>
                 <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
                   Video X (%)
                   <input
                     type="range"
                     min="-100"
                     max="100"
-                    value={mobileControls.iframeLeftPercent ?? 0}
+                    value={mobileControls.iframeLeftPercent ?? MOBILE_HERO_MEDIA_DEFAULTS.iframeLeftPercent}
                     onChange={(e) => updateMobileControl('iframeLeftPercent', Number(e.target.value))}
                     style={{ width: '120px' }}
                   />
-                  <span style={{ width: '30px', textAlign: 'right' }}>{mobileControls.iframeLeftPercent ?? 0}</span>
+                  <span style={{ width: '30px', textAlign: 'right' }}>
+                    {mobileControls.iframeLeftPercent ?? MOBILE_HERO_MEDIA_DEFAULTS.iframeLeftPercent}
+                  </span>
                 </label>
                 <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
                   Video Y (%)
@@ -1552,11 +1667,41 @@ export default function Hero() {
                     type="range"
                     min="-100"
                     max="100"
-                    value={mobileControls.iframeTopPercent ?? 0}
+                    value={mobileControls.iframeTopPercent ?? MOBILE_HERO_MEDIA_DEFAULTS.iframeTopPercent}
                     onChange={(e) => updateMobileControl('iframeTopPercent', Number(e.target.value))}
                     style={{ width: '120px' }}
                   />
-                  <span style={{ width: '30px', textAlign: 'right' }}>{mobileControls.iframeTopPercent ?? 0}</span>
+                  <span style={{ width: '30px', textAlign: 'right' }}>
+                    {mobileControls.iframeTopPercent ?? MOBILE_HERO_MEDIA_DEFAULTS.iframeTopPercent}
+                  </span>
+                </label>
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+                  Video width (%)
+                  <input
+                    type="range"
+                    min="50"
+                    max="160"
+                    value={mobileControls.iframeWidthPercent ?? MOBILE_HERO_MEDIA_DEFAULTS.iframeWidthPercent}
+                    onChange={(e) => updateMobileControl('iframeWidthPercent', Number(e.target.value))}
+                    style={{ width: '120px' }}
+                  />
+                  <span style={{ width: '30px', textAlign: 'right' }}>
+                    {mobileControls.iframeWidthPercent ?? MOBILE_HERO_MEDIA_DEFAULTS.iframeWidthPercent}
+                  </span>
+                </label>
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+                  Video height (%)
+                  <input
+                    type="range"
+                    min="50"
+                    max="160"
+                    value={mobileControls.iframeHeightPercent ?? MOBILE_HERO_MEDIA_DEFAULTS.iframeHeightPercent}
+                    onChange={(e) => updateMobileControl('iframeHeightPercent', Number(e.target.value))}
+                    style={{ width: '120px' }}
+                  />
+                  <span style={{ width: '30px', textAlign: 'right' }}>
+                    {mobileControls.iframeHeightPercent ?? MOBILE_HERO_MEDIA_DEFAULTS.iframeHeightPercent}
+                  </span>
                 </label>
                 <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
                   Video Scale
@@ -1565,12 +1710,40 @@ export default function Hero() {
                     min="0.5"
                     max="2"
                     step="0.01"
-                    value={mobileControls.videoScale ?? 1}
+                    value={mobileControls.videoScale ?? MOBILE_HERO_MEDIA_DEFAULTS.videoScale}
                     onChange={(e) => updateMobileControl('videoScale', Number(e.target.value))}
                     style={{ width: '120px' }}
                   />
                   <span style={{ width: '40px', textAlign: 'right' }}>
-                    {(mobileControls.videoScale ?? 1).toFixed(2)}
+                    {(mobileControls.videoScale ?? MOBILE_HERO_MEDIA_DEFAULTS.videoScale).toFixed(2)}
+                  </span>
+                </label>
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+                  Video area top (px)
+                  <input
+                    type="range"
+                    min="-40"
+                    max="120"
+                    value={mobileControls.containerTopPx ?? MOBILE_HERO_MEDIA_DEFAULTS.containerTopPx}
+                    onChange={(e) => updateMobileControl('containerTopPx', Number(e.target.value))}
+                    style={{ width: '120px' }}
+                  />
+                  <span style={{ width: '30px', textAlign: 'right' }}>
+                    {mobileControls.containerTopPx ?? MOBILE_HERO_MEDIA_DEFAULTS.containerTopPx}
+                  </span>
+                </label>
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+                  Video area pad (px)
+                  <input
+                    type="range"
+                    min="0"
+                    max="200"
+                    value={mobileControls.containerPadPx ?? MOBILE_HERO_MEDIA_DEFAULTS.containerPadPx}
+                    onChange={(e) => updateMobileControl('containerPadPx', Number(e.target.value))}
+                    style={{ width: '120px' }}
+                  />
+                  <span style={{ width: '30px', textAlign: 'right' }}>
+                    {mobileControls.containerPadPx ?? MOBILE_HERO_MEDIA_DEFAULTS.containerPadPx}
                   </span>
                 </label>
                 <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '0.25rem 0' }} />

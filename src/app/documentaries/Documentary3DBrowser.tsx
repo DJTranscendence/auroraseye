@@ -144,6 +144,7 @@ export default function Documentary3DBrowser({ filmsData }: Props) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
   const [selectedInterest, setSelectedInterest] = useState('All');
+  const [hoveredFilmId, setHoveredFilmId] = useState<string | null>(null);
 
   const handleGridClick = (event: React.MouseEvent | React.PointerEvent) => {
     const { clientX, clientY } = event;
@@ -158,12 +159,6 @@ export default function Documentary3DBrowser({ filmsData }: Props) {
 
     if (tile?.dataset.videoUrl) {
       window.open(tile.dataset.videoUrl, '_blank', 'noopener,noreferrer');
-    }
-  };
-
-  const handleTileClick = (videoUrl: string) => {
-    if (typeof window !== 'undefined') {
-      window.location.assign(getDirectWatchUrl(videoUrl));
     }
   };
 
@@ -358,36 +353,39 @@ export default function Documentary3DBrowser({ filmsData }: Props) {
             <div
               className={styles.videoGrid}
               onClickCapture={handleGridClick}
-              onPointerDownCapture={handleGridClick}
             >
               {filteredVideos.map((film, index) => {
                 const palette = categoryPaletteMap.get(film.category) ?? chipPalette[index % chipPalette.length];
 
                 return (
-                <div
-                  key={film.id}
-                  className={styles.videoTile}
-                  data-video-url={getDirectWatchUrl(film.videoUrl)}
-                  style={{
-                    animationDelay: `${index * 60}ms`,
-                    '--tile-badge-bg': palette.bg,
-                    '--tile-badge-border': palette.border,
-                    '--tile-badge-text': palette.text,
-                    '--tile-kicker-text': palette.text,
-                  } as React.CSSProperties}
-                >
-                  <div
-                    className={styles.tileImage}
-                    style={{ backgroundImage: `linear-gradient(180deg, rgba(7, 10, 20, 0.08), rgba(7, 10, 20, 0.9)), url('${film.thumbnail}')` }}
-                  >
-                    <iframe
-                      className={styles.tilePreview}
-                      src={getPreviewUrl(film.videoUrl)}
-                      title={`${film.title} preview`}
-                      allow="autoplay; encrypted-media; picture-in-picture"
-                      aria-hidden="true"
-                      tabIndex={-1}
-                    />
+                 <div
+                   key={film.id}
+                   className={styles.videoTile}
+                   data-video-url={getDirectWatchUrl(film.videoUrl)}
+                   onMouseEnter={() => setHoveredFilmId(film.id)}
+                   onMouseLeave={() => setHoveredFilmId(null)}
+                   style={{
+                     animationDelay: `${index * 60}ms`,
+                     '--tile-badge-bg': palette.bg,
+                     '--tile-badge-border': palette.border,
+                     '--tile-badge-text': palette.text,
+                     '--tile-kicker-text': palette.text,
+                   } as React.CSSProperties}
+                 >
+                   <div
+                     className={styles.tileImage}
+                     style={{ backgroundImage: `linear-gradient(180deg, rgba(7, 10, 20, 0.08), rgba(7, 10, 20, 0.9)), url('${film.thumbnail}')` }}
+                   >
+                     {film.id === hoveredFilmId && (
+                       <iframe
+                         className={styles.tilePreview}
+                         src={getPreviewUrl(film.videoUrl)}
+                         title={`${film.title} preview`}
+                         allow="autoplay; encrypted-media; picture-in-picture"
+                         aria-hidden="true"
+                         tabIndex={-1}
+                       />
+                     )}
                     <div className={styles.playOrb}>
                       <Play size={24} fill="currentColor" />
                     </div>

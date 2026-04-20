@@ -1,15 +1,18 @@
 /** Shared defaults for navbar drag offsets (server + client). Each key is one horizontal group in the header. */
 
 export const NAVBAR_DRAG_IDS = [
+  'logo',
   'homeIcon',
   'documentaries',
   'ourTeam',
   'news',
-  'youtubeNav',
+  'contactUs',
   'ticker',
   'donate',
-  'instagram',
+  'facebook',
+  'youtubeSocial',
   'linkedin',
+  'instagram',
 ] as const;
 
 export type NavDragId = (typeof NAVBAR_DRAG_IDS)[number];
@@ -20,7 +23,9 @@ const zero = (): { x: number; y: number } => ({ x: 0, y: 0 });
 
 export const DEFAULT_NAVBAR_DRAGGABLE: NavbarDraggableOffsets = NAVBAR_DRAG_IDS.reduce(
   (acc, id) => {
-    acc[id] = zero();
+    if (id === 'logo') acc[id] = { x: -57, y: 0 };
+    else if (id === 'donate') acc[id] = { x: 23, y: 0 }; // 23px is approx 6mm total
+    else acc[id] = zero();
     return acc;
   },
   {} as NavbarDraggableOffsets,
@@ -55,6 +60,11 @@ export function mergeNavbarDraggableFromApi(raw: unknown): NavbarDraggableOffset
     if (pt) {
       out[id] = pt;
     }
+  }
+
+  const legacyYoutubeNav = readPoint((o as Record<string, unknown>).youtubeNav);
+  if (legacyYoutubeNav && !readPoint((o as Record<string, unknown>).contactUs)) {
+    out.contactUs = legacyYoutubeNav;
   }
 
   const allZero = NAVBAR_DRAG_IDS.every((id) => out[id].x === 0 && out[id].y === 0);

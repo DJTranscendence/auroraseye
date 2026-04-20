@@ -37,6 +37,21 @@
   color: var(--foreground);
 }
 
+.logoutButton {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.logoutButton:hover {
+  color: var(--foreground);
+}
+
 .newsletter p {
   font-size: 0.95rem;
   color: var(--text-muted);

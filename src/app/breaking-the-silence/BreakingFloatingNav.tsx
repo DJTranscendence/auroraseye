@@ -4,6 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Hand, Heart } from "lucide-react";
 import styles from "./page.module.css";
+import {
+  isFloatingNavMobileViewport,
+  mobileFloatingNavClearanceBelowNavbarPx,
+  mobileFloatingNavDefaultTopPx,
+} from "@/utils/floatingNavLayout";
 
 const NAV_LINKS = [
   { name: "The Documentary", href: "#documentary" },
@@ -23,11 +28,20 @@ export default function BreakingFloatingNav() {
   useEffect(() => {
     const savedPosition = window.localStorage.getItem("breaking-floating-nav-position");
 
+    const navWidth = navRef.current?.offsetWidth ?? 760;
+    const centeredLeft = Math.max(16, Math.round((window.innerWidth - navWidth) / 2));
+    const mobileTop = mobileFloatingNavDefaultTopPx();
+    const desktopDefaultTop = 96;
+
     if (savedPosition) {
       try {
         const parsed = JSON.parse(savedPosition) as { left: number; top: number };
         if (Number.isFinite(parsed.left) && Number.isFinite(parsed.top)) {
-          setPosition(parsed);
+          if (isFloatingNavMobileViewport() && parsed.top < mobileTop - mobileFloatingNavClearanceBelowNavbarPx() * 0.2) {
+            setPosition({ left: centeredLeft, top: mobileTop });
+          } else {
+            setPosition(parsed);
+          }
           return;
         }
       } catch {
@@ -35,10 +49,10 @@ export default function BreakingFloatingNav() {
       }
     }
 
-    const navWidth = navRef.current?.offsetWidth ?? 760;
-    const centeredLeft = Math.max(16, Math.round((window.innerWidth - navWidth) / 2));
-    const defaultTop = 96;
-    setPosition({ left: centeredLeft, top: defaultTop });
+    setPosition({
+      left: centeredLeft,
+      top: isFloatingNavMobileViewport() ? mobileTop : desktopDefaultTop,
+    });
   }, []);
 
   useEffect(() => {
@@ -91,10 +105,11 @@ export default function BreakingFloatingNav() {
       const navHeight = navRef.current?.offsetHeight ?? 64;
       const nextLeft = event.clientX - dragOffsetRef.current.x;
       const nextTop = event.clientY - dragOffsetRef.current.y;
+      const minTop = isFloatingNavMobileViewport() ? mobileFloatingNavDefaultTopPx() : 92;
 
       setPosition({
         left: Math.min(Math.max(12, nextLeft), window.innerWidth - navWidth - 12),
-        top: Math.min(Math.max(92, nextTop), window.innerHeight - navHeight - 12),
+        top: Math.min(Math.max(minTop, nextTop), window.innerHeight - navHeight - 12),
       });
     };
 

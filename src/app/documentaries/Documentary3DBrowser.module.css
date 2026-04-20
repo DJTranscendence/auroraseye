@@ -36,7 +36,7 @@
 
 .filterRow {
   width: min(74rem, 100%);
-  margin: calc(1.5rem + 1.5cm) auto 0;
+  margin: 1rem auto 0;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
@@ -178,6 +178,7 @@
 .videoGrid {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   margin-top: 2.5rem;
+  touch-action: pan-y;
 }
 
 .categoryTile,
@@ -206,7 +207,7 @@
 .videoTile {
   min-height: 21.5rem;
   z-index: 1;
-  touch-action: manipulation;
+  touch-action: pan-y;
 }
 
 

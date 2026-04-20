@@ -9,6 +9,10 @@
   --text-muted: #ceb8a8;
   --border: #6e5345;
   --accent: #42c5c0;
+
+  /* Logo wordmark brown — nav labels, donate ring text, etc. */
+  --logo-brown: #452c22;
+  --logo-brown-hover: #5c3a2c;
   
   --nav-height: 80px;
   --container-max-width: 1200px;

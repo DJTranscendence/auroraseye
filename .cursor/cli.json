@@ -1,0 +1,11 @@
+{
+  "approvalMode": "allowlist",
+  "permissions": {
+    "allow": [
+      "Shell(git *)",
+      "Shell(npm run build*)",
+      "Shell(vercel *)"
+    ],
+    "deny": []
+  }
+}

@@ -66,6 +66,7 @@ type SiteConfig = {
     phone: string;
     address: string;
     youtube: string;
+    facebook: string;
     instagram: string;
     linkedin: string;
   };
@@ -819,6 +820,14 @@ export default function ManageSettings() {
                 <input 
                   value={config.contact.youtube} 
                   onChange={e => setConfig({...config, contact: {...config.contact, youtube: e.target.value}})}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Facebook page URL</label>
+                <input
+                  value={config.contact.facebook ?? ''}
+                  onChange={e => setConfig({...config, contact: {...config.contact, facebook: e.target.value}})}
+                  placeholder="https://… or local path e.g. /contact"
                 />
               </div>
               <div className={styles.formGroup}>

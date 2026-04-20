@@ -207,17 +207,53 @@
 }
 
 .tabButton {
+  --tab-bg: rgba(15, 23, 42, 0.6);
+  --tab-border: rgba(148, 163, 184, 0.35);
+  --tab-text: var(--foreground);
+  --tab-bg-active: rgba(66, 197, 192, 0.25);
+  --tab-border-active: rgba(66, 197, 192, 0.6);
+  --tab-text-active: #ffffff;
   padding: 0.65rem 1.1rem;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: rgba(15, 23, 42, 0.6);
-  color: var(--foreground);
+  border: 1px solid var(--tab-border);
+  background: var(--tab-bg);
+  color: var(--tab-text);
   font-weight: 700;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .tabButtonActive {
-  border-color: rgba(66, 197, 192, 0.6);
-  background: rgba(66, 197, 192, 0.25);
+  border-color: var(--tab-border-active);
+  background: var(--tab-bg-active);
+  color: var(--tab-text-active);
+}
+
+.tabButton[data-project='child-protection'],
+.tabButton[data-project='breaking-the-silence'] {
+  --tab-bg: rgba(16, 50, 63, 0.9);
+  --tab-border: rgba(127, 233, 230, 0.64);
+  --tab-text: #bff8f5;
+  --tab-bg-active: rgba(20, 63, 78, 0.95);
+  --tab-border-active: rgba(166, 246, 244, 0.9);
+  --tab-text-active: #e8fffe;
+}
+
+.tabButton[data-project='karsha-nuns'] {
+  --tab-bg: rgba(86, 61, 21, 0.9);
+  --tab-border: rgba(251, 191, 36, 0.7);
+  --tab-text: #fcd985;
+  --tab-bg-active: rgba(102, 72, 24, 0.95);
+  --tab-border-active: rgba(252, 211, 77, 0.92);
+  --tab-text-active: #ffefbe;
+}
+
+.tabButton[data-project='matrimandir-and-i'] {
+  --tab-bg: rgba(88, 52, 92, 0.9);
+  --tab-border: rgba(238, 182, 219, 0.7);
+  --tab-text: #ffd8ec;
+  --tab-bg-active: rgba(102, 60, 108, 0.95);
+  --tab-border-active: rgba(255, 211, 238, 0.92);
+  --tab-text-active: #ffeaf6;
 }
 
 .panel {
@@ -290,11 +326,24 @@
   color: #475569;
 }
 
+.adminModerationBar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.9rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  background: rgba(239, 68, 68, 0.06);
+  color: #7f1d1d;
+  font-size: 0.82rem;
+}
+
 .promptActionRow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem 1.25rem;
   margin-bottom: 1.25rem;
 }
@@ -305,6 +354,7 @@
   gap: 0.55rem;
   flex: 1 1 280px;
   align-items: center;
+  align-content: flex-start;
 }
 
 .promptActionsRight {
@@ -313,6 +363,7 @@
   align-items: center;
   gap: 0.75rem 1rem;
   flex-shrink: 0;
+  margin-left: 0;
 }
 
 .promptChip {
@@ -355,6 +406,105 @@
   color: #4c1d95;
 }
 
+.avatarPickerCard {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.2rem 0 0.65rem;
+  padding: 0.7rem 0.85rem 0.8rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.avatarPickerRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 0.9rem;
+  margin: 0;
+}
+
+.avatarPickerLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1f3340;
+}
+
+.avatarPickerHint {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.avatarOptions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.avatarNameRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 0.9rem;
+  margin: 0 0 1rem;
+}
+
+.avatarNameLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.avatarNameInput {
+  min-width: 180px;
+  padding: 0.55rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  background: #ffffff;
+  color: #1f3340;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.requirementHint {
+  margin: 0.1rem 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #9f1239;
+}
+
+.avatarOption {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  background: #ffffff;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0;
+}
+
+.avatarOptionActive {
+  border-color: rgba(45, 212, 191, 0.9);
+  background: rgba(45, 212, 191, 0.18);
+  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.28);
+  transform: translateY(-1px);
+}
+
+.avatarOptionImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .chatColumn {
   display: flex;
   flex-direction: column;
@@ -362,13 +512,14 @@
 }
 
 .postButton {
-  padding: 0.95rem 1.6rem;
+  padding: 1rem 1.6rem;
   border-radius: 999px;
   border: none;
   background: #2dd4bf;
   color: #ffffff;
   font-weight: 700;
   font-size: 1.05rem;
+  line-height: 1.35;
   cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.2s ease, filter 0.2s ease;
   box-shadow: 0 4px 16px rgba(45, 212, 191, 0.35);
@@ -381,6 +532,12 @@
 
 .postButton:active {
   transform: scale(0.97);
+}
+
+.postButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .addNameToggle {
@@ -417,7 +574,13 @@
   flex-direction: column;
   border-radius: 1.75rem;
   overflow: hidden;
-  box-shadow: inset 0 8px 32px rgba(15, 23, 42, 0.08), inset 0 2px 6px rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow:
+    inset 0 20px 42px rgba(15, 23, 42, 0.16),
+    inset 0 -10px 24px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 22px 36px rgba(15, 23, 42, 0.14),
+    0 8px 14px rgba(15, 23, 42, 0.08);
   background-color: rgba(255, 255, 255, 0.45);
   isolation: isolate;
 }
@@ -455,7 +618,7 @@
 .chatBubble {
   border: 1px solid rgba(15, 23, 42, 0.04);
   border-radius: 1.25rem;
-  padding: 1.15rem 1.4rem;
+  padding: 1.15rem 1.4rem 1.9rem;
   background: #ffffff;
   display: flex;
   flex-direction: column;
@@ -469,6 +632,15 @@
   max-width: 95%;
 }
 
+.chatReactionHint {
+  position: absolute;
+  right: 0.95rem;
+  bottom: 0.7rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
 .chatBubble:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
@@ -479,6 +651,26 @@
   align-items: baseline;
   gap: 0.65rem;
   opacity: 0.7;
+}
+
+.chatAvatar {
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(248, 250, 252, 0.95);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  overflow: hidden;
+}
+
+.chatAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .chatBubbleHeader strong {
@@ -576,10 +768,10 @@
   display: flex;
   align-items: flex-end;
   gap: 0.25rem;
-  background: #2a3942;
+  background: #b9d8db;
   border-radius: 999px;
   padding: 0.35rem 0.45rem 0.35rem 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(15, 23, 42, 0.12);
 }
 
 .waIconButton {
@@ -592,15 +784,15 @@
   border: none;
   border-radius: 999px;
   background: transparent;
-  color: #aebac1;
+  color: #4b6474;
   cursor: pointer;
   flex-shrink: 0;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .waIconButton:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #e9edef;
+  background: rgba(15, 23, 42, 0.08);
+  color: #1f3340;
 }
 
 .waHiddenFile {
@@ -618,7 +810,7 @@
   resize: none;
   background: transparent;
   border: none;
-  color: #e9edef;
+  color: #1f3340;
   font-size: 0.95rem;
   line-height: 1.45;
   padding: 0.55rem 0.35rem;
@@ -627,7 +819,7 @@
 }
 
 .waTextarea::placeholder {
-  color: #8696a0;
+  color: #5f7686;
 }
 
 .waSendButton {
@@ -653,9 +845,32 @@
   transform: scale(0.96);
 }
 
+.waSendButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.2);
+}
+
 .chatReactions {
   display: flex;
+  align-items: center;
+  gap: 0.45rem;
   margin-top: 0.4rem;
+}
+
+.adminDeleteMessageButton {
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+  color: #b91c1c;
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.adminDeleteMessageButton:hover {
+  background: rgba(239, 68, 68, 0.14);
 }
 
 .reactionButton {
@@ -701,11 +916,191 @@
     align-items: stretch;
   }
 
+  /* In a column stack, 1 1 280px becomes a tall min-height; keep chips tight to the CTA. */
+  .promptChipsRow {
+    flex: 0 1 auto;
+    flex-basis: auto;
+    min-height: 0;
+  }
+
   .promptActionsRight {
     justify-content: flex-start;
   }
 
   .emojiPopover {
     grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding-top: calc(var(--nav-height) + 1.6rem);
+    padding-bottom: 3.5rem;
+  }
+
+  .container {
+    padding: 0 0.9rem;
+  }
+
+  .header {
+    margin-top: 0.45rem;
+    margin-bottom: 1.2rem;
+    gap: 0.9rem;
+  }
+
+  .header h1 {
+    font-size: clamp(1.6rem, 8vw, 2.25rem);
+  }
+
+  .subhead {
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    margin-bottom: 1rem;
+    scrollbar-width: thin;
+  }
+
+  .tabButton {
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+
+  .chatFullBleed {
+    padding: 0 0.3rem 1.5rem;
+  }
+
+  .panel {
+    padding: 0.85rem;
+    border-radius: 1rem;
+    gap: 0.75rem;
+  }
+
+  .panelHeader h2 {
+    font-size: 1.4rem;
+  }
+
+  .panelHeader p {
+    font-size: 0.88rem;
+    line-height: 1.4;
+  }
+
+  .promptLabel {
+    margin: 0 0 0.35rem;
+    font-size: 0.78rem;
+  }
+
+  .promptActionRow {
+    gap: 0.4rem;
+    margin-bottom: 0.55rem;
+  }
+
+  .promptActionsRight {
+    width: 100%;
+    gap: 0.45rem;
+  }
+
+  .postButton {
+    width: 100%;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    padding: 0.75rem 0.85rem;
+    text-align: center;
+  }
+
+  .promptChipsRow {
+    gap: 0.35rem;
+    row-gap: 0.35rem;
+  }
+
+  .promptChip {
+    font-size: 0.72rem;
+    padding: 0.38rem 0.72rem;
+    line-height: 1.25;
+  }
+
+  .avatarPickerCard {
+    padding: 0.65rem 0.6rem 0.7rem;
+    border-radius: 0.8rem;
+  }
+
+  .avatarPickerLabel {
+    font-size: 0.8rem;
+  }
+
+  .avatarPickerHint {
+    font-size: 0.73rem;
+  }
+
+  .avatarOptions {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.55rem;
+    margin-bottom: 0.05rem;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .avatarOption {
+    width: 2.15rem;
+    height: 2.15rem;
+    flex: 0 0 auto;
+  }
+
+  .avatarNameRow {
+    margin-bottom: 0.75rem;
+  }
+
+  .avatarNameInput {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .chatColumn {
+    min-height: min(48vh, 380px);
+  }
+
+  .chatList {
+    padding: 0.9rem;
+  }
+
+  .chatBubble {
+    max-width: 100%;
+    width: 100%;
+    padding: 0.9rem 0.95rem 1.65rem;
+    border-radius: 1rem;
+  }
+
+  .chatBubble p {
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  .chatReactionHint {
+    right: 0.75rem;
+    bottom: 0.5rem;
+    font-size: 0.68rem;
+  }
+
+  .waBar {
+    border-radius: 1rem;
+    padding: 0.26rem 0.3rem 0.26rem 0.35rem;
+  }
+
+  .waIconButton,
+  .waSendButton {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .waTextarea {
+    min-height: 2.2rem;
+    font-size: 0.92rem;
+    padding: 0.48rem 0.3rem;
   }
 }

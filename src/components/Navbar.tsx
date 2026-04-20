@@ -5,9 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from 'next/navigation';
 import styles from "./Navbar.module.css";
-import { Youtube, Menu, Settings, House, Instagram, Linkedin, RotateCcw, GripVertical } from "lucide-react";
-import { trackYouTubeClick } from '@/utils/youtubeAnalytics';
+import { Menu, Settings, House, RotateCcw, GripVertical, ChevronRight } from "lucide-react";
 import YouTubeViewsTicker from './YouTubeViewsTicker';
+import { SocialBrandTile } from './SocialBrandTile';
+import { trackYouTubeClick } from '@/utils/youtubeAnalytics';
+import { AURORAS_THEME_SAVED_EVENT } from '@/config/theme-events';
 import {
   DEFAULT_NAVBAR_DRAGGABLE,
   mergeNavbarDraggableFromApi,
@@ -15,8 +17,35 @@ import {
   type NavbarDraggableOffsets,
 } from '@/config/navbar-draggable-defaults';
 
+/** Absolute http(s) or same-site path (not protocol-relative `//`). */
+function isSocialHref(url: string) {
+  const u = url.trim();
+  if (!u) {
+    return false;
+  }
+  if (u.startsWith('http://') || u.startsWith('https://')) {
+    return true;
+  }
+  return u.startsWith('/') && !u.startsWith('//');
+}
+
+function resolvedSocialHref(url: string) {
+  return isSocialHref(url) ? url.trim() : '#';
+}
+
+function isExternalHttpUrl(url: string) {
+  return url.startsWith('http://') || url.startsWith('https://');
+}
+
 export default function Navbar() {
+  type PreviewMode = 'admin' | 'non-admin';
+  type PreviewToggleDragState = {
+    pointerId: number;
+    offsetX: number;
+    offsetY: number;
+  };
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   const [isDonateRingSpinning, setIsDonateRingSpinning] = useState(false);
   const [navOffsets, setNavOffsets] = useState<NavbarDraggableOffsets>(DEFAULT_NAVBAR_DRAGGABLE);
   const [draggingId, setDraggingId] = useState<NavDragId | null>(null);
@@ -28,12 +57,22 @@ export default function Navbar() {
   const [adminConfig, setAdminConfig] = useState<any>(null);
   const [adminBaseTheme, setAdminBaseTheme] = useState<ThemePalette | null>(null);
   const [adminHeaderColor, setAdminHeaderColor] = useState('#0a0b12');
+  const [adminTextureOverlayOpacity, setAdminTextureOverlayOpacity] = useState(0.14);
+  const [adminDarkOverlayOpacity, setAdminDarkOverlayOpacity] = useState(1);
   const [adminHueShift, setAdminHueShift] = useState(0);
-  const [youtubeUrl, setYoutubeUrl] = useState('https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw');
+  const [facebookUrl, setFacebookUrl] = useState('');
+  const [youtubeSocialUrl, setYoutubeSocialUrl] = useState(
+    'https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw',
+  );
   const [instagramUrl, setInstagramUrl] = useState('https://www.instagram.com/auroras_eye_films/');
-  const [linkedinUrl, setLinkedinUrl] = useState('#');
+  const [linkedinUrl, setLinkedinUrl] = useState('https://linkedin.com/company/auroras-eye-films');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [previewMode, setPreviewMode] = useState<PreviewMode>('non-admin');
+  const [previewTogglePosition, setPreviewTogglePosition] = useState<{ x: number; y: number } | null>(null);
+  const [navbarConfigReady, setNavbarConfigReady] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
+  const previewToggleRef = useRef<HTMLDivElement | null>(null);
+  const previewToggleDragRef = useRef<PreviewToggleDragState | null>(null);
   const donateRingRef = useRef<SVGSVGElement | null>(null);
   const donateRingStopTimeoutRef = useRef<number | null>(null);
   const dragStateRef = useRef<{
@@ -46,6 +85,17 @@ export default function Navbar() {
     moved: boolean;
   } | null>(null);
 
+  /** Persisted CMS offsets are tuned for wide headers; negative x on mobile clips the logo after config loads. */
+  const [narrowNavbarViewport, setNarrowNavbarViewport] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const sync = () => setNarrowNavbarViewport(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
   useEffect(() => {
     navOffsetsRef.current = navOffsets;
   }, [navOffsets]);
@@ -56,9 +106,13 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const isAdmin = user?.role === 'admin';
+  const showAdminView = previewMode === 'admin';
+  const canEditNavbarTheme = isAdmin && showAdminView;
 
   type ThemePalette = {
     headerBackground?: string;
+    headerTextureOverlayOpacity?: number;
+    headerDarkOverlayOpacity?: number;
     background?: string;
     foreground?: string;
     primary?: string;
@@ -70,7 +124,12 @@ export default function Navbar() {
     accent?: string;
   };
 
-  const THEME_VAR_MAP: Record<keyof ThemePalette, string> = {
+  type ThemeCssVarKey = Exclude<
+    keyof ThemePalette,
+    'headerTextureOverlayOpacity' | 'headerDarkOverlayOpacity'
+  >;
+
+  const THEME_VAR_MAP: Record<ThemeCssVarKey, string> = {
     headerBackground: '--header-background',
     background: '--background',
     foreground: '--foreground',
@@ -88,7 +147,7 @@ export default function Navbar() {
   const readThemeFromCssVars = () => {
     const styles = getComputedStyle(document.documentElement);
     const theme: ThemePalette = {};
-    (Object.keys(THEME_VAR_MAP) as Array<keyof ThemePalette>).forEach((key) => {
+    (Object.keys(THEME_VAR_MAP) as Array<ThemeCssVarKey>).forEach((key) => {
       const value = styles.getPropertyValue(THEME_VAR_MAP[key]).trim();
       if (value) {
         theme[key] = value;
@@ -193,11 +252,20 @@ export default function Navbar() {
         if (data?.theme?.headerBackground) {
           setAdminHeaderColor(data.theme.headerBackground);
         }
+        if (Number.isFinite(data?.theme?.headerTextureOverlayOpacity)) {
+          setAdminTextureOverlayOpacity(Number(data.theme.headerTextureOverlayOpacity));
+        }
+        if (Number.isFinite(data?.theme?.headerDarkOverlayOpacity)) {
+          setAdminDarkOverlayOpacity(Number(data.theme.headerDarkOverlayOpacity));
+        }
         if (data?.theme) {
           setAdminBaseTheme(data.theme as ThemePalette);
         }
+        if (typeof data?.contact?.facebook === 'string') {
+          setFacebookUrl(data.contact.facebook);
+        }
         if (data?.contact?.youtube) {
-          setYoutubeUrl(data.contact.youtube);
+          setYoutubeSocialUrl(data.contact.youtube);
         }
         if (data?.contact?.instagram) {
           setInstagramUrl(data.contact.instagram);
@@ -206,8 +274,46 @@ export default function Navbar() {
           setLinkedinUrl(data.contact.linkedin);
         }
       })
-      .catch(() => undefined);
+      .catch(() => undefined)
+      .finally(() => {
+        setNavbarConfigReady(true);
+      });
   }, [pathname]);
+
+  useEffect(() => {
+    const storedPreviewMode = localStorage.getItem('auroras-navbar-preview-mode');
+    if (storedPreviewMode === 'admin' || storedPreviewMode === 'non-admin') {
+      setPreviewMode(storedPreviewMode);
+      return;
+    }
+    setPreviewMode(isAdmin ? 'admin' : 'non-admin');
+  }, [isAdmin]);
+
+  useEffect(() => {
+    localStorage.setItem('auroras-navbar-preview-mode', previewMode);
+  }, [previewMode]);
+
+  useEffect(() => {
+    const raw = localStorage.getItem('auroras-navbar-preview-toggle-position');
+    if (!raw) {
+      return;
+    }
+    try {
+      const parsed = JSON.parse(raw) as { x?: number; y?: number };
+      if (Number.isFinite(parsed.x) && Number.isFinite(parsed.y)) {
+        setPreviewTogglePosition({ x: parsed.x as number, y: parsed.y as number });
+      }
+    } catch {
+      /* ignore invalid value */
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!previewTogglePosition) {
+      return;
+    }
+    localStorage.setItem('auroras-navbar-preview-toggle-position', JSON.stringify(previewTogglePosition));
+  }, [previewTogglePosition]);
 
   useEffect(() => {
     if (!isAdmin || !adminBaseTheme) {
@@ -237,7 +343,9 @@ export default function Navbar() {
         root.style.setProperty(cssVar, value);
       }
     });
-  }, [isAdmin, adminBaseTheme, adminHeaderColor, adminHueShift]);
+    root.style.setProperty('--header-texture-opacity', String(adminTextureOverlayOpacity));
+    root.style.setProperty('--header-dark-overlay-opacity', String(adminDarkOverlayOpacity));
+  }, [isAdmin, adminBaseTheme, adminHeaderColor, adminHueShift, adminTextureOverlayOpacity, adminDarkOverlayOpacity]);
 
   useEffect(() => {
     if (!isAdmin || adminBaseTheme) {
@@ -328,8 +436,13 @@ export default function Navbar() {
     router.push('/');
   };
 
-  const handleAdminThemeSave = async (nextHeaderColor: string, nextHueShift: number) => {
-    if (!adminConfig || !adminBaseTheme) {
+  const handleAdminThemeSave = async (
+    nextHeaderColor: string,
+    nextHueShift: number,
+    nextTextureOverlayOpacity: number,
+    nextDarkOverlayOpacity: number,
+  ) => {
+    if (!isAdmin || !adminConfig || !adminBaseTheme) {
       return;
     }
 
@@ -338,6 +451,8 @@ export default function Navbar() {
     const nextTheme = {
       ...baseTheme,
       headerBackground: nextHeaderColor,
+      headerTextureOverlayOpacity: nextTextureOverlayOpacity,
+      headerDarkOverlayOpacity: nextDarkOverlayOpacity,
       background: shiftHexHue(safeColor(baseTheme.background), nextHueShift),
       foreground: shiftHexHue(safeColor(baseTheme.foreground), nextHueShift),
       primary: shiftHexHue(safeColor(baseTheme.primary), nextHueShift),
@@ -355,12 +470,19 @@ export default function Navbar() {
       navbarDraggable: navOffsetsRef.current,
     };
 
-    await fetch('/api/cms?type=config', {
+    const res = await fetch('/api/cms?type=config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(nextConfig),
     });
+    if (!res.ok) {
+      return;
+    }
     setAdminConfig(nextConfig);
+    setAdminBaseTheme(nextTheme);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event(AURORAS_THEME_SAVED_EVENT));
+    }
   };
 
   useEffect(() => {
@@ -428,7 +550,7 @@ export default function Navbar() {
   }, [draggingId, persistNavbarDraggable, user?.role]);
 
   const handleDragStart = (id: NavDragId, event: React.PointerEvent<Element>) => {
-    if (!isAdmin) {
+    if (!canEditNavbarTheme) {
       return;
     }
 
@@ -483,12 +605,64 @@ export default function Navbar() {
     }, 700);
   };
 
-  const navDragPiece = (id: NavDragId, children: ReactNode, bodyClassName?: string) => (
+  const handlePreviewTogglePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0 || !previewToggleRef.current) {
+      return;
+    }
+    const target = event.target as HTMLElement;
+    if (target.closest('button')) {
+      return;
+    }
+
+    const rect = previewToggleRef.current.getBoundingClientRect();
+    previewToggleDragRef.current = {
+      pointerId: event.pointerId,
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+    };
+    previewToggleRef.current.setPointerCapture(event.pointerId);
+  };
+
+  const handlePreviewTogglePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const drag = previewToggleDragRef.current;
+    if (!drag || !previewToggleRef.current || drag.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const rect = previewToggleRef.current.getBoundingClientRect();
+    const nextX = event.clientX - drag.offsetX;
+    const nextY = event.clientY - drag.offsetY;
+    const maxX = Math.max(8, window.innerWidth - rect.width - 8);
+    const maxY = Math.max(8, window.innerHeight - rect.height - 8);
+    const clampedX = Math.min(Math.max(8, nextX), maxX);
+    const clampedY = Math.min(Math.max(8, nextY), maxY);
+
+    setPreviewTogglePosition({ x: clampedX, y: clampedY });
+  };
+
+  const handlePreviewTogglePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    const drag = previewToggleDragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId || !previewToggleRef.current) {
+      return;
+    }
+
+    previewToggleRef.current.releasePointerCapture(event.pointerId);
+    previewToggleDragRef.current = null;
+  };
+
+  const navDragPiece = (id: NavDragId, children: ReactNode, bodyClassName?: string) => {
+    const applyDragTransform =
+      !narrowNavbarViewport || draggingId === id;
+    return (
     <div
       className={`${styles.navDragPiece} ${draggingId === id ? styles.draggableActive : ''}`.trim()}
-      style={{ transform: `translate(${navOffsets[id].x}px, ${navOffsets[id].y}px)` }}
+      style={{
+        transform: applyDragTransform
+          ? `translate(${navOffsets[id].x}px, ${navOffsets[id].y}px)`
+          : 'none',
+      }}
     >
-      {isAdmin ? (
+      {canEditNavbarTheme ? (
         <button
           type="button"
           className={styles.navDragHandleMini}
@@ -501,12 +675,13 @@ export default function Navbar() {
       ) : null}
       <div className={[styles.navDragPieceBody, bodyClassName].filter(Boolean).join(' ')}>{children}</div>
     </div>
-  );
+    );
+  };
 
   return (
 
-    <nav className={styles.nav}>
-      {isAdmin ? (
+    <nav className={`${styles.nav} ${navbarConfigReady ? styles.navReady : styles.navPending}`}>
+      {canEditNavbarTheme ? (
         <div className={styles.adminBar}>
           <span>Theme</span>
           <label>
@@ -517,9 +692,41 @@ export default function Navbar() {
               onChange={(event) => {
                 const nextColor = event.target.value;
                 setAdminHeaderColor(nextColor);
-                void handleAdminThemeSave(nextColor, adminHueShift);
+                void handleAdminThemeSave(nextColor, adminHueShift, adminTextureOverlayOpacity, adminDarkOverlayOpacity);
               }}
             />
+          </label>
+          <label>
+            Texture
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={adminTextureOverlayOpacity}
+              onChange={(event) => {
+                const nextOpacity = Number(event.target.value);
+                setAdminTextureOverlayOpacity(nextOpacity);
+                void handleAdminThemeSave(adminHeaderColor, adminHueShift, nextOpacity, adminDarkOverlayOpacity);
+              }}
+            />
+            <span>{adminTextureOverlayOpacity.toFixed(2)}</span>
+          </label>
+          <label>
+            Dark Layer
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={adminDarkOverlayOpacity}
+              onChange={(event) => {
+                const nextOpacity = Number(event.target.value);
+                setAdminDarkOverlayOpacity(nextOpacity);
+                void handleAdminThemeSave(adminHeaderColor, adminHueShift, adminTextureOverlayOpacity, nextOpacity);
+              }}
+            />
+            <span>{adminDarkOverlayOpacity.toFixed(2)}</span>
           </label>
           <button
             type="button"
@@ -550,16 +757,18 @@ export default function Navbar() {
       ) : null}
 
       <div className={`container ${styles.container}`}>
-        <Link href="/" className={styles.logo}>
-          <Image 
-            src="/logo-new.png" 
-            alt="Aurora's Eye" 
-            width={110} 
-            height={110} 
-            className={styles.logoImage}
-          />
-
-        </Link>
+        {navDragPiece(
+          'logo',
+          <Link href="/" className={styles.logo}>
+            <Image
+              src="/logo-new.png"
+              alt="Aurora's Eye"
+              width={110}
+              height={110}
+              className={styles.logoImage}
+            />
+          </Link>,
+        )}
 
         <div className={styles.navMenuCluster}>
           <Link
@@ -603,12 +812,20 @@ export default function Navbar() {
                   <span className={styles.dropTrigger}>Documentaries ▾</span>
                   <div className={styles.dropdownMenu}>
                     <Link href="/documentaries" onClick={() => setIsOpen(false)}>All Documentaries</Link>
-                    <div className={styles.dropdownSection}>
-                      <span className={styles.dropdownSectionLabel}>Current Projects</span>
-                      <div className={styles.dropdownSectionList}>
-                        <Link href="/breaking-the-silence" onClick={() => setIsOpen(false)}>Breaking the Silence</Link>
-                        <Link href="/karsha-nuns" onClick={() => setIsOpen(false)}>Karsha Nuns</Link>
-                        <Link href="/matrimandir-and-i" onClick={() => setIsOpen(false)}>Matrimandir &amp; I</Link>
+                    <div className={styles.submenuContainer}>
+                      <div
+                        className={styles.submenuTrigger}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsSubmenuOpen(!isSubmenuOpen);
+                        }}
+                      >
+                        Current Projects <ChevronRight size={14} className={isSubmenuOpen ? styles.rotated : ''} />
+                      </div>
+                      <div className={`${styles.submenu} ${isSubmenuOpen ? styles.submenuShow : ''}`}>
+                        <Link className={styles.projectLinkBreaking} href="/breaking-the-silence" onClick={() => { setIsOpen(false); setIsSubmenuOpen(false); }}>Breaking the Silence</Link>
+                        <Link className={styles.projectLinkKarsha} href="/karsha-nuns" onClick={() => { setIsOpen(false); setIsSubmenuOpen(false); }}>Karsha Nuns</Link>
+                        <Link className={styles.projectLinkMatrimandir} href="/matrimandir-and-i" onClick={() => { setIsOpen(false); setIsSubmenuOpen(false); }}>Matrimandir &amp; I</Link>
                       </div>
                     </div>
                   </div>
@@ -622,20 +839,15 @@ export default function Navbar() {
                 'news',
                 <Link href="/news" onClick={() => setIsOpen(false)}>News</Link>,
               )}
+              {navDragPiece(
+                'contactUs',
+                <Link href="/contact" onClick={() => setIsOpen(false)}>
+                  Contact Us
+                </Link>,
+              )}
               <div className={styles.navAuthExtras}>
                 <Link href="/donations" className={styles.mobileOnly} onClick={() => setIsOpen(false)}>Donate</Link>
-                {user ? (
-                  <button
-                    type="button"
-                    className={styles.menuAction}
-                    onClick={() => {
-                      handleLogout();
-                      setIsOpen(false);
-                    }}
-                  >
-                    Logout
-                  </button>
-                ) : (
+                {!user ? (
                   <Link
                     href="/login"
                     className={`${styles.menuAction} ${styles.mobileOnly}`}
@@ -643,30 +855,8 @@ export default function Navbar() {
                   >
                     Login
                   </Link>
-                )}
+                ) : null}
               </div>
-              {navDragPiece(
-                'youtubeNav',
-                <Link
-                  href={youtubeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.youtubeAction}
-                  onClick={(event) => {
-                    if (skipNextNavClickRef.current) {
-                      event.preventDefault();
-                      return;
-                    }
-                    trackYouTubeClick({
-                      label: 'Navbar watch CTA',
-                      url: youtubeUrl,
-                      location: 'navbar-action',
-                    });
-                  }}
-                >
-                  <Youtube size={18} />
-                </Link>,
-              )}
             </div>
           </div>
 
@@ -674,7 +864,14 @@ export default function Navbar() {
             {navDragPiece(
               'ticker',
               <div>
-                <YouTubeViewsTicker />
+                <YouTubeViewsTicker
+                  channelUrl={
+                    typeof adminConfig?.contact?.youtube === 'string' &&
+                    adminConfig.contact.youtube.startsWith('http')
+                      ? adminConfig.contact.youtube
+                      : undefined
+                  }
+                />
               </div>,
             )}
             {user?.role === 'admin' ? (
@@ -719,41 +916,110 @@ export default function Navbar() {
                 </Link>
               </div>,
             )}
+            <div className={styles.socialDragCluster}>
             {navDragPiece(
-              'instagram',
+              'facebook',
               <Link
-                href={instagramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.socialIconLink}
-                aria-label="Instagram"
+                href={resolvedSocialHref(facebookUrl)}
+                {...(isExternalHttpUrl(resolvedSocialHref(facebookUrl))
+                  ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+                  : {})}
+                className={styles.socialBrandTileLink}
+                aria-label="Facebook"
+                data-inactive={!isSocialHref(facebookUrl) ? 'true' : undefined}
+                title={
+                  !isSocialHref(facebookUrl)
+                    ? 'Add a Facebook URL or local path in Admin → Site settings → Contact & Social'
+                    : undefined
+                }
                 onClick={(event) => {
                   if (skipNextNavClickRef.current) {
+                    event.preventDefault();
+                    return;
+                  }
+                  if (!isSocialHref(facebookUrl)) {
                     event.preventDefault();
                   }
                 }}
               >
-                <Instagram size={18} />
+                <SocialBrandTile brand="facebook" />
               </Link>,
-              styles.navDragPieceBodyInstagram,
+              styles.navDragPieceBodySocialLead,
+            )}
+            {navDragPiece(
+              'youtubeSocial',
+              <Link
+                href={resolvedSocialHref(youtubeSocialUrl)}
+                {...(isExternalHttpUrl(resolvedSocialHref(youtubeSocialUrl))
+                  ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+                  : {})}
+                className={styles.socialBrandTileLink}
+                aria-label="YouTube channel"
+                onClick={(event) => {
+                  if (skipNextNavClickRef.current) {
+                    event.preventDefault();
+                    return;
+                  }
+                  const href = resolvedSocialHref(youtubeSocialUrl);
+                  if (isExternalHttpUrl(href)) {
+                    trackYouTubeClick({
+                      label: 'YouTube social icon',
+                      url: href,
+                      location: 'navbar-social',
+                    });
+                  }
+                }}
+              >
+                <SocialBrandTile brand="youtube" />
+              </Link>,
             )}
             {navDragPiece(
               'linkedin',
               <Link
-                href={linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.socialIconLink}
+                href={resolvedSocialHref(linkedinUrl)}
+                {...(isExternalHttpUrl(resolvedSocialHref(linkedinUrl))
+                  ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+                  : {})}
+                className={styles.socialBrandTileLink}
                 aria-label="LinkedIn"
+                data-inactive={!isSocialHref(linkedinUrl) ? 'true' : undefined}
                 onClick={(event) => {
                   if (skipNextNavClickRef.current) {
+                    event.preventDefault();
+                    return;
+                  }
+                  if (!isSocialHref(linkedinUrl)) {
                     event.preventDefault();
                   }
                 }}
               >
-                <Linkedin size={18} />
+                <SocialBrandTile brand="linkedin" />
               </Link>,
             )}
+            {navDragPiece(
+              'instagram',
+              <Link
+                href={resolvedSocialHref(instagramUrl)}
+                {...(isExternalHttpUrl(resolvedSocialHref(instagramUrl))
+                  ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+                  : {})}
+                className={styles.socialBrandTileLink}
+                aria-label="Instagram"
+                data-inactive={!isSocialHref(instagramUrl) ? 'true' : undefined}
+                onClick={(event) => {
+                  if (skipNextNavClickRef.current) {
+                    event.preventDefault();
+                    return;
+                  }
+                  if (!isSocialHref(instagramUrl)) {
+                    event.preventDefault();
+                  }
+                }}
+              >
+                <SocialBrandTile brand="instagram" />
+              </Link>,
+            )}
+            </div>
             <div
               className={styles.menuToggle}
               onPointerDown={(event) => {

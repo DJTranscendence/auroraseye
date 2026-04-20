@@ -8,6 +8,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import styles from './page.module.css';
 import fallbackTabs from '@/data/discussionTabs.json';
+import { discussionAvatarDisplayUrl } from '@/utils/discussionAvatarUrl';
 import { Paperclip, Send, Smile } from 'lucide-react';
 
 const DEFAULT_TAB = 'breaking-the-silence';
@@ -30,6 +31,7 @@ type Message = {
   body: string;
   createdAt: string;
   imageUrl?: string;
+  avatar?: string;
 };
 
 const PROMPT_CHIPS = [
@@ -38,6 +40,13 @@ const PROMPT_CHIPS = [
   'Something I disagree with...',
   "I'd just like to share...",
 ] as const;
+
+const PROMPT_STARTERS: Record<(typeof PROMPT_CHIPS)[number], string> = {
+  'A moment that stayed with me...': 'A moment that stayed with me was...',
+  'A question I have...': 'A question I have is...',
+  'Something I disagree with...': 'Something I disagree with is...',
+  "I'd just like to share...": "I'd just like to share that...",
+};
 
 const QUICK_EMOJIS = [
   '😀',
@@ -57,6 +66,27 @@ const QUICK_EMOJIS = [
   '☀️',
   '🌙',
 ] as const;
+
+const AVATAR_CHOICES = [
+  'avatar-cowboy.png',
+  'avatar-pirate.png',
+  'avatar-ninja.png',
+  'avatar-wizard.png',
+  'avatar-dj-female.png',
+  'avatar-pizza-maker.png',
+  'avatar-owl.png',
+  'avatar-boss-female.png',
+  'avatar-woman-casual.png',
+  'avatar-dj-male.png',
+  'avatar-dj-female-2.png',
+  'avatar-space-female.png',
+  'avatar-fox.png',
+  'avatar-boss-male.png',
+  'avatar-pizza-maker-2.png',
+  'avatar-superhero-female.png',
+] as const;
+
+const toAvatarUrl = (avatarFile: string) => discussionAvatarDisplayUrl(avatarFile);
 
 const BACKGROUND_OFFSET_STORAGE_PREFIX = 'discussion-bg-offset:';
 const LEGACY_BACKGROUND_OFFSET_KEY = 'discussion-bg-offset';
@@ -85,11 +115,13 @@ function DiscussionPageInner() {
   const [isBackgroundDragEnabled, setIsBackgroundDragEnabled] = useState(false);
   const [backgroundOffset, setBackgroundOffset] = useState({ x: 0, y: 0 });
   const [showNameInput, setShowNameInput] = useState(false);
-  const [likedMessages, setLikedMessages] = useState<string[]>([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [pendingImageUrl, setPendingImageUrl] = useState<string | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<string>('');
+  const [showRequirementHint, setShowRequirementHint] = useState(false);
   const appliedProjectParamRef = useRef<string | null>(null);
   const emojiComposerRef = useRef<HTMLDivElement>(null);
+  const messageTextareaRef = useRef<HTMLTextAreaElement>(null);
   const dragStateRef = useRef<{
     pointerId: number;
     startX: number;
@@ -298,15 +330,25 @@ function DiscussionPageInner() {
   const handlePostMessage = async () => {
     const name = messageName.trim();
     const body = messageBody.trim();
+    if (!selectedAvatar) {
+      setShowRequirementHint(true);
+      return;
+    }
+    if (!name) {
+      setShowRequirementHint(true);
+      return;
+    }
     if (!body && !pendingImageUrl) {
       return;
     }
+    setShowRequirementHint(false);
 
     const nextMessage: Message = {
       id: `${Date.now()}`,
       name: name || 'Anonymous',
       body: body || '',
       createdAt: new Date().toISOString(),
+      avatar: selectedAvatar,
       ...(pendingImageUrl ? { imageUrl: pendingImageUrl } : {}),
     };
 
@@ -323,6 +365,25 @@ function DiscussionPageInner() {
       });
     } catch (error) {
       console.error('Failed to save discussion message:', error);
+    }
+  };
+
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!isAdmin) {
+      return;
+    }
+
+    const nextMessages = messages.filter((message) => message.id !== messageId);
+    setMessages(nextMessages);
+
+    try {
+      await fetch(`/api/cms?type=discussionMessages&tabId=${encodeURIComponent(activeTabId)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tabId: activeTabId, messages: nextMessages }),
+      });
+    } catch (error) {
+      console.error('Failed to delete discussion message:', error);
     }
   };
 
@@ -503,6 +564,7 @@ function DiscussionPageInner() {
               <button
                 key={tab.id}
                 type="button"
+                data-project={tab.slug || tab.id}
                 className={`${styles.tabButton} ${tab.id === activeTabId ? styles.tabButtonActive : ''}`}
                 onClick={() => setActiveTabId(tab.id)}
               >
@@ -535,8 +597,30 @@ function DiscussionPageInner() {
               </div>
 
               <p className={styles.promptLabel}>What did this film make you feel?</p>
+              {isAdmin ? (
+                <div className={styles.adminModerationBar}>
+                  <strong>Admin moderation</strong>
+                  <span>Use delete on any comment to remove it.</span>
+                </div>
+              ) : null}
 
               <div className={styles.promptActionRow}>
+                <div className={styles.promptActionsRight}>
+                  <button
+                    type="button"
+                    className={styles.postButton}
+                    onClick={() => {
+                      messageTextareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      window.setTimeout(() => {
+                        messageTextareaRef.current?.focus();
+                      }, 220);
+                    }}
+                  >
+                    Share your thoughts, feelings,
+                    <br />
+                    whatever&apos;s in your heart:
+                  </button>
+                </div>
                 <div className={styles.promptChipsRow}>
                   {PROMPT_CHIPS.map((chip, index) => (
                     <button
@@ -544,29 +628,20 @@ function DiscussionPageInner() {
                       type="button"
                       className={styles.promptChip}
                       data-pastel={String(index)}
-                      onClick={() => setMessageBody((prev) => (prev ? `${prev}\n${chip}` : chip) + ' ')}
+                      onClick={() => {
+                        setMessageBody((prev) => {
+                          const starter = PROMPT_STARTERS[chip];
+                          return prev ? `${prev}\n${starter} ` : `${starter} `;
+                        });
+                        messageTextareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        window.setTimeout(() => {
+                          messageTextareaRef.current?.focus();
+                        }, 220);
+                      }}
                     >
                       {chip}
                     </button>
                   ))}
-                </div>
-                <div className={styles.promptActionsRight}>
-                  <button type="button" className={styles.postButton} onClick={handlePostMessage}>
-                    Share your voice
-                  </button>
-                  {!showNameInput ? (
-                    <button type="button" className={styles.addNameToggle} onClick={() => setShowNameInput(true)}>
-                      + Add name (optional)
-                    </button>
-                  ) : (
-                    <input
-                      className={styles.nameInputSmall}
-                      value={messageName}
-                      onChange={(event) => setMessageName(event.target.value)}
-                      placeholder="Your name"
-                      autoFocus
-                    />
-                  )}
                 </div>
               </div>
 
@@ -585,9 +660,6 @@ function DiscussionPageInner() {
                                 hour: 'numeric',
                                 minute: '2-digit',
                               });
-                        const seed = (message.body?.length ?? 0) + (message.imageUrl ? 7 : 0);
-                        const randomLikesCount = (seed % 5) + 1;
-                        const isLiked = likedMessages.includes(message.id);
 
                         return (
                           <article
@@ -596,6 +668,13 @@ function DiscussionPageInner() {
                             style={{ animationDelay: `${index * 50}ms` }}
                           >
                             <div className={styles.chatBubbleHeader}>
+                              <span className={styles.chatAvatar} aria-hidden>
+                                {message.avatar?.endsWith('.png') ? (
+                                  <img src={toAvatarUrl(message.avatar)} alt="" className={styles.chatAvatarImage} />
+                                ) : (
+                                  message.avatar || '😀'
+                                )}
+                              </span>
                               <strong>{message.name}</strong>
                               <span>{timeString}</span>
                             </div>
@@ -604,21 +683,17 @@ function DiscussionPageInner() {
                               <img src={message.imageUrl} alt="" className={styles.chatBubbleImage} />
                             ) : null}
                             <div className={styles.chatReactions}>
-                              <button
-                                type="button"
-                                className={`${styles.reactionButton} ${isLiked ? styles.reactionButtonActive : ''}`}
-                                onClick={() => {
-                                  if (isLiked) {
-                                    setLikedMessages((prev) => prev.filter((id) => id !== message.id));
-                                  } else {
-                                    setLikedMessages((prev) => [...prev, message.id]);
-                                  }
-                                }}
-                              >
-                                {isLiked ? '❤️' : '👍'} {isLiked ? randomLikesCount + 1 : randomLikesCount}
-                                {isLiked ? ' · You and others felt this' : ' people felt this too'}
-                              </button>
+                              {isAdmin ? (
+                                <button
+                                  type="button"
+                                  className={styles.adminDeleteMessageButton}
+                                  onClick={() => void handleDeleteMessage(message.id)}
+                                >
+                                  Delete comment
+                                </button>
+                              ) : null}
                             </div>
+                            <span className={styles.chatReactionHint}>🙂 React</span>
                           </article>
                         );
                       })
@@ -629,6 +704,53 @@ function DiscussionPageInner() {
                 </div>
 
                 <div className={styles.waComposer} ref={emojiComposerRef}>
+                  <div className={styles.avatarPickerCard}>
+                    <div className={styles.avatarPickerRow}>
+                      <span className={styles.avatarPickerLabel}>1) Choose your avatar</span>
+                      <span className={styles.avatarPickerHint}>Tap one icon below to represent your comment</span>
+                    </div>
+                    <div className={styles.avatarOptions}>
+                      {AVATAR_CHOICES.map((avatar) => (
+                        <button
+                          key={avatar}
+                          type="button"
+                          className={`${styles.avatarOption} ${selectedAvatar === avatar ? styles.avatarOptionActive : ''}`}
+                          onClick={() => {
+                            setSelectedAvatar(avatar);
+                            if (messageName.trim()) {
+                              setShowRequirementHint(false);
+                            }
+                          }}
+                        >
+                          <img
+                            src={toAvatarUrl(avatar)}
+                            alt={avatar.replace('avatar-', '').replace('.png', '').replace(/-/g, ' ')}
+                            className={styles.avatarOptionImage}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className={styles.avatarNameRow}>
+                    <label htmlFor="discussion-avatar-name" className={styles.avatarNameLabel}>
+                      2) Choose your display name:
+                    </label>
+                    <input
+                      id="discussion-avatar-name"
+                      className={styles.avatarNameInput}
+                      value={messageName}
+                      onChange={(event) => {
+                        setMessageName(event.target.value);
+                        if (event.target.value.trim() && selectedAvatar) {
+                          setShowRequirementHint(false);
+                        }
+                      }}
+                      placeholder="Your name"
+                    />
+                  </div>
+                  {showRequirementHint ? (
+                    <div className={styles.requirementHint}>Almost there - please pick an avatar and add your name to post.</div>
+                  ) : null}
                   {showEmojiPicker ? (
                     <div className={styles.emojiPopover} role="listbox" aria-label="Emoji picker">
                       {QUICK_EMOJIS.map((emoji) => (
@@ -666,6 +788,7 @@ function DiscussionPageInner() {
                       <Smile size={22} strokeWidth={1.75} />
                     </button>
                     <textarea
+                      ref={messageTextareaRef}
                       className={styles.waTextarea}
                       value={messageBody}
                       onChange={(event) => setMessageBody(event.target.value)}
@@ -688,7 +811,12 @@ function DiscussionPageInner() {
                         onChange={(event) => handleComposerImage(event.target.files?.[0] ?? null)}
                       />
                     </label>
-                    <button type="button" className={styles.waSendButton} aria-label="Send" onClick={handlePostMessage}>
+                    <button
+                      type="button"
+                      className={styles.waSendButton}
+                      aria-label="Send"
+                      onClick={handlePostMessage}
+                    >
                       <Send size={18} />
                     </button>
                   </div>

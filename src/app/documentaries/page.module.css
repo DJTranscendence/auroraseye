@@ -17,7 +17,7 @@
   font-size: 1.25rem;
   color: var(--text-muted);
   max-width: 600px;
-  margin: 0 auto 3rem;
+  margin: 0 auto 1.5rem;
 }
 
 .testLinkRow {
@@ -62,7 +62,7 @@
 }
 
 .browserSection {
-  padding-top: 1rem;
+  padding-top: 0.25rem;
 }
 
 

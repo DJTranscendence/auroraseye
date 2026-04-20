@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { AURORAS_THEME_SAVED_EVENT } from '@/config/theme-events';
 
 type ThemeConfig = {
   headerBackground?: string;
@@ -32,6 +33,28 @@ const THEME_VAR_MAP: Record<keyof ThemeConfig, string> = {
   accent: '--accent',
 };
 
+function applyHeaderOpacityVars(theme: Record<string, unknown>) {
+  const root = document.documentElement;
+  const tex = theme.headerTextureOverlayOpacity;
+  if (typeof tex === 'number' && Number.isFinite(tex)) {
+    root.style.setProperty('--header-texture-opacity', String(tex));
+  } else if (typeof tex === 'string' && tex.trim()) {
+    const n = Number(tex);
+    if (Number.isFinite(n)) {
+      root.style.setProperty('--header-texture-opacity', String(n));
+    }
+  }
+  const dark = theme.headerDarkOverlayOpacity;
+  if (typeof dark === 'number' && Number.isFinite(dark)) {
+    root.style.setProperty('--header-dark-overlay-opacity', String(dark));
+  } else if (typeof dark === 'string' && dark.trim()) {
+    const n = Number(dark);
+    if (Number.isFinite(n)) {
+      root.style.setProperty('--header-dark-overlay-opacity', String(n));
+    }
+  }
+}
+
 function applyTheme(theme?: ThemeConfig) {
   if (!theme) {
     return;
@@ -45,6 +68,8 @@ function applyTheme(theme?: ThemeConfig) {
       root.style.setProperty(cssVar, value.trim());
     }
   }
+
+  applyHeaderOpacityVars(theme as unknown as Record<string, unknown>);
 }
 
 function applyTypography(typography?: TypographyConfig) {
@@ -92,6 +117,14 @@ export default function ThemeRuntime() {
     };
 
     void loadTheme();
+
+    const onThemeSaved = () => {
+      void loadTheme();
+    };
+    window.addEventListener(AURORAS_THEME_SAVED_EVENT, onThemeSaved);
+    return () => {
+      window.removeEventListener(AURORAS_THEME_SAVED_EVENT, onThemeSaved);
+    };
   }, []);
 
   return null;

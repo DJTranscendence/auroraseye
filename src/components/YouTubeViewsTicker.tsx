@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import styles from './YouTubeViewsTicker.module.css';
+import { trackYouTubeClick } from '@/utils/youtubeAnalytics';
+
+const DEFAULT_YOUTUBE_CHANNEL_URL =
+  'https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw';
 
 const FALLBACK_VIEWS_COUNT = 1700000;
 const STATS_POLL_INTERVAL_MS = 5 * 60 * 1000;
@@ -43,7 +47,14 @@ function OdometerNumber({ value }: { value: string }) {
   );
 }
 
-export default function YouTubeViewsTicker() {
+type YouTubeViewsTickerProps = {
+  /** Aurora's Eye YouTube channel (from CMS `contact.youtube` when set). */
+  channelUrl?: string;
+};
+
+export default function YouTubeViewsTicker({ channelUrl }: YouTubeViewsTickerProps) {
+  const resolvedChannelUrl =
+    typeof channelUrl === 'string' && channelUrl.startsWith('http') ? channelUrl : DEFAULT_YOUTUBE_CHANNEL_URL;
   const [totalViews, setTotalViews] = useState<number | null>(null);
   const [totalViewsText, setTotalViewsText] = useState('1,700,000');
   const [displayViewsNumber, setDisplayViewsNumber] = useState(FALLBACK_VIEWS_COUNT);
@@ -107,14 +118,29 @@ export default function YouTubeViewsTicker() {
   }, [totalViews, totalViewsText]);
 
   return (
-    <div className={styles.ticker} aria-live="polite">
-      <span className={styles.liveDot}></span>
-      <div className={styles.copy}>
-        <span className={styles.label}>YouTube Views</span>
-        <strong className={styles.value}>
-          <OdometerNumber value={formatExactCount(displayViewsNumber)} />
-        </strong>
+    <a
+      href={resolvedChannelUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={styles.tickerLink}
+      aria-label="Open Aurora's Eye Films on YouTube"
+      onClick={() =>
+        trackYouTubeClick({
+          label: 'YouTube views ticker',
+          url: resolvedChannelUrl,
+          location: 'navbar-ticker',
+        })
+      }
+    >
+      <div className={styles.ticker} aria-live="polite">
+        <span className={styles.liveDot} />
+        <div className={styles.copy}>
+          <span className={styles.label}>YouTube Views</span>
+          <strong className={styles.value}>
+            <OdometerNumber value={formatExactCount(displayViewsNumber)} />
+          </strong>
+        </div>
       </div>
-    </div>
+    </a>
   );
 }

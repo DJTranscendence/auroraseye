@@ -69,17 +69,45 @@ export const metadata: Metadata = {
   },
 };
 
-function buildThemeStyle(theme?: Record<string, string>) {
-  if (!theme) {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+const HEADER_OPACITY_THEME_KEYS = new Set(["headerTextureOverlayOpacity", "headerDarkOverlayOpacity"]);
+
+function buildThemeStyle(theme?: Record<string, unknown>) {
+  if (!theme || typeof theme !== "object") {
     return undefined;
   }
 
   const style: CSSProperties = {};
   const styleRecord = style as Record<string, string>;
-
-  const entries = Object.entries(theme).filter(([, value]) => typeof value === "string" && value.trim().length > 0);
+  const entries = Object.entries(theme);
   for (const [key, value] of entries) {
-    styleRecord[`--${key.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)}`] = value.trim();
+    if (HEADER_OPACITY_THEME_KEYS.has(key)) {
+      continue;
+    }
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        continue;
+      }
+      styleRecord[`--${key.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)}`] = trimmed;
+      continue;
+    }
+
+    if (typeof value === "number" && Number.isFinite(value)) {
+      styleRecord[`--${key.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)}`] = String(value);
+    }
+  }
+
+  const tex = theme.headerTextureOverlayOpacity;
+  if (typeof tex === "number" && Number.isFinite(tex)) {
+    styleRecord["--header-texture-opacity"] = String(tex);
+  }
+
+  const dark = theme.headerDarkOverlayOpacity;
+  if (typeof dark === "number" && Number.isFinite(dark)) {
+    styleRecord["--header-dark-overlay-opacity"] = String(dark);
   }
 
   return style;
@@ -91,7 +119,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const config = await getConfig();
-  const themeStyle = buildThemeStyle(config?.theme as Record<string, string> | undefined);
+  const themeStyle = buildThemeStyle(config?.theme as Record<string, unknown> | undefined);
 
   return (
     <html

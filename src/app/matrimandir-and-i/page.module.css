@@ -45,8 +45,8 @@
 
 .tabButton {
   border: 1px solid rgba(var(--tab-rgb), 0.4);
-  background: rgba(var(--tab-rgb), 0.15); /* Distinct pastel tint instead of dark navy */
-  color: rgba(var(--tab-rgb), 0.95);
+  background: rgb(var(--tab-rgb));
+  color: #1f2937;
   padding: 0.65rem 1.1rem;
   border-radius: 999px;
   text-transform: uppercase;
@@ -57,10 +57,11 @@
 }
 
 .tabButtonActive {
-  background: rgba(var(--tab-rgb), 0.45); /* Stronger pastel fill when active */
+  background: rgb(var(--tab-rgb));
   border-color: rgba(var(--tab-rgb), 0.8);
-  color: #fff;
+  color: #111827;
   transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
 }
 
 .tabPanel {
@@ -351,6 +352,25 @@
 }
 
 @media (max-width: 768px) {
+  .tabRow {
+    position: sticky;
+    top: calc(var(--nav-height) + 2mm);
+    z-index: 60;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+    padding: 0.4rem 0.55rem;
+    margin-top: 0.85rem;
+    border-radius: 999px;
+    background: rgba(12, 16, 26, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    gap: 0.5rem;
+    box-sizing: border-box;
+  }
+
   .embedFrame {
     height: 60vh;
     min-height: 420px;

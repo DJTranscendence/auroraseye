@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 
 import Hero from "@/components/Hero";
 import VideoGallery from "@/components/VideoGallery";
+import RedditWall from "@/components/RedditWall";
 import Footer from "@/components/Footer";
 import styles from "./page.module.css";
 import { Mail, Play } from "lucide-react";
@@ -88,6 +89,8 @@ export default function Home() {
         <section id="latest-work">
           <VideoGallery />
         </section>
+
+        <RedditWall />
 
 
         <section className={`section ${styles.mediaWall}`}>

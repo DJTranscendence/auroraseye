@@ -3,11 +3,21 @@
 import Link from "next/link";
 import styles from "./Footer.module.css";
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Footer() {
   const [config, setConfig] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else {
+      setUser(null);
+    }
+
     fetch(`/api/cms?type=config&t=${Date.now()}`, { cache: 'no-store' })
       .then(res => res.json())
       .then(setConfig)
@@ -33,7 +43,21 @@ export default function Footer() {
           <Link href="/documentaries">Documentaries</Link>
           <Link href="/team">Our Team</Link>
           <Link href="/contact">Contact</Link>
-          <Link href="/login">Login</Link>
+          {user ? (
+            <button
+              type="button"
+              className={styles.logoutButton}
+              onClick={() => {
+                localStorage.removeItem('user');
+                setUser(null);
+                router.push('/');
+              }}
+            >
+              Logout
+            </button>
+          ) : (
+            <Link href="/login">Login</Link>
+          )}
           <Link href="/donate">Donate</Link>
           <Link href="/gallery">Gallery</Link>
           <Link href="/news">News</Link>

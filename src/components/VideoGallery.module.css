@@ -6,7 +6,7 @@
   background: var(--featured-gallery-bg, transparent);
   overflow: hidden;
 }
-    z-index: 6;
+
 .header {
   margin-bottom: 3rem;
   text-align: center;
@@ -91,6 +91,11 @@
   height: 100%;
   color: inherit;
   transition: transform 0.35s ease, filter 0.35s ease;
+  cursor: pointer;
+}
+
+.posterCard:hover {
+  transform: translateY(-8px);
 }
 
 .posterThumbButton {
@@ -101,23 +106,19 @@
   border: none;
   background: transparent;
   padding: 0;
-  cursor: pointer;
   color: inherit;
   text-align: inherit;
 }
 
-.posterCard:hover {
-  transform: translateY(-8px);
-}
-
 .posterImage {
   position: relative;
-  aspect-ratio: 3 / 1.9;
-  border-radius: 0.15rem;
+  aspect-ratio: 16 / 9;
+  border-radius: 1rem;
   overflow: hidden;
   background: var(--featured-card-bg, #09111f);
   box-shadow: 0 26px 60px rgba(2, 6, 23, 0.28);
 }
+
 
 .posterImg {
   width: 100%;
@@ -187,9 +188,9 @@
   text-transform: uppercase;
   letter-spacing: 0.16em;
   backdrop-filter: blur(4px);
-}
   border: 1px solid rgba(248, 250, 252, 0.35);
   text-shadow: 0 1px 2px rgba(15, 23, 42, 0.5);
+}
 
 .latestBadge {
   position: absolute;
@@ -369,6 +370,123 @@
   color: var(--foreground);
   text-decoration: none;
   font-weight: 700;
+}
+
+.posterYoutubeComment {
+  margin-top: 0.35rem;
+  display: grid;
+  gap: 0.45rem;
+  text-align: left;
+}
+
+.posterYoutubeComposer {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.posterYoutubeCommentField {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 4.5rem;
+  padding: 0.55rem 2.8rem 0.55rem 0.65rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(9, 17, 31, 0.55);
+  color: var(--foreground);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  font-family: inherit;
+}
+
+.posterYoutubeCommentField::placeholder {
+  color: rgba(203, 184, 168, 0.65);
+}
+
+.posterYoutubeCommentField:focus {
+  outline: none;
+  border-color: rgba(66, 197, 192, 0.65);
+  box-shadow: 0 0 0 1px rgba(66, 197, 192, 0.25);
+}
+
+.posterYoutubeCommentSendIcon {
+  position: absolute;
+  right: 0.8rem;
+  bottom: 0.8rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  opacity: 0.85;
+}
+
+.posterYoutubeCommentSendIcon:hover:not(:disabled) {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+.posterYoutubeCommentSendIcon:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.posterYoutubePasteLine {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--featured-subtitle-color, var(--text-muted));
+}
+
+.posterYoutubePasteLink {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #7fe9e6;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+  cursor: pointer;
+}
+
+.posterYoutubePasteLink:hover:not(:disabled) {
+  color: #b9f4f1;
+}
+
+.posterYoutubePasteLink:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.posterYoutubeFrictionNote {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: rgba(203, 184, 168, 0.82);
+}
+
+.posterYoutubeCommentError {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: #fecaca;
+}
+
+.posterYoutubeCommentToast {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #a7f3d0;
 }
 
 .themeDock {
