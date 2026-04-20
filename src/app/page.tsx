@@ -32,10 +32,32 @@ export default function Home() {
               <p>The latest and greatest from our social media feed.</p>
             </div>
             {/* SociableKit Instagram Feed */}
-            <div className="sk-instagram-feed" data-embed-id="25674162"></div>
+            <div 
+              className="sk-instagram-feed" 
+              data-embed-id="25674162"
+              // Attempting common attributes (though dashboard is preferred)
+              data-sort-by="recent"
+            ></div>
             <Script 
               src="https://widgets.sociablekit.com/instagram-feed/widget.js" 
               strategy="afterInteractive"
+              onLoad={() => {
+                // Background script to handle video previews if possible
+                const interval = setInterval(() => {
+                  const videos = document.querySelectorAll('.sk-instagram-feed video');
+                  if (videos.length > 0) {
+                    videos.forEach((video: any) => {
+                      video.muted = true;
+                      video.loop = true;
+                      // Play on hover logic
+                      video.parentElement.onmouseenter = () => video.play();
+                      video.parentElement.onmouseleave = () => video.pause();
+                    });
+                    clearInterval(interval);
+                  }
+                }, 2000);
+                setTimeout(() => clearInterval(interval), 10000);
+              }}
             />
           </div>
         </section>
