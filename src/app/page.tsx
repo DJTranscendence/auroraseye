@@ -6,77 +6,9 @@ import Hero from "@/components/Hero";
 import VideoGallery from "@/components/VideoGallery";
 import RedditWall from "@/components/RedditWall";
 import Footer from "@/components/Footer";
+import Script from "next/script";
 import styles from "./page.module.css";
-import { Mail, Play } from "lucide-react";
-
-const mediaWallItems = [
-  {
-    type: "video",
-    title: "Auroville: Seeds of Change",
-    src: "https://img.youtube.com/vi/ScMzIvxBSi4/hqdefault.jpg",
-    size: "mega",
-  },
-  {
-    type: "image",
-    title: "Community Harvest",
-    src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    type: "video",
-    title: "Living Laboratory",
-    src: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-    size: "wide",
-  },
-  {
-    type: "image",
-    title: "Earth Architecture",
-    src: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    type: "video",
-    title: "Waterkeepers",
-    src: "https://img.youtube.com/vi/tgbNymZ7vqY/hqdefault.jpg",
-    size: "tall",
-  },
-  {
-    type: "image",
-    title: "Quiet Horizons",
-    src: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    type: "image",
-    title: "Craft & Care",
-    src: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=1200&auto=format&fit=crop",
-    size: "wide",
-  },
-  {
-    type: "video",
-    title: "Forest Schools",
-    src: "https://img.youtube.com/vi/ysz5S6PUM-U/hqdefault.jpg",
-  },
-  {
-    type: "image",
-    title: "Open Skies",
-    src: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=1200&auto=format&fit=crop",
-    size: "tall",
-  },
-  {
-    type: "video",
-    title: "Shared Futures",
-    src: "https://img.youtube.com/vi/aqz-KE-bpKQ/hqdefault.jpg",
-  },
-  {
-    type: "image",
-    title: "Studio Notes",
-    src: "https://images.unsplash.com/photo-1485846234655-95d946a49374?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    type: "image",
-    title: "Auroville Morning",
-    src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1200&auto=format&fit=crop",
-    size: "wide",
-  },
-];
+import { Mail } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -92,7 +24,6 @@ export default function Home() {
 
         <RedditWall />
 
-
         <section className={`section ${styles.mediaWall}`}>
           <div className="container">
             <div className={styles.sectionHeader}>
@@ -100,35 +31,12 @@ export default function Home() {
               <h2>Instagram Highlights</h2>
               <p>The latest and greatest from our social media feed.</p>
             </div>
-            <div className={styles.mediaGrid}>
-              {mediaWallItems.map((item) => (
-                <figure
-                  key={item.title}
-                  className={`${styles.mediaTile} ${
-                    item.size === "mega"
-                      ? styles.tileMega
-                      : item.size === "wide"
-                        ? styles.tileWide
-                        : item.size === "tall"
-                          ? styles.tileTall
-                          : ""
-                  }`}
-                >
-                  <img src={item.src} alt={item.title} loading="lazy" />
-                  <div className={styles.mediaOverlay}>
-                    <span className={styles.mediaBadge}>
-                      {item.type === "video" ? "Video" : "Photo"}
-                    </span>
-                    {item.type === "video" && (
-                      <span className={styles.playIcon} aria-hidden="true">
-                        <Play size={20} />
-                      </span>
-                    )}
-                  </div>
-                  <figcaption>{item.title}</figcaption>
-                </figure>
-              ))}
-            </div>
+            {/* SociableKit Instagram Feed */}
+            <div className="sk-instagram-feed" data-embed-id="25674162"></div>
+            <Script 
+              src="https://widgets.sociablekit.com/instagram-feed/widget.js" 
+              strategy="afterInteractive"
+            />
           </div>
         </section>
 
