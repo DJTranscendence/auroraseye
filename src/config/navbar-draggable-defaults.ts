@@ -9,10 +9,7 @@ export const NAVBAR_DRAG_IDS = [
   'contactUs',
   'ticker',
   'donate',
-  'facebook',
-  'youtubeSocial',
-  'linkedin',
-  'instagram',
+  'socials',
 ] as const;
 
 export type NavDragId = (typeof NAVBAR_DRAG_IDS)[number];

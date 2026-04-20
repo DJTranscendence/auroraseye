@@ -160,8 +160,9 @@
   min-width: 0;
 }
 
-.navDragPieceBodySocialLead {
+.navDragPieceBodySocialGroup {
   margin-left: 0.5cm;
+  gap: 0.65rem;
 }
 
 .navDragHandleMini {
@@ -197,7 +198,7 @@
     display: none;
   }
 
-  .navDragPieceBodySocialLead {
+  .navDragPieceBodySocialGroup {
     margin-left: 0;
   }
 }

@@ -918,106 +918,99 @@ export default function Navbar() {
             )}
             <div className={styles.socialDragCluster}>
             {navDragPiece(
-              'facebook',
-              <Link
-                href={resolvedSocialHref(facebookUrl)}
-                {...(isExternalHttpUrl(resolvedSocialHref(facebookUrl))
-                  ? { target: '_blank' as const, rel: 'noopener noreferrer' }
-                  : {})}
-                className={styles.socialBrandTileLink}
-                aria-label="Facebook"
-                data-inactive={!isSocialHref(facebookUrl) ? 'true' : undefined}
-                title={
-                  !isSocialHref(facebookUrl)
-                    ? 'Add a Facebook URL or local path in Admin → Site settings → Contact & Social'
-                    : undefined
-                }
-                onClick={(event) => {
-                  if (skipNextNavClickRef.current) {
-                    event.preventDefault();
-                    return;
+              'socials',
+              <>
+                <Link
+                  href={resolvedSocialHref(facebookUrl)}
+                  {...(isExternalHttpUrl(resolvedSocialHref(facebookUrl))
+                    ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+                    : {})}
+                  className={styles.socialBrandTileLink}
+                  aria-label="Facebook"
+                  data-inactive={!isSocialHref(facebookUrl) ? 'true' : undefined}
+                  title={
+                    !isSocialHref(facebookUrl)
+                      ? 'Add a Facebook URL or local path in Admin → Site settings → Contact & Social'
+                      : undefined
                   }
-                  if (!isSocialHref(facebookUrl)) {
-                    event.preventDefault();
-                  }
-                }}
-              >
-                <SocialBrandTile brand="facebook" />
-              </Link>,
-              styles.navDragPieceBodySocialLead,
-            )}
-            {navDragPiece(
-              'youtubeSocial',
-              <Link
-                href={resolvedSocialHref(youtubeSocialUrl)}
-                {...(isExternalHttpUrl(resolvedSocialHref(youtubeSocialUrl))
-                  ? { target: '_blank' as const, rel: 'noopener noreferrer' }
-                  : {})}
-                className={styles.socialBrandTileLink}
-                aria-label="YouTube channel"
-                onClick={(event) => {
-                  if (skipNextNavClickRef.current) {
-                    event.preventDefault();
-                    return;
-                  }
-                  const href = resolvedSocialHref(youtubeSocialUrl);
-                  if (isExternalHttpUrl(href)) {
-                    trackYouTubeClick({
-                      label: 'YouTube social icon',
-                      url: href,
-                      location: 'navbar-social',
-                    });
-                  }
-                }}
-              >
-                <SocialBrandTile brand="youtube" />
-              </Link>,
-            )}
-            {navDragPiece(
-              'linkedin',
-              <Link
-                href={resolvedSocialHref(linkedinUrl)}
-                {...(isExternalHttpUrl(resolvedSocialHref(linkedinUrl))
-                  ? { target: '_blank' as const, rel: 'noopener noreferrer' }
-                  : {})}
-                className={styles.socialBrandTileLink}
-                aria-label="LinkedIn"
-                data-inactive={!isSocialHref(linkedinUrl) ? 'true' : undefined}
-                onClick={(event) => {
-                  if (skipNextNavClickRef.current) {
-                    event.preventDefault();
-                    return;
-                  }
-                  if (!isSocialHref(linkedinUrl)) {
-                    event.preventDefault();
-                  }
-                }}
-              >
-                <SocialBrandTile brand="linkedin" />
-              </Link>,
-            )}
-            {navDragPiece(
-              'instagram',
-              <Link
-                href={resolvedSocialHref(instagramUrl)}
-                {...(isExternalHttpUrl(resolvedSocialHref(instagramUrl))
-                  ? { target: '_blank' as const, rel: 'noopener noreferrer' }
-                  : {})}
-                className={styles.socialBrandTileLink}
-                aria-label="Instagram"
-                data-inactive={!isSocialHref(instagramUrl) ? 'true' : undefined}
-                onClick={(event) => {
-                  if (skipNextNavClickRef.current) {
-                    event.preventDefault();
-                    return;
-                  }
-                  if (!isSocialHref(instagramUrl)) {
-                    event.preventDefault();
-                  }
-                }}
-              >
-                <SocialBrandTile brand="instagram" />
-              </Link>,
+                  onClick={(event) => {
+                    if (skipNextNavClickRef.current) {
+                      event.preventDefault();
+                      return;
+                    }
+                    if (!isSocialHref(facebookUrl)) {
+                      event.preventDefault();
+                    }
+                  }}
+                >
+                  <SocialBrandTile brand="facebook" />
+                </Link>
+                <Link
+                  href={resolvedSocialHref(youtubeSocialUrl)}
+                  {...(isExternalHttpUrl(resolvedSocialHref(youtubeSocialUrl))
+                    ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+                    : {})}
+                  className={styles.socialBrandTileLink}
+                  aria-label="YouTube channel"
+                  onClick={(event) => {
+                    if (skipNextNavClickRef.current) {
+                      event.preventDefault();
+                      return;
+                    }
+                    const href = resolvedSocialHref(youtubeSocialUrl);
+                    if (isExternalHttpUrl(href)) {
+                      trackYouTubeClick({
+                        label: 'YouTube social icon',
+                        url: href,
+                        location: 'navbar-social',
+                      });
+                    }
+                  }}
+                >
+                  <SocialBrandTile brand="youtube" />
+                </Link>
+                <Link
+                  href={resolvedSocialHref(linkedinUrl)}
+                  {...(isExternalHttpUrl(resolvedSocialHref(linkedinUrl))
+                    ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+                    : {})}
+                  className={styles.socialBrandTileLink}
+                  aria-label="LinkedIn"
+                  data-inactive={!isSocialHref(linkedinUrl) ? 'true' : undefined}
+                  onClick={(event) => {
+                    if (skipNextNavClickRef.current) {
+                      event.preventDefault();
+                      return;
+                    }
+                    if (!isSocialHref(linkedinUrl)) {
+                      event.preventDefault();
+                    }
+                  }}
+                >
+                  <SocialBrandTile brand="linkedin" />
+                </Link>
+                <Link
+                  href={resolvedSocialHref(instagramUrl)}
+                  {...(isExternalHttpUrl(resolvedSocialHref(instagramUrl))
+                    ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+                    : {})}
+                  className={styles.socialBrandTileLink}
+                  aria-label="Instagram"
+                  data-inactive={!isSocialHref(instagramUrl) ? 'true' : undefined}
+                  onClick={(event) => {
+                    if (skipNextNavClickRef.current) {
+                      event.preventDefault();
+                      return;
+                    }
+                    if (!isSocialHref(instagramUrl)) {
+                      event.preventDefault();
+                    }
+                  }}
+                >
+                  <SocialBrandTile brand="instagram" />
+                </Link>
+              </>,
+              styles.navDragPieceBodySocialGroup,
             )}
             </div>
             <div
