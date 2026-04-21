@@ -31,11 +31,11 @@ const DEFAULT_CONFIG = {
     bgImage:
       'https://images.unsplash.com/photo-1492691523567-6170c8675fa8?q=80&w=2670&auto=format&fit=crop',
     controls: {
-      iframeTopPercent: -1,
-      iframeTopCm: 5,
-      iframeLeftPercent: -10,
-      iframeWidthPercent: 110,
-      iframeHeightPercent: 110,
+      iframeTopPercent: 0,
+      iframeTopCm: 0,
+      iframeLeftPercent: 0,
+      iframeWidthPercent: 100,
+      iframeHeightPercent: 100,
       videoScale: 1,
       containerTopPx: 0,
       containerPadPx: 0,

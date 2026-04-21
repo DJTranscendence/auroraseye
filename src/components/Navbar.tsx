@@ -90,7 +90,7 @@ export default function Navbar() {
     moved: boolean;
   } | null>(null);
 
-  /** Persisted CMS offsets are tuned for wide headers; negative x on mobile clips the logo after config loads. */
+  /** On narrow viewports, drag transforms are suppressed (except while dragging) so the bar stays usable. */
   const [narrowNavbarViewport, setNarrowNavbarViewport] = useState(false);
 
   useEffect(() => {
@@ -786,6 +786,7 @@ export default function Navbar() {
               }).then((res) => {
                 if (res.ok) {
                   setAdminConfig(body);
+                  syncNavbarDraggableForPublish(DEFAULT_NAVBAR_DRAGGABLE);
                 }
               });
             }}

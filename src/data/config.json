@@ -5,8 +5,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=CFDiUQfuxdA",
     "bgImage": "https://images.unsplash.com/photo-1492691523567-6170c8675fa8?q=80&w=2670&auto=format&fit=crop",
     "controls": {
-      "iframeTopPercent": 34,
-      "iframeTopCm": -5,
+      "iframeTopPercent": 0,
+      "iframeTopCm": 0,
       "iframeLeftPercent": 0,
       "iframeWidthPercent": 100,
       "iframeHeightPercent": 100,
@@ -14,7 +14,7 @@
       "containerTopPx": 0,
       "containerPadPx": 0,
       "actionsOffsetX": 0,
-      "actionsOffsetY": 61,
+      "actionsOffsetY": 0,
       "actionsFadeOutFrom": 36.98,
       "actionsFadeOutDuration": 2.5,
       "actionsFadeInAt": 6,
@@ -27,12 +27,12 @@
       "scrollFadeInDuration": 3,
       "supportCtaOffsetX": 0,
       "supportCtaOffsetY": 0,
-      "recruitmentOffsetX": -65,
+      "recruitmentOffsetX": 0,
       "recruitmentOffsetY": 0
     },
     "controlsMobile": {
-      "iframeTopPercent": 5,
-      "iframeTopCm": -5,
+      "iframeTopPercent": 0,
+      "iframeTopCm": 0,
       "iframeLeftPercent": 0,
       "iframeWidthPercent": 100,
       "iframeHeightPercent": 100,
@@ -40,12 +40,12 @@
       "containerTopPx": 0,
       "containerPadPx": 0,
       "actionsOffsetX": 0,
-      "actionsOffsetY": 16,
+      "actionsOffsetY": 0,
       "scrollOffsetX": 0,
       "scrollOffsetY": 0,
       "supportCtaOffsetX": 0,
       "supportCtaOffsetY": 0,
-      "recruitmentOffsetX": -65,
+      "recruitmentOffsetX": 0,
       "recruitmentOffsetY": 0
     }
   },
@@ -76,53 +76,14 @@
     "fontFamily": "default"
   },
   "navbarDraggable": {
-    "logo": {
-      "x": -57,
-      "y": 0
-    },
-    "homeIcon": {
-      "x": 0,
-      "y": 0
-    },
-    "documentaries": {
-      "x": 0,
-      "y": 0
-    },
-    "ourTeam": {
-      "x": 0,
-      "y": 0
-    },
-    "news": {
-      "x": 0,
-      "y": 0
-    },
-    "contactUs": {
-      "x": 0,
-      "y": 0
-    },
-    "ticker": {
-      "x": 0,
-      "y": 0
-    },
-    "donate": {
-      "x": 23,
-      "y": 0
-    },
-    "facebook": {
-      "x": 0,
-      "y": 0
-    },
-    "youtubeSocial": {
-      "x": 0,
-      "y": 0
-    },
-    "linkedin": {
-      "x": 0,
-      "y": 0
-    },
-    "instagram": {
-      "x": 0,
-      "y": 0
-    }
+    "logo": { "x": 0, "y": 0 },
+    "homeIcon": { "x": 0, "y": 0 },
+    "documentaries": { "x": 0, "y": 0 },
+    "ourTeam": { "x": 0, "y": 0 },
+    "news": { "x": 0, "y": 0 },
+    "contactUs": { "x": 0, "y": 0 },
+    "ticker": { "x": 0, "y": 0 },
+    "donate": { "x": 0, "y": 0 },
+    "socials": { "x": 0, "y": 0 }
   }
 }

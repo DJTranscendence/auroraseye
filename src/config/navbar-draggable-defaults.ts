@@ -18,11 +18,10 @@ export type NavbarDraggableOffsets = Record<NavDragId, { x: number; y: number }>
 
 const zero = (): { x: number; y: number } => ({ x: 0, y: 0 });
 
+/** All zeros: tune positions in admin and save; legacy negative logo X caused clipping on many widths. */
 export const DEFAULT_NAVBAR_DRAGGABLE: NavbarDraggableOffsets = NAVBAR_DRAG_IDS.reduce(
   (acc, id) => {
-    if (id === 'logo') acc[id] = { x: -57, y: 0 };
-    else if (id === 'donate') acc[id] = { x: 23, y: 0 }; // 23px is approx 6mm total
-    else acc[id] = zero();
+    acc[id] = zero();
     return acc;
   },
   {} as NavbarDraggableOffsets,
@@ -70,6 +69,11 @@ export function mergeNavbarDraggableFromApi(raw: unknown): NavbarDraggableOffset
     for (const id of NAVBAR_DRAG_IDS) {
       out[id] = { ...nc };
     }
+  }
+
+  // Shipped default logo x was -57; it clips on many viewports. Treat as unset.
+  if (out.logo.x <= -50) {
+    out.logo = { x: 0, y: out.logo.y };
   }
 
   return out;

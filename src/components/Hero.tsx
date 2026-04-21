@@ -19,6 +19,9 @@ const HERO_VIDEO_TIME_KEY = 'hero_video_time';
 const HERO_TITLE_CYCLE_KEY = 'hero_title_cycle_state';
 const HERO_VIDEO_CONTROL_KEY = 'hero_video_controls';
 const HERO_VIDEO_CONTROL_MOBILE_KEY = 'hero_video_controls_mobile';
+/** Clears legacy hero layout localStorage once so CMS config is the single source of truth. */
+const HERO_LAYOUT_STORAGE_MIGRATION_KEY = 'auroras-hero-layout-storage-v';
+const HERO_LAYOUT_STORAGE_MIGRATION_VERSION = '3';
 const HERO_TITLE_CYCLE_MS = 6000;
 const HERO_VIDEO_START_OFFSET_SECONDS = 1;
 const HERO_ACTIONS_HIDE_FROM_SECONDS = 36.98;
@@ -106,24 +109,20 @@ export default function Hero() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPublishingLayout, setIsPublishingLayout] = useState(false);
   const [layoutStatus, setLayoutStatus] = useState('');
-  const [hasLocalControlState, setHasLocalControlState] = useState<boolean | null>(null);
-  const [hasLocalMobileControlState, setHasLocalMobileControlState] = useState<boolean | null>(null);
-  const [mobileControlsHydrated, setMobileControlsHydrated] = useState(false);
   const [controlsMode, setControlsMode] = useState<'desktop' | 'mobile'>('desktop');
   const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [panelOpacity, setPanelOpacity] = useState(0.8);
-  const [iframeTopPercent, setIframeTopPercent] = useState(5);
-  const [iframeTopCm, setIframeTopCm] = useState(-5);
-  const [iframeLeftPercent, setIframeLeftPercent] = useState(-10);
-  const [iframeWidthPercent, setIframeWidthPercent] = useState(110);
-  const [iframeHeightPercent, setIframeHeightPercent] = useState(110);
+  const [iframeTopPercent, setIframeTopPercent] = useState(0);
+  const [iframeTopCm, setIframeTopCm] = useState(0);
+  const [iframeLeftPercent, setIframeLeftPercent] = useState(0);
+  const [iframeWidthPercent, setIframeWidthPercent] = useState(100);
+  const [iframeHeightPercent, setIframeHeightPercent] = useState(100);
   const [videoScale, setVideoScale] = useState(1);
   const [containerTopPx, setContainerTopPx] = useState(0);
   const [containerPadPx, setContainerPadPx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [panelPosition, setPanelPosition] = useState<{ x: number; y: number } | null>(null);
   const [isDraggingPanel, setIsDraggingPanel] = useState(false);
-  const [controlsHydrated, setControlsHydrated] = useState(false);
   const [actionsOffsetX, setActionsOffsetX] = useState(0);
   const [actionsOffsetY, setActionsOffsetY] = useState(0);
   const [actionsFadeOutFrom, setActionsFadeOutFrom] = useState(HERO_ACTIONS_HIDE_FROM_SECONDS);
@@ -329,58 +328,19 @@ export default function Hero() {
   };
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (typeof window === 'undefined') {
       return;
     }
-    const savedState = readControlState();
-    if (savedState) {
-      if (savedState.actionsOffsetX) setActionsOffsetX(savedState.actionsOffsetX);
-      if (savedState.actionsOffsetY) setActionsOffsetY(savedState.actionsOffsetY);
-      if (savedState.scrollOffsetX) setScrollOffsetX(savedState.scrollOffsetX);
-      if (savedState.scrollOffsetY) setScrollOffsetY(savedState.scrollOffsetY);
-      if (savedState.supportCtaOffsetX) setSupportCtaOffsetX(savedState.supportCtaOffsetX);
-      if (savedState.supportCtaOffsetY) setSupportCtaOffsetY(savedState.supportCtaOffsetY);
+    try {
+      if (localStorage.getItem(HERO_LAYOUT_STORAGE_MIGRATION_KEY) !== HERO_LAYOUT_STORAGE_MIGRATION_VERSION) {
+        localStorage.removeItem(HERO_VIDEO_CONTROL_KEY);
+        localStorage.removeItem(HERO_VIDEO_CONTROL_MOBILE_KEY);
+        localStorage.setItem(HERO_LAYOUT_STORAGE_MIGRATION_KEY, HERO_LAYOUT_STORAGE_MIGRATION_VERSION);
+      }
+    } catch {
+      /* ignore */
     }
-  }, [isAdmin]);
-
-  useEffect(() => {
-    if (controlsHydrated && isAdmin) {
-      const state: HeroControlState = {
-        iframeTopPercent,
-        iframeTopCm,
-        iframeLeftPercent,
-        iframeWidthPercent,
-        iframeHeightPercent,
-        videoScale,
-        containerTopPx,
-        containerPadPx,
-        actionsOffsetX,
-        actionsOffsetY,
-        scrollOffsetX,
-        scrollOffsetY,
-        supportCtaOffsetX,
-        supportCtaOffsetY,
-      };
-      writeControlState(state);
-    }
-  }, [
-    iframeTopPercent,
-    iframeTopCm,
-    iframeLeftPercent,
-    iframeWidthPercent,
-    iframeHeightPercent,
-    videoScale,
-    containerTopPx,
-    containerPadPx,
-    actionsOffsetX,
-    actionsOffsetY,
-    scrollOffsetX,
-    scrollOffsetY,
-    supportCtaOffsetX,
-    supportCtaOffsetY,
-    controlsHydrated,
-    isAdmin,
-  ]);
+  }, []);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const youtubePlayerHostRef = useRef<HTMLIFrameElement>(null);
@@ -395,32 +355,6 @@ export default function Hero() {
   const isYouTube = heroVideoUrl.includes('youtube.com') || heroVideoUrl.includes('youtu.be');
   const isDirectVideo = heroVideoUrl.endsWith('.mp4');
   const youtubeVideoId = useMemo(() => getYouTubeId(heroVideoUrl), [heroVideoUrl]);
-
-  const readControlState = (): HeroControlState | null => {
-    if (typeof window === 'undefined') {
-      return null;
-    }
-    try {
-      const raw = localStorage.getItem(HERO_VIDEO_CONTROL_KEY);
-      if (raw) {
-        return JSON.parse(raw);
-      }
-    } catch (e) {
-      console.error('Failed to read hero control state', e);
-    }
-    return null;
-  };
-
-  const writeControlState = (state: HeroControlState) => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    try {
-      localStorage.setItem(HERO_VIDEO_CONTROL_KEY, JSON.stringify(state));
-    } catch (e) {
-      console.error('Failed to write hero control state', e);
-    }
-  };
 
   const youtubeEmbedUrl = useMemo(() => {
     if (!youtubeVideoId) {
@@ -503,62 +437,6 @@ export default function Hero() {
     sessionStorage.setItem(HERO_VIDEO_TIME_KEY, next.toString());
   };
 
-  const readHeroControlState = () => {
-    if (typeof window === 'undefined') {
-      return null;
-    }
-
-    try {
-      const raw = localStorage.getItem(HERO_VIDEO_CONTROL_KEY);
-      if (!raw) {
-        return null;
-      }
-
-      const parsed = JSON.parse(raw) as HeroControlState;
-      if (!parsed || typeof parsed !== 'object') {
-        return null;
-      }
-
-      return parsed;
-    } catch {
-      return null;
-    }
-  };
-
-  const writeHeroControlState = (state: HeroControlState) => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    localStorage.setItem(HERO_VIDEO_CONTROL_KEY, JSON.stringify(state));
-  };
-
-  const readMobileControlState = (): HeroControlState | null => {
-    if (typeof window === 'undefined') {
-      return null;
-    }
-
-    try {
-      const raw = localStorage.getItem(HERO_VIDEO_CONTROL_MOBILE_KEY);
-      if (!raw) {
-        return null;
-      }
-
-      const parsed = JSON.parse(raw) as HeroControlState;
-      return parsed && typeof parsed === 'object' ? parsed : null;
-    } catch {
-      return null;
-    }
-  };
-
-  const writeMobileControlState = (state: HeroControlState) => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    localStorage.setItem(HERO_VIDEO_CONTROL_MOBILE_KEY, JSON.stringify(state));
-  };
-
   useEffect(() => {
     let isMounted = true;
 
@@ -595,117 +473,23 @@ export default function Hero() {
     setPanelPosition({ x: 32, y: nextY });
   }, [controlsVisible, panelPosition]);
 
-  useEffect(() => {
-    if (!isAdmin) {
-      setHasLocalControlState(false);
-      return;
-    }
-    const saved = readHeroControlState();
-    if (!saved) {
-      setHasLocalControlState(false);
-      return;
-    }
+  const desktopControlsSig = useMemo(
+    () => JSON.stringify(config?.hero?.controls ?? null),
+    [config?.hero?.controls],
+  );
 
-    if (Number.isFinite(saved.iframeTopPercent)) {
-      setIframeTopPercent(saved.iframeTopPercent as number);
-    }
-    if (Number.isFinite(saved.iframeTopCm)) {
-      setIframeTopCm(saved.iframeTopCm as number);
-    }
-    if (Number.isFinite(saved.iframeLeftPercent)) {
-      setIframeLeftPercent(saved.iframeLeftPercent as number);
-    }
-    if (Number.isFinite(saved.iframeWidthPercent)) {
-      setIframeWidthPercent(saved.iframeWidthPercent as number);
-    }
-    if (Number.isFinite(saved.iframeHeightPercent)) {
-      setIframeHeightPercent(saved.iframeHeightPercent as number);
-    }
-    if (Number.isFinite(saved.videoScale)) {
-      setVideoScale(saved.videoScale as number);
-    }
-    if (Number.isFinite(saved.containerTopPx)) {
-      setContainerTopPx(saved.containerTopPx as number);
-    }
-    if (Number.isFinite(saved.containerPadPx)) {
-      setContainerPadPx(saved.containerPadPx as number);
-    }
-    if (Number.isFinite(saved.actionsOffsetX)) {
-      setActionsOffsetX(saved.actionsOffsetX as number);
-    }
-    if (Number.isFinite(saved.actionsOffsetY)) {
-      setActionsOffsetY(saved.actionsOffsetY as number);
-    }
-    if (Number.isFinite(saved.actionsFadeOutFrom)) {
-      setActionsFadeOutFrom(saved.actionsFadeOutFrom as number);
-    }
-    if (Number.isFinite(saved.actionsFadeOutDuration)) {
-      setActionsFadeOutDuration(saved.actionsFadeOutDuration as number);
-    }
-    if (Number.isFinite(saved.actionsFadeInAt)) {
-      setActionsFadeInAt(saved.actionsFadeInAt as number);
-    }
-    if (Number.isFinite(saved.actionsFadeInDuration)) {
-      setActionsFadeInDuration(saved.actionsFadeInDuration as number);
-    }
-    if (Number.isFinite(saved.scrollOffsetX)) {
-      setScrollOffsetX(saved.scrollOffsetX as number);
-    }
-    if (Number.isFinite(saved.scrollOffsetY)) {
-      setScrollOffsetY(saved.scrollOffsetY as number);
-    }
-    if (Number.isFinite(saved.scrollFadeOutFrom)) {
-      setScrollFadeOutFrom(saved.scrollFadeOutFrom as number);
-    }
-    if (Number.isFinite(saved.scrollFadeOutDuration)) {
-      setScrollFadeOutDuration(saved.scrollFadeOutDuration as number);
-    }
-    if (Number.isFinite(saved.scrollFadeInAt)) {
-      setScrollFadeInAt(saved.scrollFadeInAt as number);
-    }
-    if (Number.isFinite(saved.scrollFadeInDuration)) {
-      setScrollFadeInDuration(saved.scrollFadeInDuration as number);
-    }
-    if (Number.isFinite(saved.supportCtaOffsetX)) {
-      setSupportCtaOffsetX(saved.supportCtaOffsetX as number);
-    }
-    if (Number.isFinite(saved.supportCtaOffsetY)) {
-      setSupportCtaOffsetY(saved.supportCtaOffsetY as number);
-    }
-    if (Number.isFinite(saved.recruitmentOffsetX)) {
-      setRecruitmentOffsetX(saved.recruitmentOffsetX as number);
-    }
-    if (Number.isFinite(saved.recruitmentOffsetY)) {
-      setRecruitmentOffsetY(saved.recruitmentOffsetY as number);
-    }
-    setHasLocalControlState(true);
-    setControlsHydrated(true);
-  }, [isAdmin]);
+  const mobileControlsSig = useMemo(
+    () =>
+      JSON.stringify(config?.hero?.controlsMobile ?? config?.hero?.controls ?? null),
+    [config?.hero?.controlsMobile, config?.hero?.controls],
+  );
 
   useEffect(() => {
-    if (!isAdmin) {
-      setHasLocalMobileControlState(false);
+    if (!desktopControlsSig || desktopControlsSig === 'null') {
       return;
     }
-    const savedMobile = readMobileControlState();
-    if (!savedMobile) {
-      setHasLocalMobileControlState(false);
-      return;
-    }
-
-    setMobileControls(savedMobile);
-    setHasLocalMobileControlState(true);
-    setMobileControlsHydrated(true);
-  }, [isAdmin]);
-
-  useEffect(() => {
-    if (hasLocalControlState !== false || controlsHydrated) {
-      return;
-    }
-
     const controlsFromConfig = config?.hero?.controls as HeroControlState | undefined;
-    if (!controlsFromConfig) {
-      setControlsHydrated(true);
+    if (!controlsFromConfig || typeof controlsFromConfig !== 'object') {
       return;
     }
 
@@ -781,76 +565,21 @@ export default function Hero() {
     if (Number.isFinite(controlsFromConfig.recruitmentOffsetY)) {
       setRecruitmentOffsetY(controlsFromConfig.recruitmentOffsetY as number);
     }
-
-    writeHeroControlState(controlsFromConfig);
-    setControlsHydrated(true);
-  }, [config, controlsHydrated, hasLocalControlState]);
+  }, [desktopControlsSig, config]);
 
   useEffect(() => {
-    if (hasLocalMobileControlState !== false || mobileControlsHydrated) {
+    if (!mobileControlsSig || mobileControlsSig === 'null') {
       return;
     }
-
     const controlsFromConfig = (config?.hero?.controlsMobile ?? config?.hero?.controls) as
       | HeroControlState
       | undefined;
-    if (!controlsFromConfig) {
-      setMobileControlsHydrated(true);
+    if (!controlsFromConfig || typeof controlsFromConfig !== 'object') {
       return;
     }
 
     setMobileControls(controlsFromConfig);
-    writeMobileControlState(controlsFromConfig);
-    setMobileControlsHydrated(true);
-  }, [config, hasLocalMobileControlState, mobileControlsHydrated]);
-
-  useEffect(() => {
-    if (!controlsHydrated) {
-      return;
-    }
-    if (!isAdmin) {
-      return;
-    }
-    const nextDesktopState = buildControlState();
-    writeHeroControlState(nextDesktopState);
-  }, [
-    isAdmin,
-    controlsHydrated,
-    iframeTopPercent,
-    iframeTopCm,
-    iframeLeftPercent,
-    iframeWidthPercent,
-    iframeHeightPercent,
-    videoScale,
-    containerTopPx,
-    containerPadPx,
-    actionsOffsetX,
-    actionsOffsetY,
-    actionsFadeOutFrom,
-    actionsFadeOutDuration,
-    actionsFadeInAt,
-    actionsFadeInDuration,
-    scrollOffsetX,
-    scrollOffsetY,
-    scrollFadeOutFrom,
-    scrollFadeOutDuration,
-    scrollFadeInAt,
-    scrollFadeInDuration,
-    supportCtaOffsetX,
-    supportCtaOffsetY,
-    recruitmentOffsetX,
-    recruitmentOffsetY,
-  ]);
-
-  useEffect(() => {
-    if (!mobileControlsHydrated) {
-      return;
-    }
-    if (!isAdmin) {
-      return;
-    }
-    writeMobileControlState(buildMobileControlState());
-  }, [mobileControls, mobileControlsHydrated, isAdmin]);
+  }, [mobileControlsSig, config]);
 
   const handlePublishLayout = async () => {
     if (!isAdmin || isPublishingLayout) {
@@ -885,6 +614,14 @@ export default function Hero() {
       }
 
       setConfig(nextConfig);
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(HERO_VIDEO_CONTROL_KEY);
+          localStorage.removeItem(HERO_VIDEO_CONTROL_MOBILE_KEY);
+        }
+      } catch {
+        /* ignore */
+      }
       setLayoutStatus('Layout published to site.');
     } catch (error) {
       console.error('Failed to publish layout', error);
