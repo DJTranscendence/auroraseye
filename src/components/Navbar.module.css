@@ -128,6 +128,13 @@
   height: 100%;
   position: relative;
   z-index: 1;
+  /* Extra left padding so admin drag handles (right: 100%) are not clipped by body overflow-x */
+  padding-left: clamp(1.85rem, 3.2vw, 2.85rem);
+  padding-right: clamp(1.35rem, 2.5vw, 2rem);
+}
+
+.container > :first-child {
+  flex-shrink: 0;
 }
 
 .navMenuCluster {
@@ -236,6 +243,8 @@
   transition: transform 0.3s ease;
   width: 110px;
   height: 110px;
+  min-width: 88px;
+  min-height: 88px;
 }
 
 .logo:hover .logoImage {
@@ -244,7 +253,7 @@
 
 .links {
   display: flex;
-  gap: 2.5rem;
+  gap: 1rem; /* was 2.5rem; ~60% tighter */
   align-items: center;
   flex: 1;
   justify-content: center;
@@ -257,8 +266,8 @@
   flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
-  gap: calc(0.65rem * 2);
-  margin-left: 0.9rem;
+  gap: 0.52rem; /* was calc(0.65rem * 2); ~60% tighter */
+  margin-left: 2.35rem; /* shift menu cluster right */
   flex: 1;
   min-width: 0;
 }
@@ -667,7 +676,7 @@
     flex: 0 0 auto;
     width: 100%;
     max-width: min(22rem, 100%);
-    gap: 0.5rem;
+    gap: 0.2rem; /* was 0.5rem; ~60% tighter */
     margin-top: auto;
     margin-bottom: auto;
   }

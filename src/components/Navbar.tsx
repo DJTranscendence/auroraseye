@@ -817,6 +817,8 @@ export default function Navbar() {
               width={110}
               height={110}
               className={styles.logoImage}
+              priority
+              sizes="110px"
             />
           </Link>,
         )}
