@@ -10,8 +10,8 @@
   z-index: 12000;
   padding: 0.4rem 0;
   transition: var(--transition-smooth);
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .navPending {
@@ -21,10 +21,6 @@
 
 .navReady {
   opacity: 1;
-}
-
-.nav::-webkit-scrollbar {
-  display: none;
 }
 
 .adminBar {
@@ -118,8 +114,37 @@
   pointer-events: none;
 }
 
+/* Horizontal scroll only inside the bar (never clips content off-screen on desktop). */
+.navScrollInner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  isolation: isolate;
+}
 
+.navScrollInner::-webkit-scrollbar {
+  height: 6px;
+}
 
+.navScrollInner::-webkit-scrollbar-thumb {
+  background: rgba(127, 233, 230, 0.35);
+  border-radius: 999px;
+}
+
+.navScrollInner > .container {
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  padding-left: clamp(1rem, 2.5vw, 1.75rem);
+  padding-right: clamp(1rem, 2.5vw, 1.75rem);
+}
 
 .container {
   display: flex;
@@ -128,9 +153,6 @@
   height: 100%;
   position: relative;
   z-index: 1;
-  /* Extra left padding so admin drag handles (right: 100%) are not clipped by body overflow-x */
-  padding-left: clamp(1.85rem, 3.2vw, 2.85rem);
-  padding-right: clamp(1.35rem, 2.5vw, 2rem);
 }
 
 .container > :first-child {
@@ -139,10 +161,10 @@
 
 .navMenuCluster {
   display: flex;
-  flex: 1;
+  flex: 1 1 auto;
   align-items: center;
   justify-content: space-around;
-  min-width: 0;
+  min-width: min-content;
   gap: 1rem;
 }
 
@@ -172,37 +194,12 @@
   gap: 0.65rem;
 }
 
-.navDragHandleMini {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 50%;
-  right: 100%;
-  transform: translateY(-50%);
-  padding: 0.12rem 0.04rem;
-  margin-right: 0.2rem;
-  border: none;
-  background: transparent;
-  color: rgba(127, 233, 230, 0.5);
-  cursor: grab;
-  touch-action: none;
-}
-
-.navDragHandleMini:active {
-  cursor: grabbing;
-}
-
 @media (max-width: 768px) {
   .navMenuCluster {
     padding-left: 0;
     flex-wrap: nowrap;
     justify-content: flex-end;
     gap: 0.5rem;
-  }
-
-  .navDragHandleMini {
-    display: none;
   }
 
   .navDragPieceBodySocialGroup {
@@ -255,7 +252,8 @@
   display: flex;
   gap: 1rem; /* was 2.5rem; ~60% tighter */
   align-items: center;
-  flex: 1;
+  flex: 1 1 auto;
+  flex-shrink: 0;
   justify-content: center;
   overflow: visible;
 }
@@ -267,7 +265,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.52rem; /* was calc(0.65rem * 2); ~60% tighter */
-  margin-left: 2.35rem; /* shift menu cluster right */
+  margin-left: 1rem;
   flex: 1;
   min-width: 0;
 }
@@ -466,8 +464,9 @@
 .actions {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   gap: calc(1.5rem + 5mm);
-  margin-left: 5cm;
+  margin-left: clamp(0.75rem, 2vw, 1.75rem);
   justify-content: space-evenly;
 }
 
@@ -476,7 +475,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-left: 1cm;
+  margin-left: 0.5rem;
 }
 
 .draggableItem {

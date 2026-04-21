@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from 'next/navigation';
 import styles from "./Navbar.module.css";
-import { Menu, Settings, House, RotateCcw, GripVertical, ChevronRight } from "lucide-react";
+import { Menu, Settings, House, RotateCcw, ChevronRight } from "lucide-react";
 import YouTubeViewsTicker from './YouTubeViewsTicker';
 import { SocialBrandTile } from './SocialBrandTile';
 import { trackYouTubeClick } from '@/utils/youtubeAnalytics';
@@ -13,13 +13,11 @@ import { AURORAS_THEME_SAVED_EVENT } from '@/config/theme-events';
 import {
   DEFAULT_NAVBAR_DRAGGABLE,
   mergeNavbarDraggableFromApi,
-  type NavDragId,
   type NavbarDraggableOffsets,
 } from '@/config/navbar-draggable-defaults';
 import {
   resetNavbarDraggablePublishBridge,
   syncNavbarDraggableForPublish,
-  updateNavbarDraggableForPublish,
 } from '@/config/navbar-draggable-publish-bridge';
 
 /** Absolute http(s) or same-site path (not protocol-relative `//`). */
@@ -52,12 +50,8 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   const [isDonateRingSpinning, setIsDonateRingSpinning] = useState(false);
-  const [navOffsets, setNavOffsets] = useState<NavbarDraggableOffsets>(DEFAULT_NAVBAR_DRAGGABLE);
-  const [draggingId, setDraggingId] = useState<NavDragId | null>(null);
   const navOffsetsRef = useRef<NavbarDraggableOffsets>(DEFAULT_NAVBAR_DRAGGABLE);
   const adminConfigRef = useRef<Record<string, unknown> | null>(null);
-  /** Pointerup clears dragStateRef before click fires; use this to suppress navigation after a drag. */
-  const skipNextNavClickRef = useRef(false);
   const [user, setUser] = useState<any>(null);
   const [adminConfig, setAdminConfig] = useState<any>(null);
   const [adminBaseTheme, setAdminBaseTheme] = useState<ThemePalette | null>(null);
@@ -80,35 +74,6 @@ export default function Navbar() {
   const previewToggleDragRef = useRef<PreviewToggleDragState | null>(null);
   const donateRingRef = useRef<SVGSVGElement | null>(null);
   const donateRingStopTimeoutRef = useRef<number | null>(null);
-  const dragStateRef = useRef<{
-    id: NavDragId;
-    pointerId: number;
-    startX: number;
-    startY: number;
-    originX: number;
-    originY: number;
-    moved: boolean;
-  } | null>(null);
-
-  /** On narrow viewports, drag transforms are suppressed (except while dragging) so the bar stays usable. */
-  const [narrowNavbarViewport, setNarrowNavbarViewport] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const sync = () => setNarrowNavbarViewport(mq.matches);
-    sync();
-    mq.addEventListener('change', sync);
-    return () => mq.removeEventListener('change', sync);
-  }, []);
-
-  useEffect(() => {
-    navOffsetsRef.current = navOffsets;
-  }, [navOffsets]);
-
-  useEffect(() => {
-    updateNavbarDraggableForPublish(navOffsets);
-  }, [navOffsets]);
-
   useEffect(() => {
     adminConfigRef.current = adminConfig;
   }, [adminConfig]);
@@ -266,7 +231,6 @@ export default function Navbar() {
         }
         setAdminConfig(data);
         const merged = mergeNavbarDraggableFromApi(data?.navbarDraggable);
-        setNavOffsets(merged);
         navOffsetsRef.current = merged;
         syncNavbarDraggableForPublish(merged);
         if (data?.theme?.headerBackground) {
@@ -383,56 +347,12 @@ export default function Navbar() {
     }
   }, [isAdmin, adminBaseTheme, adminHeaderColor]);
 
-  const persistNavbarDraggable = useCallback(async (offsets: NavbarDraggableOffsets) => {
-    if (user?.role !== 'admin') {
-      return;
-    }
-
-    let cfg = adminConfigRef.current as Record<string, unknown> | null;
-    if (!cfg) {
-      try {
-        const res = await fetch(`/api/cms?type=config&t=${Date.now()}`, { cache: 'no-store' });
-        if (!res.ok) {
-          return;
-        }
-        const data = await res.json();
-        if (!data || typeof data !== 'object' || !data.hero) {
-          return;
-        }
-        cfg = data as Record<string, unknown>;
-        setAdminConfig(data);
-        adminConfigRef.current = data as Record<string, unknown>;
-      } catch {
-        return;
-      }
-    }
-
-    const safeOffsets = mergeNavbarDraggableFromApi(offsets);
-    const body = { ...cfg, navbarDraggable: safeOffsets };
-    try {
-      const res = await fetch('/api/cms?type=config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (res.ok) {
-        setNavOffsets(safeOffsets);
-        navOffsetsRef.current = safeOffsets;
-        setAdminConfig(body);
-        syncNavbarDraggableForPublish(safeOffsets);
-      }
-    } catch {
-      /* ignore */
-    }
-  }, [user?.role]);
-
   useEffect(() => {
     if (!isAdmin) {
       return;
     }
 
     const resetWidgetPositions = () => {
-      setNavOffsets(DEFAULT_NAVBAR_DRAGGABLE);
       navOffsetsRef.current = DEFAULT_NAVBAR_DRAGGABLE;
       const cfg = adminConfigRef.current as Record<string, unknown> | null;
       if (!cfg) {
@@ -523,99 +443,11 @@ export default function Navbar() {
       return;
     }
     navOffsetsRef.current = safeNav;
-    setNavOffsets(safeNav);
     setAdminConfig(nextConfig);
     setAdminBaseTheme(nextTheme);
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event(AURORAS_THEME_SAVED_EVENT));
     }
-  };
-
-  useEffect(() => {
-    if (!draggingId) {
-      return;
-    }
-
-    const handlePointerMove = (event: PointerEvent) => {
-      const dragState = dragStateRef.current;
-      if (!dragState || dragState.pointerId !== event.pointerId) {
-        return;
-      }
-
-      const deltaX = event.clientX - dragState.startX;
-      const deltaY = event.clientY - dragState.startY;
-      if (!dragState.moved && (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3)) {
-        dragState.moved = true;
-      }
-
-      const nextY = dragState.originY;
-
-      setNavOffsets((prev) => {
-        const rawX = dragState.originX + deltaX;
-        const minX = dragState.id === 'logo' ? 0 : -48;
-        const maxX = 420;
-        const x = Math.min(maxX, Math.max(minX, rawX));
-        const next = {
-          ...prev,
-          [dragState.id]: {
-            x,
-            y: nextY,
-          },
-        };
-        navOffsetsRef.current = next;
-        return next;
-      });
-    };
-
-    const handlePointerUp = (event: PointerEvent) => {
-      const dragState = dragStateRef.current;
-      if (!dragState || dragState.pointerId !== event.pointerId) {
-        return;
-      }
-
-      const { moved } = dragState;
-      dragStateRef.current = null;
-      setDraggingId(null);
-      document.body.style.userSelect = '';
-
-      if (moved) {
-        skipNextNavClickRef.current = true;
-        window.setTimeout(() => {
-          skipNextNavClickRef.current = false;
-        }, 0);
-      }
-
-      if (moved && user?.role === 'admin') {
-        void persistNavbarDraggable(navOffsetsRef.current);
-      }
-    };
-
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
-    };
-  }, [draggingId, persistNavbarDraggable, user?.role]);
-
-  const handleDragStart = (id: NavDragId, event: React.PointerEvent<Element>) => {
-    if (!canEditNavbarTheme) {
-      return;
-    }
-
-    const origin = navOffsetsRef.current[id];
-    dragStateRef.current = {
-      id,
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      originX: origin.x,
-      originY: origin.y,
-      moved: false,
-    };
-    setDraggingId(id);
-    document.body.style.userSelect = 'none';
   };
 
   const getRotationFromMatrix = (matrixValue: string) => {
@@ -700,33 +532,12 @@ export default function Navbar() {
     previewToggleDragRef.current = null;
   };
 
-  const navDragPiece = (id: NavDragId, children: ReactNode, bodyClassName?: string) => {
-    const applyDragTransform =
-      !narrowNavbarViewport || draggingId === id;
-    return (
-    <div
-      className={`${styles.navDragPiece} ${draggingId === id ? styles.draggableActive : ''}`.trim()}
-      style={{
-        transform: applyDragTransform
-          ? `translate(${navOffsets[id].x}px, ${navOffsets[id].y}px)`
-          : 'none',
-      }}
-    >
-      {canEditNavbarTheme ? (
-        <button
-          type="button"
-          className={styles.navDragHandleMini}
-          aria-label={`Drag to move this header control horizontally (${id})`}
-          title="Drag handle — position is saved for all visitors"
-          onPointerDown={(event) => handleDragStart(id, event)}
-        >
-          <GripVertical size={12} aria-hidden />
-        </button>
-      ) : null}
+  /** Layout is CSS-only on desktop so nothing clips under overflow-x; legacy CMS offsets are not applied as transforms. */
+  const navClusterPiece = (children: ReactNode, bodyClassName?: string) => (
+    <div className={styles.navDragPiece}>
       <div className={[styles.navDragPieceBody, bodyClassName].filter(Boolean).join(' ')}>{children}</div>
     </div>
-    );
-  };
+  );
 
   return (
 
@@ -782,7 +593,6 @@ export default function Navbar() {
             type="button"
             className={styles.adminBarButton}
             onClick={() => {
-              setNavOffsets(DEFAULT_NAVBAR_DRAGGABLE);
               navOffsetsRef.current = DEFAULT_NAVBAR_DRAGGABLE;
               const cfg = adminConfigRef.current as Record<string, unknown> | null;
               if (!cfg) {
@@ -802,26 +612,26 @@ export default function Navbar() {
             }}
           >
             <RotateCcw size={14} aria-hidden />
-            Reset nav positions (saved for all visitors)
+            Clear legacy CMS offsets (zeros saved layout)
           </button>
         </div>
       ) : null}
 
-      <div className={`container ${styles.container}`}>
-        {navDragPiece(
-          'logo',
-          <Link href="/" className={styles.logo}>
-            <Image
-              src="/logo-new.png"
-              alt="Aurora's Eye"
-              width={110}
-              height={110}
-              className={styles.logoImage}
-              priority
-              sizes="110px"
-            />
-          </Link>,
-        )}
+      <div className={styles.navScrollInner}>
+        <div className={`container ${styles.container}`}>
+          {navClusterPiece(
+            <Link href="/" className={styles.logo}>
+              <Image
+                src="/logo-new.png"
+                alt="Aurora's Eye"
+                width={110}
+                height={110}
+                className={styles.logoImage}
+                priority
+                sizes="110px"
+              />
+            </Link>,
+          )}
 
         <div className={styles.navMenuCluster}>
           <Link
@@ -833,34 +643,13 @@ export default function Navbar() {
           </Link>
 
           <div className={`${styles.links} ${isOpen ? styles.active : ''}`}>
-            <div
-              className={styles.linksDraggableRow}
-              onClickCapture={(event) => {
-                if (skipNextNavClickRef.current) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                }
-              }}
-            >
-              {navDragPiece(
-                'homeIcon',
-                <Link
-                  href="/"
-                  className={styles.homeIconLink}
-                  onClick={(event) => {
-                    if (skipNextNavClickRef.current) {
-                      event.preventDefault();
-                      return;
-                    }
-                    setIsOpen(false);
-                  }}
-                  aria-label="Home"
-                >
+            <div className={styles.linksDraggableRow}>
+              {navClusterPiece(
+                <Link href="/" className={styles.homeIconLink} onClick={() => setIsOpen(false)} aria-label="Home">
                   <House size={16} />
                 </Link>,
               )}
-              {navDragPiece(
-                'documentaries',
+              {navClusterPiece(
                 <div className={styles.dropdown}>
                   <span className={styles.dropTrigger}>Documentaries ▾</span>
                   <div className={styles.dropdownMenu}>
@@ -884,16 +673,9 @@ export default function Navbar() {
                   </div>
                 </div>,
               )}
-              {navDragPiece(
-                'ourTeam',
-                <Link href="/team" onClick={() => setIsOpen(false)}>Our Team</Link>,
-              )}
-              {navDragPiece(
-                'news',
-                <Link href="/news" onClick={() => setIsOpen(false)}>News</Link>,
-              )}
-              {navDragPiece(
-                'contactUs',
+              {navClusterPiece(<Link href="/team" onClick={() => setIsOpen(false)}>Our Team</Link>)}
+              {navClusterPiece(<Link href="/news" onClick={() => setIsOpen(false)}>News</Link>)}
+              {navClusterPiece(
                 <Link href="/contact" onClick={() => setIsOpen(false)}>
                   Contact Us
                 </Link>,
@@ -914,8 +696,7 @@ export default function Navbar() {
           </div>
 
           <div className={styles.actions}>
-            {navDragPiece(
-              'ticker',
+            {navClusterPiece(
               <div>
                 <YouTubeViewsTicker
                   channelUrl={
@@ -932,20 +713,13 @@ export default function Navbar() {
                 <Settings size={18} />
               </Link>
             ) : null}
-            {navDragPiece(
-              'donate',
-              <div data-role="donate">
+            {navClusterPiece(<div data-role="donate">
                 <Link
                   href="/donations"
                   className={styles.donateAction}
                   aria-label="Support and Donate"
                   onMouseEnter={handleDonateRingEnter}
                   onMouseLeave={handleDonateRingLeave}
-                  onClick={(event) => {
-                    if (skipNextNavClickRef.current) {
-                      event.preventDefault();
-                    }
-                  }}
                 >
                   <span className={styles.donateActionBadge}>
                     <span className={styles.donateActionIcon} aria-hidden="true" />
@@ -970,9 +744,7 @@ export default function Navbar() {
               </div>,
             )}
             <div className={styles.socialDragCluster}>
-            {navDragPiece(
-              'socials',
-              <>
+            {navClusterPiece(<>
                 <Link
                   href={resolvedSocialHref(facebookUrl)}
                   {...(isExternalHttpUrl(resolvedSocialHref(facebookUrl))
@@ -987,10 +759,6 @@ export default function Navbar() {
                       : undefined
                   }
                   onClick={(event) => {
-                    if (skipNextNavClickRef.current) {
-                      event.preventDefault();
-                      return;
-                    }
                     if (!isSocialHref(facebookUrl)) {
                       event.preventDefault();
                     }
@@ -1005,11 +773,7 @@ export default function Navbar() {
                     : {})}
                   className={styles.socialBrandTileLink}
                   aria-label="YouTube channel"
-                  onClick={(event) => {
-                    if (skipNextNavClickRef.current) {
-                      event.preventDefault();
-                      return;
-                    }
+                  onClick={() => {
                     const href = resolvedSocialHref(youtubeSocialUrl);
                     if (isExternalHttpUrl(href)) {
                       trackYouTubeClick({
@@ -1031,10 +795,6 @@ export default function Navbar() {
                   aria-label="LinkedIn"
                   data-inactive={!isSocialHref(linkedinUrl) ? 'true' : undefined}
                   onClick={(event) => {
-                    if (skipNextNavClickRef.current) {
-                      event.preventDefault();
-                      return;
-                    }
                     if (!isSocialHref(linkedinUrl)) {
                       event.preventDefault();
                     }
@@ -1051,10 +811,6 @@ export default function Navbar() {
                   aria-label="Instagram"
                   data-inactive={!isSocialHref(instagramUrl) ? 'true' : undefined}
                   onClick={(event) => {
-                    if (skipNextNavClickRef.current) {
-                      event.preventDefault();
-                      return;
-                    }
                     if (!isSocialHref(instagramUrl)) {
                       event.preventDefault();
                     }
@@ -1078,6 +834,7 @@ export default function Navbar() {
           </div>
         </div>
 
+      </div>
       </div>
     </nav>
   );
