@@ -407,7 +407,8 @@ export default function Navbar() {
       }
     }
 
-    const body = { ...cfg, navbarDraggable: offsets };
+    const safeOffsets = mergeNavbarDraggableFromApi(offsets);
+    const body = { ...cfg, navbarDraggable: safeOffsets };
     try {
       const res = await fetch('/api/cms?type=config', {
         method: 'POST',
@@ -415,8 +416,10 @@ export default function Navbar() {
         body: JSON.stringify(body),
       });
       if (res.ok) {
+        setNavOffsets(safeOffsets);
+        navOffsetsRef.current = safeOffsets;
         setAdminConfig(body);
-        syncNavbarDraggableForPublish(offsets);
+        syncNavbarDraggableForPublish(safeOffsets);
       }
     } catch {
       /* ignore */
@@ -504,10 +507,11 @@ export default function Navbar() {
       accent: shiftHexHue(safeColor(baseTheme.accent), nextHueShift),
     };
 
+    const safeNav = mergeNavbarDraggableFromApi(navOffsetsRef.current);
     const nextConfig = {
       ...adminConfig,
       theme: nextTheme,
-      navbarDraggable: navOffsetsRef.current,
+      navbarDraggable: safeNav,
     };
 
     const res = await fetch('/api/cms?type=config', {
@@ -518,6 +522,8 @@ export default function Navbar() {
     if (!res.ok) {
       return;
     }
+    navOffsetsRef.current = safeNav;
+    setNavOffsets(safeNav);
     setAdminConfig(nextConfig);
     setAdminBaseTheme(nextTheme);
     if (typeof window !== 'undefined') {
@@ -546,7 +552,9 @@ export default function Navbar() {
 
       setNavOffsets((prev) => {
         const rawX = dragState.originX + deltaX;
-        const x = dragState.id === 'logo' ? Math.max(0, rawX) : rawX;
+        const minX = dragState.id === 'logo' ? 0 : -48;
+        const maxX = 420;
+        const x = Math.min(maxX, Math.max(minX, rawX));
         const next = {
           ...prev,
           [dragState.id]: {

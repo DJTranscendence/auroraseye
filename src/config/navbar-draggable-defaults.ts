@@ -63,17 +63,17 @@ export function mergeNavbarDraggableFromApi(raw: unknown): NavbarDraggableOffset
     out.contactUs = legacyYoutubeNav;
   }
 
-  const allZero = NAVBAR_DRAG_IDS.every((id) => out[id].x === 0 && out[id].y === 0);
-  const nc = readPoint(o.navCluster);
-  if (allZero && nc && (nc.x !== 0 || nc.y !== 0)) {
-    for (const id of NAVBAR_DRAG_IDS) {
-      out[id] = { ...nc };
-    }
-  }
+  // Legacy `navCluster` used to fan one offset onto every widget — a bad value shifted the entire bar
+  // off-screen under `overflow-x: hidden`. Ignore navCluster; use per-id keys only.
 
-  // Negative X clips the wordmark off the left; treat any saved left pull as invalid.
-  if (out.logo.x < 0) {
-    out.logo = { x: 0, y: out.logo.y };
+  const clampX = (id: NavDragId, x: number) => {
+    const minX = id === 'logo' ? 0 : -48;
+    const maxX = 420;
+    return Math.min(maxX, Math.max(minX, x));
+  };
+
+  for (const id of NAVBAR_DRAG_IDS) {
+    out[id] = { x: clampX(id, out[id].x), y: out[id].y };
   }
 
   return out;
