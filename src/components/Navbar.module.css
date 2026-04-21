@@ -212,7 +212,7 @@
   font-weight: 700;
   color: var(--foreground);
   letter-spacing: -0.01em;
-  left: -15mm;
+  /* Horizontal position comes from admin drag (navbarDraggable); a fixed negative offset clipped the wordmark. */
 }
 
 .logo::before {

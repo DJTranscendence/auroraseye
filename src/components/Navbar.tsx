@@ -545,10 +545,12 @@ export default function Navbar() {
       const nextY = dragState.originY;
 
       setNavOffsets((prev) => {
+        const rawX = dragState.originX + deltaX;
+        const x = dragState.id === 'logo' ? Math.max(0, rawX) : rawX;
         const next = {
           ...prev,
           [dragState.id]: {
-            x: dragState.originX + deltaX,
+            x,
             y: nextY,
           },
         };

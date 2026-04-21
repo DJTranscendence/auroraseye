@@ -71,8 +71,8 @@ export function mergeNavbarDraggableFromApi(raw: unknown): NavbarDraggableOffset
     }
   }
 
-  // Shipped default logo x was -57; it clips on many viewports. Treat as unset.
-  if (out.logo.x <= -50) {
+  // Negative X clips the wordmark off the left; treat any saved left pull as invalid.
+  if (out.logo.x < 0) {
     out.logo = { x: 0, y: out.logo.y };
   }
 
