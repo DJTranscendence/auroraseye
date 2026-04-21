@@ -247,7 +247,7 @@
   gap: 2.5rem;
   align-items: center;
   flex: 1;
-  justify-content: space-evenly;
+  justify-content: center;
   overflow: visible;
 }
 
@@ -256,9 +256,9 @@
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
-  justify-content: space-evenly;
-  /* Was 0.65rem; +300% spacing → 4× */
-  gap: calc(0.65rem * 4);
+  justify-content: center;
+  gap: calc(0.65rem * 2);
+  margin-left: 0.9rem;
   flex: 1;
   min-width: 0;
 }

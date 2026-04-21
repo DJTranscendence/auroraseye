@@ -16,6 +16,11 @@ import {
   type NavDragId,
   type NavbarDraggableOffsets,
 } from '@/config/navbar-draggable-defaults';
+import {
+  resetNavbarDraggablePublishBridge,
+  syncNavbarDraggableForPublish,
+  updateNavbarDraggableForPublish,
+} from '@/config/navbar-draggable-publish-bridge';
 
 /** Absolute http(s) or same-site path (not protocol-relative `//`). */
 function isSocialHref(url: string) {
@@ -98,6 +103,10 @@ export default function Navbar() {
 
   useEffect(() => {
     navOffsetsRef.current = navOffsets;
+  }, [navOffsets]);
+
+  useEffect(() => {
+    updateNavbarDraggableForPublish(navOffsets);
   }, [navOffsets]);
 
   useEffect(() => {
@@ -242,13 +251,24 @@ export default function Navbar() {
       setUser(null);
     }
 
+    resetNavbarDraggablePublishBridge();
+
     fetch(`/api/cms?type=config&t=${Date.now()}`, { cache: 'no-store' })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) {
+          return null;
+        }
+        return res.json();
+      })
       .then((data) => {
+        if (!data || typeof data !== 'object' || !data.hero) {
+          return;
+        }
         setAdminConfig(data);
         const merged = mergeNavbarDraggableFromApi(data?.navbarDraggable);
         setNavOffsets(merged);
         navOffsetsRef.current = merged;
+        syncNavbarDraggableForPublish(merged);
         if (data?.theme?.headerBackground) {
           setAdminHeaderColor(data.theme.headerBackground);
         }
@@ -364,10 +384,29 @@ export default function Navbar() {
   }, [isAdmin, adminBaseTheme, adminHeaderColor]);
 
   const persistNavbarDraggable = useCallback(async (offsets: NavbarDraggableOffsets) => {
-    const cfg = adminConfigRef.current as Record<string, unknown> | null;
-    if (!cfg || user?.role !== 'admin') {
+    if (user?.role !== 'admin') {
       return;
     }
+
+    let cfg = adminConfigRef.current as Record<string, unknown> | null;
+    if (!cfg) {
+      try {
+        const res = await fetch(`/api/cms?type=config&t=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) {
+          return;
+        }
+        const data = await res.json();
+        if (!data || typeof data !== 'object' || !data.hero) {
+          return;
+        }
+        cfg = data as Record<string, unknown>;
+        setAdminConfig(data);
+        adminConfigRef.current = data as Record<string, unknown>;
+      } catch {
+        return;
+      }
+    }
+
     const body = { ...cfg, navbarDraggable: offsets };
     try {
       const res = await fetch('/api/cms?type=config', {
@@ -377,6 +416,7 @@ export default function Navbar() {
       });
       if (res.ok) {
         setAdminConfig(body);
+        syncNavbarDraggableForPublish(offsets);
       }
     } catch {
       /* ignore */

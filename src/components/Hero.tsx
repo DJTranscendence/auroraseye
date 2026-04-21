@@ -6,6 +6,7 @@ import { ArrowRight, Youtube, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { trackYouTubeClick } from '@/utils/youtubeAnalytics';
 import fallbackConfig from '@/data/config.json';
+import { getNavbarDraggableForHeroPublish } from '@/config/navbar-draggable-publish-bridge';
 
 const HERO_TITLES = [
   'Storytelling through Light & Life',
@@ -862,8 +863,10 @@ export default function Hero() {
     try {
       const response = await fetch('/api/cms?type=config', { cache: 'no-store' });
       const current = response.ok ? await response.json() : config;
+      const liveNav = getNavbarDraggableForHeroPublish();
       const nextConfig = {
         ...current,
+        ...(liveNav ? { navbarDraggable: liveNav } : {}),
         hero: {
           ...current?.hero,
           controls: buildControlState(),
