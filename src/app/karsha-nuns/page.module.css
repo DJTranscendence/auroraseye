@@ -99,7 +99,7 @@
 .floatingNavWrap {
   position: fixed;
   left: 0;
-  top: calc(var(--nav-height) + 2.05rem);
+  top: calc(var(--nav-height) + 2.05rem + 2mm);
   z-index: 990;
   padding: 0 12px;
   pointer-events: auto;
@@ -111,7 +111,7 @@
   flex-direction: row;
   align-items: center;
   gap: 0.45rem;
-  width: min(720px, calc(100vw - 24px));
+  width: max-content;
   max-width: calc(100vw - 24px);
   min-width: 0;
   margin: 0 auto;
@@ -147,6 +147,44 @@
   cursor: grab;
 }
 
+.saveNavDefaultWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.2rem;
+  flex-shrink: 0;
+  max-width: 5.5rem;
+}
+
+.saveNavDefaultBtn {
+  padding: 0.28rem 0.4rem;
+  border-radius: 0.45rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  color: rgba(248, 250, 252, 0.92);
+  background: rgba(66, 197, 192, 0.22);
+  border: 1px solid rgba(66, 197, 192, 0.45);
+  cursor: pointer;
+}
+
+.saveNavDefaultBtn:hover:not(:disabled) {
+  background: rgba(66, 197, 192, 0.32);
+}
+
+.saveNavDefaultBtn:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.saveNavDefaultStatus {
+  font-size: 0.58rem;
+  line-height: 1.2;
+  color: rgba(226, 232, 240, 0.78);
+  text-align: center;
+}
+
 .projectNav {
   display: flex;
   flex: 1 1 auto;
@@ -154,11 +192,8 @@
   gap: 0.15rem;
   padding: 0.2rem 0.22rem;
   flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+  overflow-x: hidden;
+  scrollbar-width: none;
   background: transparent;
   border: none;
   box-shadow: none;
@@ -167,16 +202,7 @@
 }
 
 .projectNav::-webkit-scrollbar {
-  height: 5px;
-}
-
-.projectNav::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.45);
-  border-radius: 999px;
-}
-
-.projectNav::-webkit-scrollbar-track {
-  background: transparent;
+  display: none;
 }
 
 .projectNav a {
@@ -278,6 +304,29 @@
   margin: 0;
   color: var(--text-muted);
   line-height: 1.75;
+}
+
+@keyframes karshaBreathing {
+  0% { transform: scale(1); box-shadow: 0 4px 14px 0 rgba(251, 191, 36, 0.3); }
+  50% { transform: scale(1.025); box-shadow: 0 8px 24px 0 rgba(251, 191, 36, 0.5); }
+  100% { transform: scale(1); box-shadow: 0 4px 14px 0 rgba(251, 191, 36, 0.3); }
+}
+
+.btnKarsha {
+  background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%);
+  color: #452c22 !important; /* logo-brown */
+  box-shadow: 0 4px 14px 0 rgba(251, 191, 36, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: karshaBreathing 7s infinite ease-in-out;
+  font-weight: 800 !important;
+}
+
+.btnKarsha:hover {
+  background: linear-gradient(135deg, #fffbeb 0%, #fde68a 100%);
+  transform: scale(1.03) translateY(-1px);
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.45);
+  animation-play-state: paused;
 }
 
 .heroVisual {
@@ -536,4 +585,52 @@
   .socialIcons {
     gap: 0.65rem;
   }
+}
+.ctaImage { width: 100%; max-width: 1200px; margin: 2rem auto 0; display: block; border-radius: 1.5rem; box-shadow: var(--shadow-aurora); }
+
+.ctaImageWrapper {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.adminCtaUploadOverlay {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 10;
+}
+
+.adminUploadButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.1rem;
+  padding: 0 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(66, 197, 192, 0.8);
+  background: rgba(8, 15, 24, 0.75);
+  color: #e5f7f6;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.3);
+  transition: all 0.2s ease;
+}
+
+.adminUploadButton:hover {
+  background: #7fe9e6;
+  color: #0f172a;
+  transform: scale(1.05);
+}
+
+.heroCopy p {
+  font-size: 1.25rem;
+  line-height: 1.75;
+  color: #fff;
+  opacity: 0.95;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  font-weight: 500;
 }

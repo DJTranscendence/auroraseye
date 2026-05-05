@@ -31,6 +31,16 @@ export function gapTwoMmPx(): number {
   return (2 * 96) / 25.4;
 }
 
+/** ~4mm expressed in CSS pixels. */
+export function gapFourMmPx(): number {
+  return (4 * 96) / 25.4;
+}
+
+/** ~5mm expressed in CSS pixels. */
+export function gapFiveMmPx(): number {
+  return (5 * 96) / 25.4;
+}
+
 /** Space below the fixed site navbar before the floating section nav (mobile). */
 export function mobileFloatingNavClearanceBelowNavbarPx(): number {
   return gapTwoMmPx() * 2 + 12;
@@ -41,7 +51,7 @@ export function mobileFloatingNavDefaultTopPx(): number {
   return readCssLengthPx('--nav-height', 72) + mobileFloatingNavClearanceBelowNavbarPx();
 }
 
-/** Karsha Nuns: default mobile `top` is ~2mm lower than Breaking the Silence. */
+/** Karsha Nuns: default mobile `top` is lower than Breaking the Silence. */
 export function karshaMobileFloatingNavDefaultTopPx(): number {
-  return mobileFloatingNavDefaultTopPx() + gapTwoMmPx();
+  return mobileFloatingNavDefaultTopPx() + gapFourMmPx() + gapFiveMmPx();
 }

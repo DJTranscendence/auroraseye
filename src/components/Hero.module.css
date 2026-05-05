@@ -14,10 +14,11 @@
 
 .videoBackground {
   position: absolute;
-  top: var(--video-container-top, 0);
+  /* Same vertical band as padded hero (below fixed nav); CMS containerTopPx / pad still apply. */
+  top: calc(var(--nav-height, 80px) + var(--video-container-top, 0px));
   left: 0;
   width: 100%;
-  height: calc(100% - var(--video-container-height-offset, 0px));
+  height: calc(100% - var(--nav-height, 80px) - var(--video-container-height-offset, 0px));
   pointer-events: none;
   overflow: hidden;
   background: #000;
@@ -88,6 +89,14 @@
   z-index: 0;
 }
 
+/* Offset % is relative to video *band* (container), not the 16:9 wrapper height (which grows with width). */
+@supports (width: 1cqw) {
+  .heroVideo,
+  .heroIframe {
+    top: calc(var(--hero-media-top-cm, 0cm) + var(--hero-media-top-num, 0) * 1cqh);
+  }
+}
+
 .mediaPending {
   opacity: 0;
 }
@@ -110,25 +119,22 @@
 
 
 
-.badge,
-.title {
-  display: none !important;
-}
-
 .badge {
   display: inline-flex;
   align-items: center;
-  background: var(--surface);
-  color: var(--primary);
-  padding: 0.5rem 1rem;
+  background: rgba(7, 14, 28, 0.58);
+  color: #f8f5ef;
+  padding: 0.65rem 1.1rem;
   border-radius: 2rem;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   gap: 0.75rem;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 2rem;
+  letter-spacing: 0.18em;
+  margin-bottom: 1.35rem;
+  box-shadow: 0 16px 36px rgba(2, 6, 23, 0.3);
+  backdrop-filter: blur(14px);
 }
 
 .pulse {
@@ -155,28 +161,30 @@
 }
 
 .title {
-  font-size: 4.5rem;
-  line-height: 1.1;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 1.5rem;
-  min-height: 2.4em;
+  font-size: clamp(3rem, 7vw, 5.75rem);
+  line-height: 0.98;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  margin-bottom: 1rem;
+  min-height: 2.1em;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #fffaf2;
+  text-shadow: 0 14px 42px rgba(2, 6, 23, 0.72);
 }
 
 .titleSwap {
   display: block;
   animation: titleSwapIn 2s ease;
+  max-width: 12ch;
 }
 
 .description {
   font-size: 1.25rem;
-  color: #d1d5db;
+  color: #ece5dc;
   line-height: 1.6;
   margin-bottom: 2.5rem;
-  mix-blend-mode: difference;
   text-shadow: 0 2px 14px rgba(2, 6, 23, 0.45);
 }
 
@@ -243,6 +251,28 @@
   }
   100% {
     transform: translateX(-100%);
+  }
+}
+
+@media (max-width: 768px) {
+  .badge {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    margin-bottom: 1rem;
+  }
+
+  .title {
+    min-height: 2.5em;
+    margin-bottom: 0.85rem;
+  }
+
+  .titleSwap {
+    max-width: 10ch;
+  }
+
+  .description {
+    font-size: 1rem;
+    padding-inline: 0.75rem;
   }
 }
 
@@ -664,11 +694,7 @@
     gap: 0.9rem;
   }
   .videoBackground {
-    top: var(--nav-height);
-    height: calc(100% - var(--nav-height));
     pointer-events: auto;
-    width: 100%;
-    left: 0;
   }
   .heroIframe {
     pointer-events: auto;

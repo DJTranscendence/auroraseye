@@ -1,16 +1,16 @@
 {
   "hero": {
-    "title": "Storytelling through Light & Life",
+    "title": "",
     "description": "",
     "videoUrl": "https://www.youtube.com/watch?v=CFDiUQfuxdA",
     "bgImage": "https://images.unsplash.com/photo-1492691523567-6170c8675fa8?q=80&w=2670&auto=format&fit=crop",
     "controls": {
-      "iframeTopPercent": 0,
-      "iframeTopCm": 0,
+      "iframeTopPercent": 12,
+      "iframeTopCm": -2.5,
       "iframeLeftPercent": 0,
       "iframeWidthPercent": 100,
       "iframeHeightPercent": 100,
-      "videoScale": 1,
+      "videoScale": 0.97,
       "containerTopPx": 0,
       "containerPadPx": 0,
       "actionsOffsetX": 0,
@@ -27,16 +27,16 @@
       "scrollFadeInDuration": 3,
       "supportCtaOffsetX": 0,
       "supportCtaOffsetY": 0,
-      "recruitmentOffsetX": 0,
+      "recruitmentOffsetX": -55,
       "recruitmentOffsetY": 0
     },
     "controlsMobile": {
-      "iframeTopPercent": 0,
-      "iframeTopCm": 0,
-      "iframeLeftPercent": 0,
-      "iframeWidthPercent": 100,
+      "iframeTopPercent": 2.5,
+      "iframeTopCm": 0.3,
+      "iframeLeftPercent": -42,
+      "iframeWidthPercent": 92,
       "iframeHeightPercent": 100,
-      "videoScale": 1,
+      "videoScale": 1.1,
       "containerTopPx": 0,
       "containerPadPx": 0,
       "actionsOffsetX": 0,
@@ -54,7 +54,7 @@
     "phone": "+91 00000 00000",
     "address": "Anitya community, Auroville, Tamil Nadu 605101, India",
     "youtube": "https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw",
-    "facebook": "",
+    "facebook": "https://www.facebook.com/AurorasEye/about/",
     "instagram": "https://www.instagram.com/auroras_eye_films/",
     "linkedin": "https://linkedin.com/company/auroras-eye-films"
   },
@@ -62,7 +62,7 @@
     "headerBackground": "#49bfc1",
     "headerTextureOverlayOpacity": 0.14,
     "headerDarkOverlayOpacity": 0,
-    "background": "#643768",
+    "background": "#6a83a4",
     "foreground": "#f5efe7",
     "primary": "#9a6446",
     "primaryGlow": "#9a644633",
@@ -76,14 +76,44 @@
     "fontFamily": "default"
   },
   "navbarDraggable": {
-    "logo": { "x": 0, "y": 0 },
-    "homeIcon": { "x": 0, "y": 0 },
-    "documentaries": { "x": 0, "y": 0 },
-    "ourTeam": { "x": 0, "y": 0 },
-    "news": { "x": 0, "y": 0 },
-    "contactUs": { "x": 0, "y": 0 },
-    "ticker": { "x": 0, "y": 0 },
-    "donate": { "x": 0, "y": 0 },
-    "socials": { "x": 0, "y": 0 }
+    "logo": {
+      "x": 0,
+      "y": 0
+    },
+    "homeIcon": {
+      "x": 0,
+      "y": 0
+    },
+    "documentaries": {
+      "x": 0,
+      "y": 0
+    },
+    "ourTeam": {
+      "x": 0,
+      "y": 0
+    },
+    "news": {
+      "x": 0,
+      "y": 0
+    },
+    "contactUs": {
+      "x": 0,
+      "y": 0
+    },
+    "ticker": {
+      "x": 0,
+      "y": 0
+    },
+    "donate": {
+      "x": 0,
+      "y": 0
+    },
+    "socials": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "karshaFloatingNav": {
+    "desktopTopPx": 122
   }
 }

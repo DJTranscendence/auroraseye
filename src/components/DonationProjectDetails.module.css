@@ -11,7 +11,8 @@
   padding: 2rem;
   border-radius: 2rem;
   border-top-left-radius: 0;
-  background: linear-gradient(135deg, rgba(10, 18, 32, 0.9), rgba(12, 30, 34, 0.85));
+  background: var(--donation-project-bg, linear-gradient(135deg, rgba(10, 18, 32, 0.9), rgba(12, 30, 34, 0.85)));
+  color: var(--donation-project-fg, var(--foreground));
   border: 1px solid rgba(66, 197, 192, 0.3);
   box-shadow: 0 24px 50px rgba(2, 6, 23, 0.35);
 }
@@ -22,7 +23,7 @@
 }
 
 .heroCopy p {
-  color: var(--text-muted);
+  color: var(--donation-project-muted, var(--text-muted));
   line-height: 1.7;
 }
 
@@ -129,8 +130,52 @@
 
 .heroActions {
   display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
   gap: 1rem;
   margin-top: 1.5rem;
+}
+
+.fundRegionStack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  max-width: min(100%, 22rem);
+}
+
+.fundProjectLead {
+  margin: 0 0 0.15rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--donation-project-fg, #f4f9ff);
+  line-height: 1.25;
+}
+
+.fundRegionLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #c7f7f6;
+  line-height: 1.35;
+}
+
+.fundRegionSelect {
+  width: 100%;
+  max-width: 22rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(66, 197, 192, 0.45);
+  background: rgba(8, 14, 26, 0.92);
+  color: #e8fffe;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fundRegionSelect:focus {
+  outline: 2px solid rgba(66, 197, 192, 0.65);
+  outline-offset: 2px;
 }
 
 .heroCopy {
@@ -151,6 +196,13 @@
   font-weight: 800;
   text-decoration: none;
   box-shadow: 0 18px 35px rgba(53, 211, 209, 0.35);
+}
+
+.primaryButtonMuted {
+  pointer-events: none;
+  opacity: 0.42;
+  box-shadow: none;
+  cursor: default;
 }
 
 .ghostButton {
@@ -210,36 +262,8 @@
   transform: scale(1.05);
 }
 
-.heroMediaBadge {
-  position: absolute;
-  top: 0.6rem;
-  left: 0.6rem;
-  padding: 0.25rem 0.55rem;
-  border-radius: 999px;
-  font-size: 0.6rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  background: rgba(4, 10, 20, 0.7);
-  border: 1px solid rgba(127, 233, 230, 0.4);
-  color: #7fe9e6;
-}
-
-.heroMediaVideo {
-  border-color: rgba(66, 197, 192, 0.45);
-}
-
-.videoPlaceholder {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  display: grid;
-  place-items: center;
-  gap: 0.35rem;
-  color: #bfeff0;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.65rem;
-  background: radial-gradient(circle at 20% 20%, rgba(66, 197, 192, 0.25), transparent 55%),
-    rgba(7, 16, 28, 0.85);
+.mediaBadge, .mediaTitle {
+  display: none !important;
 }
 
 .imagePlaceholder {
@@ -585,5 +609,12 @@
   .mediaWallGrid .mediaTile:nth-child(10n + 7) {
     grid-column: span 1;
     grid-row: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero,
+  .heroImageWrap {
+    border-radius: 0;
   }
 }

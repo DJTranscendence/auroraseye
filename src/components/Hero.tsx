@@ -8,13 +8,6 @@ import { trackYouTubeClick } from '@/utils/youtubeAnalytics';
 import fallbackConfig from '@/data/config.json';
 import { getNavbarDraggableForHeroPublish } from '@/config/navbar-draggable-publish-bridge';
 
-const HERO_TITLES = [
-  'Storytelling through Light & Life',
-  'Direction. Camera. Truth.',
-  'Cinematography that serves story',
-  'From Auroville to the world',
-];
-
 const HERO_VIDEO_TIME_KEY = 'hero_video_time';
 const HERO_TITLE_CYCLE_KEY = 'hero_title_cycle_state';
 const HERO_VIDEO_CONTROL_KEY = 'hero_video_controls';
@@ -32,12 +25,12 @@ const HERO_YOUTUBE_LOOP_SECONDS = 49;
 const MOBILE_HERO_MEDIA_DEFAULTS = {
   containerTopPx: 0,
   containerPadPx: 0,
-  iframeTopPercent: 0,
+  iframeTopPercent: 2.5,
   iframeLeftPercent: 0,
   iframeWidthPercent: 100,
   iframeHeightPercent: 100,
   videoScale: 1,
-  iframeTopCm: 0,
+  iframeTopCm: 0.3,
 } as const;
 
 const getYouTubeId = (url: string) => {
@@ -268,6 +261,15 @@ export default function Hero() {
     }
   }, [isMobileViewport]);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('edit') === 'layout') {
+        setControlsVisible(true);
+      }
+    }
+  }, []);
+
   const togglePause = () => {
     setIsPaused((prev) => {
       const next = !prev;
@@ -378,7 +380,10 @@ export default function Hero() {
     url.searchParams.set('enablejsapi', '1');
     return url.toString();
   }, [youtubeVideoId]);
-  const heroDescription = (config?.hero?.description ?? '').replace(/[—–]/g, '-');
+  const heroTitle = typeof config?.hero?.title === 'string' ? config.hero.title.trim() : '';
+  const heroDescription = typeof config?.hero?.description === 'string'
+    ? config.hero.description.trim().replace(/[—–]/g, '-')
+    : '';
 
   const readTitleCycleState = () => {
     if (typeof window === 'undefined') {
@@ -396,7 +401,7 @@ export default function Hero() {
         return null;
       }
 
-      const index = Math.max(0, Math.floor(parsed.index as number)) % HERO_TITLES.length;
+      const index = 0;
       const timestamp = Math.max(0, Math.floor(parsed.timestamp as number));
       return { index, timestamp };
     } catch {
@@ -410,7 +415,7 @@ export default function Hero() {
     }
 
     const normalized = {
-      index: ((index % HERO_TITLES.length) + HERO_TITLES.length) % HERO_TITLES.length,
+      index: 0,
       timestamp: Math.max(0, Math.floor(timestamp)),
     };
 
@@ -689,31 +694,14 @@ export default function Hero() {
     } else {
       const elapsed = Math.max(0, now - state.timestamp);
       const skippedSteps = Math.floor(elapsed / HERO_TITLE_CYCLE_MS);
-      const initialIndex = (state.index + skippedSteps) % HERO_TITLES.length;
-      const alignedTimestamp = state.timestamp + skippedSteps * HERO_TITLE_CYCLE_MS;
-
-      setActiveTitleIndex(initialIndex);
-      writeTitleCycleState(initialIndex, alignedTimestamp);
+      setActiveTitleIndex(0);
+      writeTitleCycleState(0, state.timestamp);
     }
 
-    let interval: number;
-    const timeout = window.setTimeout(() => {
-      interval = window.setInterval(() => {
-        setActiveTitleIndex((current) => {
-          const next = (current + 1) % HERO_TITLES.length;
-          writeTitleCycleState(next, Date.now());
-          return next;
-        });
-      }, HERO_TITLE_CYCLE_MS);
-    }, HERO_TITLE_CYCLE_MS);
-
     return () => {
-      window.clearTimeout(timeout);
-      if (interval) {
-        window.clearInterval(interval);
-      }
+      setActiveTitleIndex(0);
     };
-  }, []);
+  }, [heroTitle]);
 
   useEffect(() => {
     setIsVideoReady(false);
@@ -971,7 +959,9 @@ export default function Hero() {
           backgroundImage: `url(${config.hero.bgImage})`,
           '--video-container-top': `${effectiveContainerTopPx}px`,
           '--video-container-height-offset': `${effectiveContainerPadPx}px`,
+          /* Percent of video band height (see Hero.module.css); avoids drift when 16:9 wrapper height tracks width. */
           '--hero-media-top': `${effectiveIframeTopPercent}%`,
+          '--hero-media-top-num': String(effectiveIframeTopPercent),
           '--hero-media-top-cm': `${iframeTopCm}cm`,
           '--hero-media-left': `${effectiveIframeLeftPercent}%`,
           '--hero-media-width': `${effectiveIframeWidthPercent}%`,
@@ -1020,25 +1010,23 @@ export default function Hero() {
         <div className={styles.recruitmentWindow}>
           <div className={styles.recruitmentTrack}>
             <span>
-              We want you! Join the dynamic Aurora's Eye Team! Writers, Editors, Designers, show us your stuff! Click here to get in touch.
+              We want you! Join the dynamic Aurora&apos;s Eye Team! Writers, Editors, Designers, show us your stuff! Click here to get in touch.
             </span>
             <span>
-              We want you! Join the dynamic Aurora's Eye Team! Writers, Editors, Designers, show us your stuff! Click here to get in touch.
+              We want you! Join the dynamic Aurora&apos;s Eye Team! Writers, Editors, Designers, show us your stuff! Click here to get in touch.
             </span>
           </div>
         </div>
       </Link>
       <div className={`container ${styles.content} animate-fade-in`}>
-        <div className={styles.badge}>
-          <div className={styles.pulse}></div>
-          <span>Documenting the Extraordinary</span>
-        </div>
-        <h1 className={styles.title}>
-          <span key={HERO_TITLES[activeTitleIndex]} className={styles.titleSwap}>
-            {HERO_TITLES[activeTitleIndex]}
-          </span>
-        </h1>
-        <p className={styles.description}>{heroDescription}</p>
+        {heroTitle ? (
+          <h1 className={styles.title}>
+            <span key={heroTitle} className={styles.titleSwap}>
+              {heroTitle}
+            </span>
+          </h1>
+        ) : null}
+        {heroDescription ? <p className={styles.description}>{heroDescription}</p> : null}
         <div
           className={styles.actions}
           style={{
@@ -1104,6 +1092,7 @@ export default function Hero() {
               color: 'white',
               cursor: 'pointer',
             }}
+            title="Edit Homepage Layout"
           >
             <Settings size={20} />
           </button>

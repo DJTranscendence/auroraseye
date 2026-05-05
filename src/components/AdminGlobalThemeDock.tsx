@@ -284,7 +284,7 @@ export default function AdminGlobalThemeDock() {
               document.body.style.userSelect = 'none';
             }}
           >
-            <h2 className={styles.dockTitle}>Site theme</h2>
+            <h2 className={styles.dockTitle}>Page theme</h2>
             <button type="button" className={styles.toggleBtn} onClick={() => setExpanded(false)}>
               Hide
             </button>
@@ -354,7 +354,7 @@ export default function AdminGlobalThemeDock() {
               setExpanded(true);
             }}
           >
-            Site theme
+            Page theme
           </button>
         </div>
       )}

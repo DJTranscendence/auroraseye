@@ -6,6 +6,10 @@ import Footer from '@/components/Footer';
 import { DonationProject } from '@/components/DonationProjectDetails';
 import WatchNextStrip from '@/components/WatchNextStrip';
 import YouTubeSubscribePanel from '@/components/YouTubeSubscribePanel';
+import RedditWall, {
+  AURORAS_EYE_REDDIT,
+  MATRIMANDIR_AND_I_REDDIT_POSTS,
+} from '@/components/RedditWall';
 import styles from './page.module.css';
 
 type DonationProjectsPayload = {
@@ -14,7 +18,30 @@ type DonationProjectsPayload = {
 
 type TabId = 'shorts' | 'interviews' | 'episodes' | 'feature';
 
-const DONATION_LINK = 'https://give.aviusa.org/page/MMAndI';
+const DONATION_LINK_INDIA = 'https://pay.auroville.org/aef';
+
+function FundingLink({
+  href,
+  className,
+  children,
+}: {
+  href: string | null;
+  className: string;
+  children: React.ReactNode;
+}) {
+  if (href) {
+    return (
+      <a className={className} href={href} target="_blank" rel="noopener noreferrer">
+        {children}
+      </a>
+    );
+  }
+  return (
+    <span className={`${className} ${styles.fundingLinkDisabled}`} aria-disabled="true">
+      {children}
+    </span>
+  );
+}
 
 export default function MatrimandirAndIPage() {
   const [activeTab, setActiveTab] = useState<TabId>('shorts');
@@ -22,6 +49,8 @@ export default function MatrimandirAndIPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [bgImage, setBgImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+
+  const fundingHref = DONATION_LINK_INDIA;
 
   // Background Drag State
   const [isBackgroundDragEnabled, setIsBackgroundDragEnabled] = useState(false);
@@ -269,14 +298,9 @@ export default function MatrimandirAndIPage() {
                     <h2>{tab.title}</h2>
                     <p>{tab.description}</p>
                   </div>
-                  <a
-                    className={styles.panelFundingLink}
-                    href={DONATION_LINK}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <FundingLink href={fundingHref} className={styles.panelFundingLink}>
                     Fund this section
-                  </a>
+                  </FundingLink>
                 </div>
 
                 {tab.sourceUrl ? (
@@ -293,23 +317,23 @@ export default function MatrimandirAndIPage() {
                     <article className={styles.featureCard}>
                       <h3>Fund Sound Production</h3>
                       <p>Help us build the soundscape with a dedicated audio production fund.</p>
-                      <a href={DONATION_LINK} target="_blank" rel="noopener noreferrer">
+                      <FundingLink href={fundingHref} className={styles.featureCardLink}>
                         Fund Sound Production
-                      </a>
+                      </FundingLink>
                     </article>
                     <article className={styles.featureCard}>
                       <h3>Esteemed Local Composer</h3>
                       <p>Support an original score crafted by a respected local composer.</p>
-                      <a href={DONATION_LINK} target="_blank" rel="noopener noreferrer">
+                      <FundingLink href={fundingHref} className={styles.featureCardLink}>
                         Fund the Composer
-                      </a>
+                      </FundingLink>
                     </article>
                     <article className={styles.featureCard}>
                       <h3>Audio Editor</h3>
                       <p>Fund a dedicated audio editor to refine the final feature mix.</p>
-                      <a href={DONATION_LINK} target="_blank" rel="noopener noreferrer">
+                      <FundingLink href={fundingHref} className={styles.featureCardLink}>
                         Fund Audio Editing
-                      </a>
+                      </FundingLink>
                     </article>
                   </div>
                 )}
@@ -388,6 +412,16 @@ export default function MatrimandirAndIPage() {
               ❤️ Join the conversation - In our chatroom 💬
             </a>
           </div>
+
+          <RedditWall
+            sectionClassName={styles.redditWallBelowChat}
+            posts={MATRIMANDIR_AND_I_REDDIT_POSTS}
+            eyebrow="Community Pulse"
+            heading="Matrimandir & I on Reddit"
+            description="Discuss episodes, trailers, and voices from the series on Aurora's Eye Films' community subreddit."
+            ctaHref={AURORAS_EYE_REDDIT}
+            ctaLabel="Visit r/AurorasEyeFilms"
+          />
 
           <div className={styles.youtubeSection}>
             <YouTubeSubscribePanel contextLabel="matrimandir-subscribe-panel" />

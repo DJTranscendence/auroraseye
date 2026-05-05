@@ -37,7 +37,7 @@ export async function GET(request: Request) {
     } else if (type === 'discussionTabs') {
       return NextResponse.json(await getDiscussionTabs(), { headers: NO_STORE_HEADERS });
     } else if (type === 'discussionMessages') {
-      const payload = await getDiscussionMessages();
+      const payload = (await getDiscussionMessages()) as Record<string, any[]>;
       if (tabId) {
         return NextResponse.json({ messages: payload?.[tabId] ?? [] }, { headers: NO_STORE_HEADERS });
       }

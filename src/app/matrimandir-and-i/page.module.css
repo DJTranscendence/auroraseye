@@ -38,6 +38,50 @@
   gap: 0.75rem;
 }
 
+.fundPayRegionBar {
+  margin-top: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  max-width: 26rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.fundPayRegionLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(248, 250, 252, 0.88);
+  text-align: center;
+  line-height: 1.35;
+}
+
+.fundPayRegionSelect {
+  width: 100%;
+  max-width: 22rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.85);
+  color: #f1f5f9;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fundPayRegionSelect:focus {
+  outline: 2px solid rgba(66, 197, 192, 0.55);
+  outline-offset: 2px;
+}
+
+.fundingLinkDisabled {
+  opacity: 0.42;
+  pointer-events: none;
+  cursor: default;
+}
+
 .tabButton:nth-child(1) { --tab-rgb: 255, 179, 186; /* Pastel Pink */ }
 .tabButton:nth-child(2) { --tab-rgb: 255, 223, 186; /* Pastel Peachy Orange */ }
 .tabButton:nth-child(3) { --tab-rgb: 186, 255, 201; /* Pastel Mint */ }
@@ -321,7 +365,8 @@
   line-height: 1.6;
 }
 
-.featureCard a {
+.featureCard a,
+.featureCardLink {
   margin-top: 0.4rem;
   display: inline-flex;
   align-items: center;
@@ -349,6 +394,12 @@
   .featureGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+/* Reddit wall sits directly under the “Join the conversation” CTA */
+.redditWallBelowChat {
+  padding-top: 1.5rem;
+  padding-bottom: 3rem;
 }
 
 @media (max-width: 768px) {

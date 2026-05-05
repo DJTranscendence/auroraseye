@@ -141,7 +141,6 @@ function getDirectWatchUrl(videoUrl: string) {
 }
 
 export default function Documentary3DBrowser({ filmsData }: Props) {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
   const [selectedInterest, setSelectedInterest] = useState('All');
   const [hoveredFilmId, setHoveredFilmId] = useState<string | null>(null);
@@ -178,86 +177,39 @@ export default function Documentary3DBrowser({ filmsData }: Props) {
     []
   );
 
-  const categoryBuckets = useMemo<CategoryBucket[]>(() => {
-    const grouped = new Map<string, Film[]>();
-
-    for (const film of filmsData) {
-      const existing = grouped.get(film.category) ?? [];
-      existing.push(film);
-      grouped.set(film.category, existing);
-    }
-
-    return Array.from(grouped.entries())
-      .map(([category, videos]) => ({
-        category,
-        thumbnail: videos[0]?.thumbnail ?? '/uploads/placeholder.jpg',
-        videos,
-      }))
-      .sort((left, right) => left.category.localeCompare(right.category));
+  const categories = useMemo(() => {
+    const set = new Set(filmsData.map(f => f.category));
+    return Array.from(set).sort();
   }, [filmsData]);
-
-  const selectedBucket = selectedCategory
-    ? categoryBuckets.find((bucket) => bucket.category === selectedCategory) ?? null
-    : null;
-
-  const interestOptions = useMemo(() => ['All', ...categoryBuckets.map((bucket) => bucket.category)], [categoryBuckets]);
 
   const categoryPaletteMap = useMemo(() => {
     const map = new Map<string, (typeof chipPalette)[number]>();
-    categoryBuckets.forEach((bucket, index) => {
-      map.set(bucket.category, chipPalette[index % chipPalette.length]);
+    categories.forEach((cat, index) => {
+      map.set(cat, chipPalette[index % chipPalette.length]);
     });
     return map;
-  }, [categoryBuckets, chipPalette]);
+  }, [categories, chipPalette]);
 
-  const normalizedInterestQuery = selectedInterest === 'All' ? '' : selectedInterest.toLowerCase();
-
-  const filteredCategoryBuckets = useMemo(() => {
-    if (!normalizedInterestQuery) {
-      return categoryBuckets;
-    }
-
-    return categoryBuckets.filter((bucket) => {
-      const searchableText = [
-        bucket.category,
-        ...bucket.videos.flatMap((video) => [video.title, video.description, video.year]),
-      ]
-        .join(' ')
-        .toLowerCase();
-
-      return searchableText.includes(normalizedInterestQuery);
-    });
-  }, [categoryBuckets, normalizedInterestQuery]);
+  const interestOptions = useMemo(() => ['All', ...categories], [categories]);
 
   const filteredVideos = useMemo(() => {
-    if (!selectedBucket) {
-      return [];
-    }
-
-    if (!normalizedInterestQuery) {
-      return selectedBucket.videos;
-    }
-
-    return selectedBucket.videos.filter((video) =>
+    if (selectedInterest === 'All') return filmsData;
+    const query = selectedInterest.toLowerCase();
+    return filmsData.filter((video) =>
       [video.title, video.description, video.year, video.category]
         .join(' ')
         .toLowerCase()
-        .includes(normalizedInterestQuery),
+        .includes(query),
     );
-  }, [normalizedInterestQuery, selectedBucket]);
-
-  const handleBack = () => {
-    setSelectedFilm(null);
-    setSelectedCategory(null);
-  };
+  }, [selectedInterest, filmsData]);
 
   return (
     <div className={styles.browser}>
       <div className={styles.chrome}>
         <div>
-          <p className={styles.eyebrow}>Interactive Catalog</p>
+          <p className={styles.eyebrow}>Documentary Catalog</p>
           <h2 className={styles.heading}>
-            {selectedCategory ? selectedCategory : 'Zoom through our documentary work'}
+            {selectedInterest === 'All' ? 'Browse all documentary work' : selectedInterest}
           </h2>
           <div className={styles.filterRow}>
             <div className={styles.filterLabel}>
@@ -305,51 +257,10 @@ export default function Documentary3DBrowser({ filmsData }: Props) {
             </div>
           </div>
         </div>
-
-        {(selectedCategory || selectedFilm) && (
-          <button className={styles.navButton} onClick={handleBack}>
-            <ArrowLeft size={18} />
-            <span>Back To Categories</span>
-          </button>
-        )}
       </div>
 
       <div className={styles.viewport}>
-        <div className={`${styles.scene} ${selectedCategory ? styles.sceneZoomed : ''}`}>
-          {!selectedCategory && (
-            <div className={styles.categoryGrid}>
-              {filteredCategoryBuckets.map((bucket, index) => {
-                const palette = categoryPaletteMap.get(bucket.category) ?? chipPalette[index % chipPalette.length];
-
-                return (
-                <button
-                  key={bucket.category}
-                  className={styles.categoryTile}
-                  onClick={() => setSelectedCategory(bucket.category)}
-                  style={{
-                    animationDelay: `${index * 70}ms`,
-                    '--tile-badge-bg': palette.bg,
-                    '--tile-badge-border': palette.border,
-                    '--tile-badge-text': palette.text,
-                    '--tile-kicker-text': palette.text,
-                  } as React.CSSProperties}
-                >
-                  <div
-                    className={styles.tileImage}
-                    style={{ backgroundImage: `linear-gradient(180deg, rgba(7, 10, 20, 0.02), rgba(7, 10, 20, 0.55)), url('${bucket.thumbnail}')` }}
-                  >
-                    <div className={styles.categoryBadge}>{bucket.category}</div>
-                  </div>
-                  <div className={styles.tileMeta}>
-                    <span className={styles.tileKicker}>{bucket.videos.length} films</span>
-                  </div>
-                </button>
-                );
-              })}
-            </div>
-          )}
-
-          {selectedBucket && !selectedFilm && (
+        <div className={styles.scene}>
             <div
               className={styles.videoGrid}
               onClickCapture={handleGridClick}
@@ -391,6 +302,7 @@ export default function Documentary3DBrowser({ filmsData }: Props) {
                     </div>
                   </div>
                   <div className={styles.tileMeta}>
+                    <div className={styles.tileBadge}>{film.category}</div>
                     <span className={styles.tileKicker}>{film.year}</span>
                     <h3>{film.title}</h3>
                     <p>{film.description}</p>
@@ -400,7 +312,6 @@ export default function Documentary3DBrowser({ filmsData }: Props) {
                 );
               })}
             </div>
-          )}
         </div>
 
         {selectedFilm && (

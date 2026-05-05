@@ -1,51 +1,64 @@
 'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Hand, Heart } from "lucide-react";
 import styles from "./page.module.css";
 import {
+  gapTwoMmPx,
   isFloatingNavMobileViewport,
   mobileFloatingNavClearanceBelowNavbarPx,
   mobileFloatingNavDefaultTopPx,
+  readCssLengthPx,
 } from "@/utils/floatingNavLayout";
 
 const NAV_LINKS = [
-  { name: "The Documentary", href: "#documentary" },
-  { name: "Why This Film Matters", href: "#why" },
-  { name: "Join the Conversation", href: "#conversation", icon: "heart" },
-  { name: "Connect", href: "#connect" },
-  { name: "Donate", href: "#donate" },
+  { href: "#documentary" as const },
+  { href: "#why" },
+  { href: "#conversation", icon: "heart" as const },
+  { href: "#connect" },
+  { href: "#donate" },
 ];
+const DEFAULT_LABELS = [
+  "The Documentary",
+  "Why This Film Matters",
+  "Join the Conversation",
+  "Connect",
+  "Donate",
+];
+const BREAKING_FLOATING_NAV_POSITION_KEY = "breaking-floating-nav-position-v4";
 
-export default function BreakingFloatingNav() {
+export default function BreakingFloatingNav({ labelSlots }: { labelSlots: ReactNode[] }) {
   const [activeHref, setActiveHref] = useState("#documentary");
   const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const navRef = useRef<HTMLDivElement | null>(null);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
+  const desktopFloatingNavDefaultTopPx = () =>
+    readCssLengthPx("--nav-height", 80) + mobileFloatingNavClearanceBelowNavbarPx() - (2 * 96) / 25.4 + gapTwoMmPx() * 0.5 + (96 / 2.54);
 
   useEffect(() => {
-    const savedPosition = window.localStorage.getItem("breaking-floating-nav-position");
+    const savedPosition = window.localStorage.getItem(BREAKING_FLOATING_NAV_POSITION_KEY);
 
     const navWidth = navRef.current?.offsetWidth ?? 760;
     const centeredLeft = Math.max(16, Math.round((window.innerWidth - navWidth) / 2));
     const mobileTop = mobileFloatingNavDefaultTopPx();
-    const desktopDefaultTop = 96;
+    const desktopDefaultTop = desktopFloatingNavDefaultTopPx();
 
     if (savedPosition) {
       try {
         const parsed = JSON.parse(savedPosition) as { left: number; top: number };
         if (Number.isFinite(parsed.left) && Number.isFinite(parsed.top)) {
-          if (isFloatingNavMobileViewport() && parsed.top < mobileTop - mobileFloatingNavClearanceBelowNavbarPx() * 0.2) {
-            setPosition({ left: centeredLeft, top: mobileTop });
+          const minTop = isFloatingNavMobileViewport() ? mobileTop : desktopDefaultTop;
+          if (parsed.top < minTop) {
+            setPosition({ left: centeredLeft, top: minTop });
           } else {
             setPosition(parsed);
           }
           return;
         }
       } catch {
-        window.localStorage.removeItem("breaking-floating-nav-position");
+        window.localStorage.removeItem(BREAKING_FLOATING_NAV_POSITION_KEY);
       }
     }
 
@@ -60,7 +73,7 @@ export default function BreakingFloatingNav() {
 
     const updateActiveSection = () => {
       const scrollAnchor = window.scrollY + 180;
-      let currentHref = NAV_LINKS[0].href;
+      let currentHref = NAV_LINKS[0]?.href ?? "#documentary";
 
       for (const sectionId of sectionIds) {
         const section = document.getElementById(sectionId);
@@ -92,7 +105,7 @@ export default function BreakingFloatingNav() {
       return;
     }
 
-    window.localStorage.setItem("breaking-floating-nav-position", JSON.stringify(position));
+    window.localStorage.setItem(BREAKING_FLOATING_NAV_POSITION_KEY, JSON.stringify(position));
   }, [position]);
 
   useEffect(() => {
@@ -105,7 +118,9 @@ export default function BreakingFloatingNav() {
       const navHeight = navRef.current?.offsetHeight ?? 64;
       const nextLeft = event.clientX - dragOffsetRef.current.x;
       const nextTop = event.clientY - dragOffsetRef.current.y;
-      const minTop = isFloatingNavMobileViewport() ? mobileFloatingNavDefaultTopPx() : 92;
+      const minTop = isFloatingNavMobileViewport()
+        ? mobileFloatingNavDefaultTopPx()
+        : desktopFloatingNavDefaultTopPx();
 
       setPosition({
         left: Math.min(Math.max(12, nextLeft), window.innerWidth - navWidth - 12),
@@ -169,9 +184,10 @@ export default function BreakingFloatingNav() {
         className={`${styles.floatingNavInner} ${isDragging ? styles.floatingNavDragging : ""}`}
       >
         <nav className={styles.projectNav} aria-label="Breaking the Silence section navigation">
-          {NAV_LINKS.map((link) => {
+          {NAV_LINKS.map((link, index) => {
             const isExternal = link.href.startsWith("http");
             const isActive = !isExternal && activeHref === link.href;
+            const label = labelSlots[index] ?? DEFAULT_LABELS[index] ?? "";
 
             return (
               <Link
@@ -184,7 +200,7 @@ export default function BreakingFloatingNav() {
                 rel={isExternal ? "noopener noreferrer" : undefined}
               >
                 {link.icon === "heart" ? <Heart size={14} fill="currentColor" /> : null}
-                {link.name}
+                {label}
               </Link>
             );
           })}

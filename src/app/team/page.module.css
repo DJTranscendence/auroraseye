@@ -3,9 +3,26 @@
 }
 
 .header {
-  padding: 80px 0 24px;
+  padding: 120px 0 60px;
   background: linear-gradient(to bottom, var(--surface) 0%, var(--background) 100%);
+  position: relative;
   text-align: center;
+}
+
+.header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
+  pointer-events: none;
+}
+
+.header h1 {
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  margin: 1rem 0 1.5rem;
+  color: #fff;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.02em;
 }
 
 /* Tighter handoff from hero to member cards (global .section uses 120px top) */
@@ -24,9 +41,13 @@
 }
 
 .subtitle {
-  font-size: 1.25rem;
-  color: var(--text-muted);
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #fff;
   margin: 0 auto;
+  opacity: 0.95;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  max-width: 700px;
 }
 
 .grid {
@@ -54,10 +75,43 @@
 }
 
 .photoContainer {
-  height: 450px;
-  border-radius: 1.5rem;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
+}
+
+.adminMemberControls {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  gap: 0.4rem;
+  z-index: 10;
+}
+
+.adminBtn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.adminBtn:hover {
+  background: #7fe9e6;
+  color: #0f172a;
+}
+
+.adminBtn.delete:hover {
+  background: #ef4444;
+  color: #fff;
 }
 
 .photoContainer img {
@@ -65,6 +119,7 @@
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
+  box-shadow: var(--shadow-lg);
 }
 
 .memberCard:hover .photoContainer img {
@@ -97,8 +152,9 @@
 
 .bio {
   font-size: 1.2rem;
-  line-height: 1.7;
-  color: var(--text-muted);
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 400;
 }
 
 .social {
@@ -177,4 +233,148 @@
   .header h1 { font-size: 3rem; }
   .memberCard { padding: 2rem; }
   .content h2 { font-size: 2.5rem; }
+}
+
+.adminHeader {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2rem;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20000;
+  padding: 2rem;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-aurora);
+  animation: modalIn 0.3s ease-out;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modalHeader {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalHeader h3 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.modalHeader button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.modalHeader button:hover {
+  color: #fff;
+}
+
+.modalBody {
+  padding: 2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  letter-spacing: 0.05em;
+}
+
+.field input, .field textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.field input:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.photoField {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.photoField input {
+  flex: 1;
+}
+
+.uploadBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.modalFooter {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.socialEditGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
 }

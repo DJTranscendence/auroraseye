@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import styles from './VideoGallery.module.css';
 import Link from 'next/link';
-import { ExternalLink, Play, ThumbsUp, SendHorizontal } from 'lucide-react';
+import { ExternalLink, Play, ThumbsUp, SendHorizontal, Plus, Trash2 } from 'lucide-react';
 import { trackYouTubeClick } from '@/utils/youtubeAnalytics';
 import fallbackFeaturedFilms from '@/data/featuredFilms.json';
 
@@ -364,6 +364,44 @@ export default function VideoGallery() {
     refreshFeaturedFilms().catch(() => undefined);
   };
 
+  const handleDelete = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this film from the featured gallery?')) return;
+    const updatedFilms = featuredFilms.filter(film => Number(film.id) !== id);
+    await fetch('/api/cms?type=featuredFilms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedFilms),
+    });
+    setFeaturedFilms(updatedFilms);
+    refreshFeaturedFilms().catch(() => undefined);
+  };
+
+  const handleAdd = async () => {
+    const newId = Date.now();
+    const newFilm: VideoCard = {
+      id: newId,
+      title: 'New Film',
+      subtitle: 'New story from Aurora\'s Eye Films',
+      viewerFit: 'Everyone interested in our latest documentaries.',
+      engagement: 'Watch now',
+      image: '',
+      videoUrl: '',
+      facebookUrl: '',
+      previewStartSeconds: 0,
+      previewEnabled: true,
+    };
+    const updatedFilms = [newFilm, ...featuredFilms];
+    await fetch('/api/cms?type=featuredFilms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedFilms),
+    });
+    setFeaturedFilms(updatedFilms);
+    refreshFeaturedFilms().catch(() => undefined);
+    setIsEditing(newFilm);
+    setEditUrl('');
+  };
+
   return (
     <section className={styles.gallerySection} style={galleryStyle}>
       <div className="container">
@@ -436,6 +474,11 @@ export default function VideoGallery() {
         <div className={styles.header}>
           <div className="badge">Latest Work</div>
           <h2 className="title">Featured Films</h2>
+          {isAdmin && (
+            <button type="button" className={`btn btn-primary ${styles.adminAddFilm}`} onClick={handleAdd}>
+              <Plus size={18} /> Add Film
+            </button>
+          )}
         </div>
         <div className={styles.posterGrid}>
           {cards.map((film) => {
@@ -487,17 +530,30 @@ export default function VideoGallery() {
                       {isLatestCard && <span className={styles.latestBadge}>NEW</span>}
                       <span className={styles.posterTag}>A film by Serena Aurora</span>
                       {isAdmin && !isLatestCard ? (
-                        <button
-                          type="button"
-                          className={`${styles.adminEditLink} ${isLatestCard ? styles.adminEditLinkShifted : ''}`}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            handleEdit(film);
-                          }}
-                        >
-                          Edit
-                        </button>
+                        <div className={styles.adminPosterControls}>
+                          <button
+                            type="button"
+                            className={`${styles.adminEditLink}`}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              handleEdit(film);
+                            }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            className={`${styles.adminDeleteLink}`}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              handleDelete(Number(film.id));
+                            }}
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
                       ) : null}
                       <span className={styles.posterPlay}>
                         <Play size={24} fill="currentColor" />

@@ -7,3 +7,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 Do NOT rely on node_modules/next/dist/docs/ as it does not exist. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
+
+## Deploy
+
+After completing substantive code or content changes (anything a reviewer would expect to see live), run production deploy from the repo root unless the user opts out:
+
+`npx vercel deploy --prod --yes`

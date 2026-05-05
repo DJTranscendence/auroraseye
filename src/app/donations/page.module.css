@@ -27,15 +27,18 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.35rem 0.9rem;
+  padding: 0.45rem 1.08rem;
   border-radius: 999px;
-  background: rgba(66, 197, 192, 0.16);
-  border: 1px solid rgba(66, 197, 192, 0.4);
-  color: #7fe9e6;
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
+  background: rgba(66, 197, 192, 0.28);
+  border: 2px solid rgba(66, 197, 192, 0.72);
+  color: #9ff9f7;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  margin-bottom: 0.55rem;
+  margin-bottom: 0.54rem;
+  text-shadow: 0 0 18px rgba(66, 197, 192, 0.45);
+  box-shadow: 0 0 0 1px rgba(8, 15, 24, 0.35) inset, 0 0 18px rgba(66, 197, 192, 0.25);
 }
 
 .tabs {
@@ -51,10 +54,10 @@
 
 .tab,
 .tabActive {
-  border: 1px solid var(--tab-border, rgba(66, 197, 192, 0.3));
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-bottom: none;
-  background: var(--tab-bg, #1a2432);
-  color: var(--tab-text, #cbd5e1);
+  background: var(--donation-project-bg, var(--background));
+  color: var(--donation-project-fg, var(--foreground));
   padding: 0.5rem 1.1rem 0.45rem;
   font-weight: 700;
   cursor: pointer;
@@ -64,9 +67,9 @@
 }
 
 .tabActive {
-  background: var(--tab-bg-active, #0f172a);
-  color: var(--tab-text-active, #ffffff);
-  border-color: var(--tab-border-active, rgba(66, 197, 192, 0.3));
+  background: var(--donation-project-bg, var(--background));
+  color: var(--donation-project-fg, var(--foreground));
+  border-color: rgba(255, 255, 255, 0.26);
   border-left: none;
   z-index: 2;
   transform: translateY(0);
@@ -75,46 +78,65 @@
 }
 
 .tab:hover {
-  background: var(--tab-bg-hover, #202b3b);
-  color: var(--tab-text-hover, #e2e8f0);
-  border-color: var(--tab-border-hover, rgba(66, 197, 192, 0.45));
+  background: var(--donation-project-bg, var(--background));
+  color: var(--donation-project-fg, var(--foreground));
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
-.tab[data-project='matrimandir-and-i'] {
-  --tab-bg: rgba(88, 52, 92, 0.93);
-  --tab-bg-hover: rgba(102, 60, 108, 0.95);
-  --tab-bg-active: rgba(74, 42, 79, 0.98);
-  --tab-border: rgba(238, 182, 219, 0.62);
-  --tab-border-hover: rgba(255, 211, 238, 0.82);
-  --tab-border-active: rgba(255, 211, 238, 0.86);
-  --tab-text: #ffd8ec;
-  --tab-text-hover: #ffeaf6;
-  --tab-text-active: #ffffff;
+.sectionThemeBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  margin: 0.75rem 0 0;
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.92);
 }
 
-.tab[data-project='karsha-nuns'] {
-  --tab-bg: rgba(86, 61, 21, 0.93);
-  --tab-bg-hover: rgba(102, 72, 24, 0.95);
-  --tab-bg-active: rgba(71, 49, 16, 0.98);
-  --tab-border: rgba(251, 191, 36, 0.68);
-  --tab-border-hover: rgba(252, 211, 77, 0.86);
-  --tab-border-active: rgba(252, 211, 77, 0.9);
-  --tab-text: #fcd985;
-  --tab-text-hover: #ffefbe;
-  --tab-text-active: #ffffff;
+.sectionThemeLabel {
+  flex: 1 1 12rem;
+  min-width: 0;
 }
 
-.tab[data-project='breaking-the-silence'],
-.tab[data-project='child-protection'] {
-  --tab-bg: rgba(16, 50, 63, 0.93);
-  --tab-bg-hover: rgba(20, 63, 78, 0.95);
-  --tab-bg-active: rgba(12, 42, 54, 0.98);
-  --tab-border: rgba(127, 233, 230, 0.66);
-  --tab-border-hover: rgba(166, 246, 244, 0.86);
-  --tab-border-active: rgba(166, 246, 244, 0.9);
-  --tab-text: #bff8f5;
-  --tab-text-hover: #e8fffe;
-  --tab-text-active: #ffffff;
+.sectionThemeSwatch {
+  width: 2.5rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.sectionThemeReset,
+.sectionThemeSave {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+}
+
+.sectionThemeSave {
+  background: rgba(66, 197, 192, 0.35);
+  border-color: rgba(66, 197, 192, 0.55);
+}
+
+.sectionThemeSave:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.sectionThemeMsg {
+  font-size: 0.85rem;
+  opacity: 0.85;
 }
 
 .tabPanel {
@@ -123,4 +145,11 @@
   border: none;
   position: relative;
   border-left: none;
+}
+
+@media (max-width: 768px) {
+  .tab,
+  .tabActive {
+    border-radius: 10px 10px 0 0;
+  }
 }

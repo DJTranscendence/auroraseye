@@ -6,21 +6,26 @@
 
 .wallContainer {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* minmax(0, 1fr) + min-width: 0 on children lets Reddit iframes shrink into columns */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 2rem;
   margin-top: 3rem;
   align-items: start;
 }
 
+.wallContainer > * {
+  min-width: 0;
+}
+
 @media (max-width: 1200px) {
   .wallContainer {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 768px) {
   .wallContainer {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
   }
 }

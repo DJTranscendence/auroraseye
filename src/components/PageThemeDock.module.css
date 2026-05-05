@@ -1,0 +1,143 @@
+.dock {
+  position: fixed;
+  right: 1rem;
+  bottom: 5rem;
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+.collapsed {
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: rgba(66, 197, 192, 0.9);
+  color: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.expanded {
+  width: 200px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+}
+
+.header {
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: grab;
+}
+
+.title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: #7fe9e6;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.field label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 700;
+}
+
+.inputWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inputWrap input[type="color"] {
+  flex: 1;
+  height: 24px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+}
+
+.inputWrap button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.footer {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.saveBtn {
+  width: 100%;
+  padding: 0.5rem;
+  background: #7fe9e6;
+  color: #0f172a;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.savedMsg {
+  text-align: center;
+  font-size: 0.7rem;
+  color: #10b981;
+  font-weight: 700;
+}
+
+/* Theme text colours apply to <main> only so the navbar keeps its own palette. */
+.pageRoot :global(main) {
+  color: var(--foreground, inherit);
+}
+
+.pageRoot :global(main h1),
+.pageRoot :global(main h2),
+.pageRoot :global(main h3) {
+  color: var(--page-heading, var(--foreground, inherit));
+}

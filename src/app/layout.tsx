@@ -23,7 +23,6 @@ const patrickHand = Patrick_Hand({
 
 
 import ThemeRuntime from "@/components/ThemeRuntime";
-import AdminGlobalThemeDock from "@/components/AdminGlobalThemeDock";
 import { getSiteUrl } from "@/config/site";
 
 const siteUrl = getSiteUrl();
@@ -153,7 +152,6 @@ export default async function RootLayout({
           }}
         />
         {children}
-        <AdminGlobalThemeDock />
       </body>
     </html>
   );

@@ -34,7 +34,7 @@
 .floatingNavWrap {
   position: fixed;
   left: 0;
-  top: calc(var(--nav-height) + 2.05rem);
+  top: calc(var(--nav-height) + 2.99rem);
   z-index: 990;
   padding: 0 12px;
   pointer-events: auto;
@@ -205,6 +205,16 @@
   line-height: 1.75;
 }
 
+.heroInjectedImage {
+  width: 100%;
+  max-width: 640px;
+  height: auto;
+  border-radius: 1rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  display: block;
+}
+
 .heroList {
   list-style: none;
   display: grid;
@@ -307,7 +317,20 @@
 
 .mediaWallHeader {
   margin-bottom: 2rem;
-  max-width: 48rem;
+  max-width: 82rem;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.adminHeaderActions {
+  display: flex;
+  gap: 0.75rem;
 }
 
 .mediaWallGrid {
@@ -405,6 +428,126 @@
 
 .adminUploadButton:hover {
   background: rgba(66, 197, 192, 0.2);
+}
+
+.adminTileControls {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.adminControlButton {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.adminControlButton:hover {
+  background: #7fe9e6;
+  color: #0f172a;
+  border-color: #7fe9e6;
+  transform: scale(1.1);
+}
+
+.adminControlButton.delete:hover {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+}
+
+.adminUploadControl {
+  position: relative;
+}
+
+.adminEditOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.85);
+  display: grid;
+  place-items: center;
+  z-index: 2000;
+  padding: 1.5rem;
+  backdrop-filter: blur(4px);
+}
+
+.adminEditModal {
+  width: min(520px, 95vw);
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  display: grid;
+  gap: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+}
+
+.adminEditField {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.adminEditField label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.adminEditField input,
+.adminTextarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.adminEditField input:focus,
+.adminTextarea:focus {
+  outline: none;
+  border-color: #7fe9e6;
+  box-shadow: 0 0 0 2px rgba(127, 233, 230, 0.2);
+}
+
+.adminEditActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 0.5rem;
 }
 
 .sectionIntro {
@@ -528,6 +671,69 @@
   gap: 0.75rem;
 }
 
+.donateCtaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.donateRegionStack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  max-width: min(100%, 22rem);
+}
+
+.donateRegionLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--bts-text-muted, rgba(226, 232, 240, 0.88));
+  line-height: 1.35;
+}
+
+.donateRegionSelect {
+  width: 100%;
+  max-width: 22rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(8, 14, 26, 0.92);
+  color: #e8fffe;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.donateRegionSelect:focus {
+  outline: 2px solid rgba(66, 197, 192, 0.65);
+  outline-offset: 2px;
+}
+
+.donateBtnMuted {
+  pointer-events: none;
+  opacity: 0.42;
+  box-shadow: none;
+  cursor: default;
+  animation: none;
+}
+
+.donateRegionAdminHints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--bts-text-muted, rgba(226, 232, 240, 0.75));
+}
+
+.donateRegionAdminHint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
 @media (max-width: 1100px) {
   .heroGrid {
     grid-template-columns: minmax(0, 1fr);
@@ -574,4 +780,48 @@
   .donateCard {
     padding: 1.5rem;
   }
+}
+.ctaImage { width: 100%; max-width: 1200px; margin: 2rem auto 0; display: block; border-radius: 1.5rem; box-shadow: var(--shadow-aurora); }
+
+.ctaImageWrapper {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.adminCtaUploadOverlay {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 10;
+}
+
+.adminUploadButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.1rem;
+  padding: 0 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(66, 197, 192, 0.8);
+  background: rgba(8, 15, 24, 0.75);
+  color: #e5f7f6;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.3);
+  transition: all 0.2s ease;
+}
+
+.adminUploadButton:hover {
+  background: #7fe9e6;
+  color: #0f172a;
+  transform: scale(1.05);
+}
+
+/* Page theme dock: optional heading colour for section titles */
+.wrapper :global(h2.title) {
+  color: var(--bts-page-heading, var(--bts-foreground, #f8fafc));
 }

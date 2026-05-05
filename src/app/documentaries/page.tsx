@@ -1,32 +1,73 @@
+'use client';
+
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Documentary3DBrowser from "./Documentary3DBrowser";
 import styles from "./page.module.css";
-import { getFilms } from "@/utils/cms";
-import type { Metadata } from "next";
+import PageThemeDock from "@/components/PageThemeDock";
+import { InlineCmsText } from "@/components/cms/InlineCmsBlocks";
 
-export const metadata: Metadata = {
-  title: "Documentary Archive",
-  description: "Browse the Aurora's Eye Films documentary archive by category and discover our latest visual storytelling work.",
-  alternates: {
-    canonical: "/documentaries",
-  },
-};
+export default function Documentaries() {
+  const [filmsData, setFilmsData] = useState<any[]>([]);
+  const [config, setConfig] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-export const dynamic = 'force-dynamic';
-
-export default async function Documentaries() {
-  const filmsData = await getFilms() as any[];
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [filmsRes, configRes] = await Promise.all([
+          fetch('/api/cms?type=films', { cache: 'no-store' }),
+          fetch('/api/cms?type=config', { cache: 'no-store' })
+        ]);
+        
+        if (filmsRes.ok) setFilmsData(await filmsRes.json());
+        if (configRes.ok) setConfig(await configRes.json());
+      } catch (err) {
+        console.error("Failed to load documentaries data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, []);
 
   return (
-    <>
+    <PageThemeDock
+      pageType="documentaries"
+      initialColors={config?.documentariesPageTheme}
+      initialPayload={config}
+    >
       <Navbar />
       <main className={styles.main}>
         <header className={styles.header}>
           <div className="container">
-            <div className="badge">Catalog</div>
-            <h1>Documentary Archive</h1>
-            <p className={styles.subtitle}>Select your interest, choose a category that interests you and then browse our catalog to select a video to enjoy!</p>
+            <div className="badge">
+              <InlineCmsText
+                cmsType="config"
+                path={['documentariesPageCopy', 'badge']}
+                initialValue={config?.documentariesPageCopy?.badge ?? 'Catalog'}
+                as="span"
+              />
+            </div>
+            <InlineCmsText
+              cmsType="config"
+              path={['documentariesPageCopy', 'headerTitle']}
+              initialValue={config?.documentariesPageCopy?.headerTitle ?? 'Documentary Archive'}
+              as="h1"
+            />
+            <InlineCmsText
+              cmsType="config"
+              path={['documentariesPageCopy', 'headerSubtitle']}
+              initialValue={
+                config?.documentariesPageCopy?.headerSubtitle ??
+                'Select your interest, choose a category that interests you and then browse our catalog to select a video to enjoy!'
+              }
+              as="p"
+              className={styles.subtitle}
+              multiline
+            />
           </div>
         </header>
 
@@ -37,6 +78,6 @@ export default async function Documentaries() {
         </section>
       </main>
       <Footer />
-    </>
+    </PageThemeDock>
   );
 }

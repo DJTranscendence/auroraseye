@@ -40,6 +40,7 @@ function relativeLuminance(hex: string) {
 export type BreakingPageColors = {
   pageBackground?: string;
   textColor?: string;
+  headingTextColor?: string;
   textMutedColor?: string;
   accentTextColor?: string;
   projectHeaderBackground?: string;
@@ -56,6 +57,7 @@ export type BreakingPageColors = {
 const INPUT_FALLBACK: Record<keyof BreakingPageColors, string> = {
   pageBackground: '#1b1512',
   textColor: '#f8fafc',
+  headingTextColor: '#f8fafc',
   textMutedColor: '#cbd5e1',
   accentTextColor: '#fbbf24',
   projectHeaderBackground: '#0f172a',
@@ -69,8 +71,9 @@ const INPUT_FALLBACK: Record<keyof BreakingPageColors, string> = {
 };
 
 const COLOR_FIELDS: Array<{ key: keyof BreakingPageColors; label: string }> = [
-  { key: 'pageBackground', label: 'Page' },
-  { key: 'textColor', label: 'Text (main)' },
+  { key: 'pageBackground', label: 'Background' },
+  { key: 'textColor', label: 'Body text' },
+  { key: 'headingTextColor', label: 'Heading text' },
   { key: 'textMutedColor', label: 'Text (muted)' },
   { key: 'accentTextColor', label: 'Accent labels' },
   { key: 'projectHeaderBackground', label: 'Title strip' },
@@ -101,6 +104,7 @@ function colorsToCssVars(colors: BreakingPageColors): CSSProperties {
   const style: Record<string, string> = {};
   if (colors.pageBackground?.trim()) {
     style['--bts-page-bg'] = colors.pageBackground.trim();
+    style['--background'] = colors.pageBackground.trim();
   }
   if (colors.projectHeaderBackground?.trim()) {
     style['--bts-project-header-bg'] = colors.projectHeaderBackground.trim();
@@ -133,6 +137,11 @@ function colorsToCssVars(colors: BreakingPageColors): CSSProperties {
   const autoMuted = isLightBackground ? '#334155' : '#cbd5e1';
   const autoAccent = isLightBackground ? '#b45309' : '#fbbf24';
   style['--bts-foreground'] = colors.textColor?.trim() || autoForeground;
+  if (colors.headingTextColor?.trim()) {
+    style['--bts-page-heading'] = colors.headingTextColor.trim();
+  } else {
+    style['--bts-page-heading'] = colors.textColor?.trim() || autoForeground;
+  }
   style['--bts-text-muted'] = colors.textMutedColor?.trim() || autoMuted;
   style['--bts-accent-text'] = colors.accentTextColor?.trim() || autoAccent;
 
@@ -194,7 +203,13 @@ export default function BreakingPageThemeDock({
   children,
 }: BreakingPageThemeDockProps) {
   const [colors, setColors] = useState<BreakingPageColors>(() => mergePageColors(initialPageColors));
-  const [expanded, setExpanded] = useState(true);
+
+  useEffect(() => {
+    if (initialPageColors) {
+      setColors(mergePageColors(initialPageColors));
+    }
+  }, [initialPageColors]);
+  const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savedMsg, setSavedMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -325,64 +340,56 @@ export default function BreakingPageThemeDock({
   return (
     <div className={pageStyles.wrapper} style={wrapperStyle}>
       {children}
-      {isAdmin ? (
-        <aside
-          ref={dockRef}
+      {isAdmin && (
+        <aside 
+          ref={dockRef as any}
           className={styles.dock}
-          aria-label="Page background colors (admin)"
           style={{ transform: `translate(${dockOffset.x}px, ${dockOffset.y}px)` }}
-          onPointerDown={(event) => {
-            const target = event.target as HTMLElement | null;
-            if (target?.closest('button, input, select, textarea, a')) return;
-            setDragState({ pointerId: event.pointerId, startX: event.clientX, startY: event.clientY });
-            document.body.style.userSelect = 'none';
-          }}
         >
           {expanded ? (
             <div className={styles.dockExpanded}>
-              <div className={styles.dockHeader}>
-                <h2 className={styles.dockTitle}>Page colors</h2>
-                <button type="button" className={styles.toggleBtn} onClick={() => setExpanded(false)}>
-                  Hide
-                </button>
+              <div 
+                className={styles.dockHeader}
+                onPointerDown={e => {
+                  if ((e.target as HTMLElement).closest('button, input')) return;
+                  setDragState({ pointerId: e.pointerId, startX: e.clientX, startY: e.clientY });
+                }}
+              >
+                <h2 className={styles.dockTitle}>Page Theme</h2>
+                <button className={styles.toggleBtn} onClick={() => setExpanded(false)}>Hide</button>
               </div>
-              <p className={styles.hint}>
-                Section backgrounds for this project only. Clear uses the default from CSS / site theme. Use Site theme
-                (bottom-right on any page) for global nav and page background. Save publishes to CMS.
-              </p>
-              {COLOR_FIELDS.map(({ key, label }) => (
-                <div key={key} className={styles.row}>
-                  <label htmlFor={`bts-color-${key}`}>{label}</label>
-                  <input
-                    id={`bts-color-${key}`}
-                    className={styles.picker}
-                    type="color"
-                    value={toHex7(colors[key] || INPUT_FALLBACK[key])}
-                    onChange={(e) => updateColor(key, e.target.value)}
-                    aria-label={`${label} background`}
-                  />
-                  <button type="button" className={styles.clearBtn} onClick={() => clearColor(key)}>
-                    Clear
+              <div className={styles.bodyScroll}>
+                {COLOR_FIELDS.map(({ key, label }) => (
+                  <div key={key} className={styles.row}>
+                    <label htmlFor={`bts-theme-${key}`}>{label}</label>
+                    <div className={styles.pickerWrap}>
+                      <input 
+                        id={`bts-theme-${key}`}
+                        className={styles.picker}
+                        type="color" 
+                        value={toHex7(colors[key] || INPUT_FALLBACK[key] || '#000000')} 
+                        onChange={e => updateColor(key, e.target.value)}
+                      />
+                      <button className={styles.clearBtn} onClick={() => clearColor(key)}>×</button>
+                    </div>
+                  </div>
+                ))}
+                <div className={styles.actions}>
+                  <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
+                    {saving ? 'Saving...' : 'Save Page Theme'}
                   </button>
+                  {savedMsg && <span className={styles.statusOk}>{savedMsg}</span>}
+                  {errorMsg && <span className={styles.statusErr}>{errorMsg}</span>}
                 </div>
-              ))}
-              <div className={styles.actions}>
-                <button type="button" className={styles.saveBtn} disabled={saving} onClick={() => void handleSave()}>
-                  {saving ? 'Saving…' : 'Save to CMS'}
-                </button>
-                {savedMsg ? <span className={styles.statusOk}>{savedMsg}</span> : null}
-                {errorMsg ? <span className={styles.statusErr}>{errorMsg}</span> : null}
               </div>
             </div>
           ) : (
-            <div className={styles.dockCollapsed}>
-              <button type="button" className={styles.toggleBtn} onClick={() => setExpanded(true)}>
-                Page colors
-              </button>
-            </div>
+            <button className={styles.collapsedBtn} onClick={() => setExpanded(true)}>
+              🎨
+            </button>
           )}
         </aside>
-      ) : null}
+      )}
     </div>
   );
 }

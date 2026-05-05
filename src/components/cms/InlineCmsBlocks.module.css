@@ -1,0 +1,154 @@
+.editableInner {
+  position: relative;
+  display: block;
+}
+
+.adminOutline {
+  outline: 1px dashed transparent;
+  outline-offset: 4px;
+  border-radius: 4px;
+  transition: outline-color 0.15s ease;
+}
+
+.adminOutline:hover {
+  outline-color: rgba(127, 233, 230, 0.75);
+}
+
+.toolbar {
+  position: absolute;
+  top: -2px;
+  right: 0;
+  display: flex;
+  gap: 0.25rem;
+  z-index: 50;
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.editableInner:hover .toolbar,
+.editableInner:focus-within .toolbar {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(15, 23, 42, 0.92);
+  color: #e2fbfb;
+  cursor: pointer;
+  padding: 0;
+}
+
+.iconBtn:hover {
+  background: rgba(66, 197, 192, 0.35);
+  border-color: rgba(127, 233, 230, 0.55);
+}
+
+.iconBtnDanger:hover {
+  border-color: rgba(248, 113, 113, 0.65);
+  color: #fecaca;
+}
+
+.dialog {
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0;
+  max-width: min(36rem, 94vw);
+  background: rgba(15, 23, 42, 0.98);
+  color: #f8fafc;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+}
+
+.dialog::backdrop {
+  background: rgba(2, 6, 23, 0.55);
+}
+
+.dialogBody {
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.dialogTitle {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(226, 251, 251, 0.75);
+  margin: 0 0 0.65rem;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 7rem;
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(2, 6, 23, 0.55);
+  color: #f8fafc;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.btn {
+  border-radius: 0.45rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btnGhost {
+  background: transparent;
+  color: rgba(226, 251, 251, 0.85);
+  border-color: rgba(148, 163, 184, 0.35);
+}
+
+.btnPrimary {
+  background: rgba(66, 197, 192, 0.95);
+  color: #0f172a;
+  border-color: rgba(127, 233, 230, 0.5);
+}
+
+.imageWrap {
+  position: relative;
+  display: block;
+}
+
+.imageToolbar {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.35rem;
+  z-index: 40;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.imageWrap:hover .imageToolbar {
+  opacity: 1;
+}
+
+.msg {
+  font-size: 0.72rem;
+  margin-top: 0.35rem;
+  color: #fecaca;
+}

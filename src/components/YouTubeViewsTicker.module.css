@@ -23,6 +23,7 @@
   backdrop-filter: blur(14px);
   text-align: left;
   min-width: 10.5rem;
+  margin-left: 0;
 }
 
 .liveDot {

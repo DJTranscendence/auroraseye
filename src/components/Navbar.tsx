@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from 'next/navigation';
 import styles from "./Navbar.module.css";
-import { Menu, Settings, House, RotateCcw, ChevronRight } from "lucide-react";
+import { Menu, Settings, House, RotateCcw, ChevronRight, ChevronDown } from "lucide-react";
 import YouTubeViewsTicker from './YouTubeViewsTicker';
 import { SocialBrandTile } from './SocialBrandTile';
 import { trackYouTubeClick } from '@/utils/youtubeAnalytics';
@@ -48,8 +48,8 @@ export default function Navbar() {
     offsetY: number;
   };
   const [isOpen, setIsOpen] = useState(false);
-  const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
-  const [isDonateRingSpinning, setIsDonateRingSpinning] = useState(false);
+  const [isMobileProjectsOpen, setIsMobileProjectsOpen] = useState(false);
+  const [isDocsMenuOpen, setIsDocsMenuOpen] = useState(false);
   const navOffsetsRef = useRef<NavbarDraggableOffsets>(DEFAULT_NAVBAR_DRAGGABLE);
   const adminConfigRef = useRef<Record<string, unknown> | null>(null);
   const [user, setUser] = useState<any>(null);
@@ -59,6 +59,7 @@ export default function Navbar() {
   const [adminTextureOverlayOpacity, setAdminTextureOverlayOpacity] = useState(0.14);
   const [adminDarkOverlayOpacity, setAdminDarkOverlayOpacity] = useState(1);
   const [adminHueShift, setAdminHueShift] = useState(0);
+  const [themeSaveError, setThemeSaveError] = useState('');
   const [facebookUrl, setFacebookUrl] = useState('');
   const [youtubeSocialUrl, setYoutubeSocialUrl] = useState(
     'https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw',
@@ -70,15 +71,18 @@ export default function Navbar() {
   const [previewTogglePosition, setPreviewTogglePosition] = useState<{ x: number; y: number } | null>(null);
   const [navbarConfigReady, setNavbarConfigReady] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
+  const docsDropdownRef = useRef<HTMLDivElement | null>(null);
   const previewToggleRef = useRef<HTMLDivElement | null>(null);
   const previewToggleDragRef = useRef<PreviewToggleDragState | null>(null);
-  const donateRingRef = useRef<SVGSVGElement | null>(null);
-  const donateRingStopTimeoutRef = useRef<number | null>(null);
   useEffect(() => {
     adminConfigRef.current = adminConfig;
   }, [adminConfig]);
   const router = useRouter();
   const pathname = usePathname();
+  const projectNavLinkClass = (base: string, href: string) => {
+    const here = pathname === href || (pathname?.startsWith(`${href}/`) ?? false);
+    return here ? `${base} ${styles.projectLinkCurrent}` : base;
+  };
   const isAdmin = user?.role === 'admin';
   const showAdminView = previewMode === 'admin';
   const canEditNavbarTheme = isAdmin && showAdminView;
@@ -207,6 +211,12 @@ export default function Navbar() {
     const nextHue = (hue + hueShift + 360) % 360;
     return `${hslToHex(nextHue, saturation, lightness)}${alphaHex}`;
   };
+
+  useEffect(() => {
+    if (!isOpen) {
+      setIsMobileProjectsOpen(false);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -381,6 +391,9 @@ export default function Navbar() {
       if (!userMenuRef.current?.contains(event.target as Node)) {
         setIsUserMenuOpen(false);
       }
+      if (!docsDropdownRef.current?.contains(event.target as Node)) {
+        setIsDocsMenuOpen(false);
+      }
     };
 
     window.addEventListener('mousedown', handleClickOutside);
@@ -440,51 +453,19 @@ export default function Navbar() {
       body: JSON.stringify(nextConfig),
     });
     if (!res.ok) {
+      const body = (await res.json().catch(() => ({}))) as { error?: string; details?: string };
+      const msg = body?.details || body?.error || `Save failed (${res.status})`;
+      setThemeSaveError(msg);
+      console.error('[Navbar theme save]', msg);
       return;
     }
+    setThemeSaveError('');
     navOffsetsRef.current = safeNav;
     setAdminConfig(nextConfig);
     setAdminBaseTheme(nextTheme);
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event(AURORAS_THEME_SAVED_EVENT));
     }
-  };
-
-  const getRotationFromMatrix = (matrixValue: string) => {
-    if (!matrixValue || matrixValue === 'none') return -30;
-    const match = matrixValue.match(/matrix\(([^)]+)\)/);
-    if (!match) return -30;
-    const values = match[1].split(',').map((value) => Number.parseFloat(value.trim()));
-    const [a, b] = values;
-    if (Number.isNaN(a) || Number.isNaN(b)) return -30;
-    return Math.atan2(b, a) * (180 / Math.PI);
-  };
-
-  const handleDonateRingEnter = () => {
-    if (donateRingStopTimeoutRef.current !== null) {
-      window.clearTimeout(donateRingStopTimeoutRef.current);
-      donateRingStopTimeoutRef.current = null;
-    }
-    const ring = donateRingRef.current;
-    if (!ring) return;
-    ring.style.transition = '';
-    ring.style.transform = '';
-    setIsDonateRingSpinning(true);
-  };
-
-  const handleDonateRingLeave = () => {
-    const ring = donateRingRef.current;
-    if (!ring) return;
-    const currentRotation = getRotationFromMatrix(getComputedStyle(ring).transform);
-    setIsDonateRingSpinning(false);
-    ring.style.transition = 'transform 0.65s ease-out';
-    ring.style.transform = `rotate(${currentRotation}deg)`;
-    ring.getBoundingClientRect();
-    ring.style.transform = `rotate(${currentRotation + 24}deg)`;
-    donateRingStopTimeoutRef.current = window.setTimeout(() => {
-      ring.style.transition = '';
-      donateRingStopTimeoutRef.current = null;
-    }, 700);
   };
 
   const handlePreviewTogglePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -545,6 +526,11 @@ export default function Navbar() {
       {canEditNavbarTheme ? (
         <div className={styles.adminBar}>
           <span>Theme</span>
+          {themeSaveError ? (
+            <span className={styles.adminBarError} role="alert">
+              {themeSaveError}
+            </span>
+          ) : null}
           <label>
             Header
             <input
@@ -650,28 +636,116 @@ export default function Navbar() {
                 </Link>,
               )}
               {navClusterPiece(
-                <div className={styles.dropdown}>
-                  <span className={styles.dropTrigger}>Documentaries ▾</span>
-                  <div className={styles.dropdownMenu}>
-                    <Link href="/documentaries" onClick={() => setIsOpen(false)}>All Documentaries</Link>
-                    <div className={styles.submenuContainer}>
-                      <div
-                        className={styles.submenuTrigger}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsSubmenuOpen(!isSubmenuOpen);
-                        }}
-                      >
-                        Current Projects <ChevronRight size={14} className={isSubmenuOpen ? styles.rotated : ''} />
-                      </div>
-                      <div className={`${styles.submenu} ${isSubmenuOpen ? styles.submenuShow : ''}`}>
-                        <Link className={styles.projectLinkBreaking} href="/breaking-the-silence" onClick={() => { setIsOpen(false); setIsSubmenuOpen(false); }}>Breaking the Silence</Link>
-                        <Link className={styles.projectLinkKarsha} href="/karsha-nuns" onClick={() => { setIsOpen(false); setIsSubmenuOpen(false); }}>Karsha Nuns</Link>
-                        <Link className={styles.projectLinkMatrimandir} href="/matrimandir-and-i" onClick={() => { setIsOpen(false); setIsSubmenuOpen(false); }}>Matrimandir &amp; I</Link>
+                <>
+                  <div
+                    ref={docsDropdownRef}
+                    className={`${styles.dropdown} ${styles.desktopOnly}`}
+                    onMouseEnter={() => setIsDocsMenuOpen(true)}
+                  >
+                    <span className={styles.dropTrigger}>Documentaries ▾</span>
+                    <div className={`${styles.dropdownMenu} ${isDocsMenuOpen ? styles.dropdownMenuOpen : ''}`}>
+                      <Link href="/documentaries" onClick={() => { setIsOpen(false); setIsDocsMenuOpen(false); }}>
+                        All Documentaries
+                      </Link>
+                      <div className={styles.submenuContainer}>
+                        <div
+                          className={styles.submenuTrigger}
+                          tabIndex={0}
+                          aria-haspopup="true"
+                          aria-label="Current projects"
+                        >
+                          Current Projects{' '}
+                          <ChevronRight size={14} className={styles.submenuChevron} aria-hidden />
+                        </div>
+                        <div className={styles.submenu}>
+                          <Link
+                            className={projectNavLinkClass(styles.projectLinkBreaking, '/breaking-the-silence')}
+                            href="/breaking-the-silence"
+                            onClick={() => { setIsOpen(false); setIsDocsMenuOpen(false); }}
+                          >
+                            Breaking the Silence
+                          </Link>
+                          <Link
+                            className={projectNavLinkClass(styles.projectLinkKarsha, '/karsha-nuns')}
+                            href="/karsha-nuns"
+                            onClick={() => { setIsOpen(false); setIsDocsMenuOpen(false); }}
+                          >
+                            Karsha Nuns
+                          </Link>
+                          <Link
+                            className={projectNavLinkClass(styles.projectLinkMatrimandir, '/matrimandir-and-i')}
+                            href="/matrimandir-and-i"
+                            onClick={() => { setIsOpen(false); setIsDocsMenuOpen(false); }}
+                          >
+                            Matrimandir &amp; I
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>,
+                  <Link href="/documentaries" className={styles.mobileOnly} onClick={() => setIsOpen(false)}>
+                    Documentaries
+                  </Link>
+                  <div className={`${styles.mobileOnly} ${styles.mobileProjectsBlock}`}>
+                    <div className={styles.submenuContainer}>
+                      <button
+                        type="button"
+                        className={`${styles.submenuTrigger} ${styles.mobileProjectsTrigger}`}
+                        aria-expanded={isMobileProjectsOpen}
+                        aria-controls="mobile-current-projects"
+                        id="mobile-current-projects-trigger"
+                        onClick={() => setIsMobileProjectsOpen((prev) => !prev)}
+                      >
+                        <span className={styles.mobileProjectsTriggerRow}>
+                          Current Projects
+                          <ChevronDown
+                            size={16}
+                            strokeWidth={2.25}
+                            className={`${styles.mobileProjectsChevron} ${isMobileProjectsOpen ? styles.mobileProjectsChevronOpen : ''}`}
+                            aria-hidden
+                          />
+                        </span>
+                      </button>
+                      <div
+                        id="mobile-current-projects"
+                        role="region"
+                        aria-labelledby="mobile-current-projects-trigger"
+                        className={`${styles.submenu} ${styles.mobileProjectsDropdown} ${isMobileProjectsOpen ? styles.submenuOpen : ''}`}
+                      >
+                        <Link
+                          className={projectNavLinkClass(styles.projectLinkBreaking, '/breaking-the-silence')}
+                          href="/breaking-the-silence"
+                          onClick={() => {
+                            setIsOpen(false);
+                            setIsMobileProjectsOpen(false);
+                          }}
+                        >
+                          Breaking the Silence
+                        </Link>
+                        <Link
+                          className={projectNavLinkClass(styles.projectLinkKarsha, '/karsha-nuns')}
+                          href="/karsha-nuns"
+                          onClick={() => {
+                            setIsOpen(false);
+                            setIsMobileProjectsOpen(false);
+                          }}
+                        >
+                          Karsha Nuns
+                        </Link>
+                        <Link
+                          className={projectNavLinkClass(styles.projectLinkMatrimandir, '/matrimandir-and-i')}
+                          href="/matrimandir-and-i"
+                          onClick={() => {
+                            setIsOpen(false);
+                            setIsMobileProjectsOpen(false);
+                          }}
+                        >
+                          Matrimandir &amp; I
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </>
               )}
               {navClusterPiece(<Link href="/team" onClick={() => setIsOpen(false)}>Our Team</Link>)}
               {navClusterPiece(<Link href="/news" onClick={() => setIsOpen(false)}>News</Link>)}
@@ -680,9 +754,13 @@ export default function Navbar() {
                   Contact Us
                 </Link>,
               )}
-              <div className={styles.navAuthExtras}>
-                <Link href="/donations" className={styles.mobileOnly} onClick={() => setIsOpen(false)}>Donate</Link>
-                {!user ? (
+              {navClusterPiece(
+                <Link href="/donations" onClick={() => setIsOpen(false)}>
+                  Support Us
+                </Link>,
+              )}
+              {!user ? (
+                <div className={styles.navAuthExtras}>
                   <Link
                     href="/login"
                     className={`${styles.menuAction} ${styles.mobileOnly}`}
@@ -690,14 +768,68 @@ export default function Navbar() {
                   >
                     Login
                   </Link>
-                ) : null}
+                </div>
+              ) : null}
+
+              <div className={styles.mobileSocialSection}>
+                <p className={styles.mobileSocialLabel}>Follow Us</p>
+                <div className={styles.mobileSocialIcons}>
+                  <Link
+                    className={styles.mobileSocialIconLink}
+                    href={resolvedSocialHref(facebookUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <SocialBrandTile brand="facebook" size={24} />
+                  </Link>
+                  <Link
+                    className={styles.mobileSocialIconLink}
+                    href={resolvedSocialHref(youtubeSocialUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <SocialBrandTile brand="youtube" size={24} />
+                  </Link>
+                  <Link
+                    className={styles.mobileSocialIconLink}
+                    href={resolvedSocialHref(linkedinUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <SocialBrandTile brand="linkedin" size={24} />
+                  </Link>
+                  <Link
+                    className={styles.mobileSocialIconLink}
+                    href={resolvedSocialHref(instagramUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <SocialBrandTile brand="instagram" size={24} />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+
+          {navClusterPiece(
+            <Link href="/donations" className={styles.donateAction} data-role="donate">
+              <div className={styles.donateActionBadge}>
+                <div className={styles.donateActionIcon} />
+                <svg className={`${styles.donateActionRing} ${styles.donateActionRingSpinning}`} viewBox="0 0 200 200">
+                  <path id="donate-text-path" d="M 100, 100 m -75, 0 a 75,75 0 1,1 150,0 a 75,75 0 1,1 -150,0" fill="none" />
+                  <text>
+                    <textPath href="#donate-text-path">SUPPORT AND DONATE • SUPPORT AND DONATE • </textPath>
+                  </text>
+                </svg>
+              </div>
+            </Link>,
+            styles.donateActionPiece
+          )}
 
           <div className={styles.actions}>
             {navClusterPiece(
-              <div>
+              <div className={styles.navBarTickerWrap}>
                 <YouTubeViewsTicker
                   channelUrl={
                     typeof adminConfig?.contact?.youtube === 'string' &&
@@ -713,36 +845,7 @@ export default function Navbar() {
                 <Settings size={18} />
               </Link>
             ) : null}
-            {navClusterPiece(<div data-role="donate">
-                <Link
-                  href="/donations"
-                  className={styles.donateAction}
-                  aria-label="Support and Donate"
-                  onMouseEnter={handleDonateRingEnter}
-                  onMouseLeave={handleDonateRingLeave}
-                >
-                  <span className={styles.donateActionBadge}>
-                    <span className={styles.donateActionIcon} aria-hidden="true" />
-                    <svg
-                      ref={donateRingRef}
-                      className={`${styles.donateActionRing} ${isDonateRingSpinning ? styles.donateActionRingSpinning : ''}`}
-                      viewBox="0 0 200 200"
-                      aria-hidden="true"
-                    >
-                      <defs>
-                        <path
-                          id="donateActionCirclePath"
-                          d="M 100, 100 m -78, 0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0"
-                        />
-                      </defs>
-                      <text>
-                        <textPath href="#donateActionCirclePath">SUPPORT AND DONATE</textPath>
-                      </text>
-                    </svg>
-                  </span>
-                </Link>
-              </div>,
-            )}
+            <div className={styles.actionsFlexSpacer} style={{ flex: 1 }} />
             <div className={styles.socialDragCluster}>
             {navClusterPiece(<>
                 <Link
@@ -835,8 +938,6 @@ export default function Navbar() {
         </div>
 
       </div>
-      </div>
     </nav>
   );
 }
-

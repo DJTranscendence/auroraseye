@@ -12,9 +12,26 @@ import { Mail } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+import { useState, useEffect } from "react";
+import PageThemeDock from "@/components/PageThemeDock";
+import { InlineCmsText } from "@/components/cms/InlineCmsBlocks";
+
 export default function Home() {
+  const [config, setConfig] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/cms?type=config', { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => setConfig(data))
+      .catch(() => {});
+  }, []);
+
   return (
-    <>
+    <PageThemeDock
+      pageType="home"
+      initialColors={config?.homePageTheme}
+      initialPayload={config}
+    >
       <Navbar />
       <main>
         <Hero />
@@ -22,53 +39,70 @@ export default function Home() {
           <VideoGallery />
         </section>
 
-        <RedditWall />
-
         <section className={`section ${styles.mediaWall}`}>
           <div className="container">
             <div className={styles.sectionHeader}>
-              <p className="eyebrow">From the field</p>
-              <h2>Instagram Highlights</h2>
-              <p>The latest and greatest from our social media feed.</p>
-            </div>
-            {/* SociableKit Instagram Feed */}
-            <div 
-              className="sk-instagram-feed" 
-              data-embed-id="25674162"
-              // Attempting common attributes (though dashboard is preferred)
-              data-sort-by="recent"
-            ></div>
-            <Script 
-              src="https://widgets.sociablekit.com/instagram-feed/widget.js" 
-              strategy="afterInteractive"
-              onLoad={() => {
-                // Background script to handle video previews if possible
-                const interval = setInterval(() => {
-                  const videos = document.querySelectorAll('.sk-instagram-feed video');
-                  if (videos.length > 0) {
-                    videos.forEach((video: any) => {
-                      video.muted = true;
-                      video.loop = true;
-                      // Play on hover logic
-                      video.parentElement.onmouseenter = () => video.play();
-                      video.parentElement.onmouseleave = () => video.pause();
-                    });
-                    clearInterval(interval);
+              <p className="eyebrow">
+                <InlineCmsText
+                  cmsType="config"
+                  path={['homePageCopy', 'mediaWallEyebrow']}
+                  initialValue={config?.homePageCopy?.mediaWallEyebrow ?? 'From the field'}
+                  as="span"
+                />
+              </p>
+              <h2>
+                <InlineCmsText
+                  cmsType="config"
+                  path={['homePageCopy', 'mediaWallTitle']}
+                  initialValue={config?.homePageCopy?.mediaWallTitle ?? 'Instagram Highlights'}
+                  as="span"
+                />
+              </h2>
+              <p>
+                <InlineCmsText
+                  cmsType="config"
+                  path={['homePageCopy', 'mediaWallSubtitle']}
+                  initialValue={
+                    config?.homePageCopy?.mediaWallSubtitle ??
+                    'The latest and greatest from our social media feed.'
                   }
-                }, 2000);
-                setTimeout(() => clearInterval(interval), 10000);
-              }}
-            />
+                  as="span"
+                />
+              </p>
+            </div>
+            {/* Elfsight Instagram Feed | Aurora's Eye */}
+            <Script src="https://elfsightcdn.com/platform.js" async strategy="afterInteractive" />
+            <div className="elfsight-app-a794f8fd-d734-4f7e-ad36-d3bf895fc0a6" data-elfsight-app-lazy></div>
           </div>
         </section>
+
+        <RedditWall />
 
         {/* Call to Action */}
         <section className={`section ${styles.cta}`}>
           <div className="container">
             <div className={styles.ctaBox}>
               <div className={styles.ctaContent}>
-                <h2 className={styles.title}>Shape the Narrative With Us</h2>
-                <p>Stay connected to the stories that matter. Subscribe for project updates and exclusive documentary insights.</p>
+                <h2 className={styles.title}>
+                  <InlineCmsText
+                    cmsType="config"
+                    path={['homePageCopy', 'ctaTitle']}
+                    initialValue={config?.homePageCopy?.ctaTitle ?? 'Shape the Narrative With Us'}
+                    as="span"
+                  />
+                </h2>
+                <p>
+                  <InlineCmsText
+                    cmsType="config"
+                    path={['homePageCopy', 'ctaBody']}
+                    initialValue={
+                      config?.homePageCopy?.ctaBody ??
+                      'Stay connected to the stories that matter. Subscribe for project updates and exclusive documentary insights.'
+                    }
+                    as="span"
+                    multiline
+                  />
+                </p>
           <form className={styles.ctaForm} onSubmit={async (e) => {
             e.preventDefault();
             const email = (e.target as any).querySelector('input').value;
@@ -90,6 +124,6 @@ export default function Home() {
         </section>
       </main>
       <Footer />
-    </>
+    </PageThemeDock>
   );
 }

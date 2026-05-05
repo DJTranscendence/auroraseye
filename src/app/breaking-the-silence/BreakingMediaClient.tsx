@@ -1,33 +1,69 @@
-'use client';
 
+'use client';
 import { useEffect, useState } from "react";
+import { Trash2, Edit3, Plus, ExternalLink, X } from "lucide-react";
+import { InlineCmsText } from "@/components/cms/InlineCmsBlocks";
 import styles from "./page.module.css";
 import fallbackContent from "@/data/breakingTheSilence.json";
 
 type BreakingContent = typeof fallbackContent;
-
 type HeroFrame = BreakingContent["heroFrame"];
-
-type MediaWallItem = {
+type MediaWallImageItem = {
   id: string;
-  type: "image" | "video" | string;
+  type: "image";
   title: string;
-  caption?: string;
-  imageUrl?: string;
-  imageAlt?: string;
-  embedUrl?: string;
-  linkUrl?: string;
+  caption: string;
+  imageUrl: string;
+  imageAlt: string;
+  linkUrl: string;
 };
-
-type MediaWall = {
+type MediaWallVideoItem = {
+  id: string;
+  type: "video";
+  title: string;
+  caption: string;
+  embedUrl: string;
+  linkUrl: string;
+};
+export type MediaWallItem = MediaWallImageItem | MediaWallVideoItem;
+export type MediaWall = {
   eyebrow: string;
   title: string;
   items: MediaWallItem[];
 };
-
 type MediaWallItemType = MediaWallItem["type"];
-
 type UploadTarget = "hero" | "media";
+
+export function normalizeMediaWallItems(items: any[] | unknown): MediaWallItem[] {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+  return items.map((item) => {
+    if (item.type === 'image') {
+      // Only include image fields
+      return {
+        id: item.id,
+        type: 'image',
+        title: item.title,
+        caption: item.caption,
+        imageUrl: item.imageUrl,
+        imageAlt: item.imageAlt ?? '',
+        linkUrl: item.linkUrl ?? '',
+      };
+    } else if (item.type === 'video') {
+      // Only include video fields
+      return {
+        id: item.id,
+        type: 'video',
+        title: item.title,
+        caption: item.caption,
+        embedUrl: item.embedUrl,
+        linkUrl: item.linkUrl ?? '',
+      };
+    }
+    return item;
+  });
+}
 
 async function fetchBreakingContent() {
   try {
@@ -55,7 +91,6 @@ async function uploadFile(file: File) {
 
   return data.url as string;
 }
-
 function useAdminStatus() {
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -100,16 +135,34 @@ function mergeHeroImage(content: BreakingContent, imageUrl: string) {
 }
 
 function mergeMediaImage(content: BreakingContent, id: string, imageUrl: string) {
-  const items = content.mediaWall.items.map((item) =>
-    item.id === id
-      ? {
-          ...item,
-          type: "image" as MediaWallItemType,
+  const items = content.mediaWall.items.map((item) => {
+    if (item.id === id) {
+      if (item.type === "image") {
+        // Only image fields, no embedUrl
+        return {
+          id: item.id,
+          type: "image",
+          title: item.title,
+          caption: item.caption,
           imageUrl,
           imageAlt: item.imageAlt ?? "",
-        }
-      : item
-  );
+          linkUrl: item.linkUrl,
+        };
+      } else if (item.type === "video") {
+        // Convert video to image, do NOT include embedUrl
+        return {
+          id: item.id,
+          type: "image",
+          title: item.title,
+          caption: item.caption,
+          imageUrl,
+          imageAlt: "",
+          linkUrl: item.linkUrl,
+        };
+      }
+    }
+    return item;
+  });
 
   return {
     ...content,
@@ -180,9 +233,24 @@ export function BreakingHeroFrameClient({
         ) : null}
       </div>
       <div className={styles.heroFrameMeta}>
-        <p className={styles.heroFrameTitle}>Breaking the Silence</p>
-        <p>Not just a film — a space to listen, speak, and heal.</p>
-        <p>Because silence protects harm. Conversation creates change.</p>
+        <p className={styles.heroFrameTitle}>
+          <InlineCmsText
+            cmsType="breakingTheSilence"
+            path={["heroFrame", "cardTitle"]}
+            initialValue={heroFrame.cardTitle ?? "Breaking the Silence"}
+            as="span"
+          />
+        </p>
+        {[0, 1].map((index) => (
+          <InlineCmsText
+            key={index}
+            cmsType="breakingTheSilence"
+            path={["heroFrame", "cardLines", index]}
+            initialValue={heroFrame.cardLines?.[index] ?? ""}
+            as="p"
+            multiline
+          />
+        ))}
       </div>
     </div>
   );
@@ -195,9 +263,86 @@ export function BreakingMediaWallClient({
   initialMediaWall: MediaWall;
   initialContent: BreakingContent;
 }) {
-  const [mediaWall, setMediaWall] = useState(initialMediaWall);
+  const [mediaWall, setMediaWall] = useState({
+    ...initialMediaWall,
+    items: normalizeMediaWallItems(initialMediaWall.items),
+  });
+  const [isEditing, setIsEditing] = useState<MediaWallItem | null>(null);
   const isAdmin = useAdminStatus();
   const { uploadingTarget, beginUpload, endUpload } = useUploadStatus();
+
+  const handleSaveContent = async (nextContent: BreakingContent) => {
+    const saveResponse = await fetch("/api/cms?type=breakingTheSilence", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nextContent),
+    });
+
+    if (saveResponse.ok) {
+      setMediaWall({
+        ...nextContent.mediaWall,
+        items: normalizeMediaWallItems(nextContent.mediaWall.items),
+      });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this item?")) return;
+    const currentContent = (await fetchBreakingContent()) ?? initialContent;
+    const nextContent = {
+      ...currentContent,
+      mediaWall: {
+        ...currentContent.mediaWall,
+        items: currentContent.mediaWall.items.filter((item) => item.id !== id),
+      },
+    };
+    await handleSaveContent(nextContent);
+  };
+
+  const handleAdd = async (type: "image" | "video") => {
+    const currentContent = (await fetchBreakingContent()) ?? initialContent;
+    const newItem: MediaWallItem = {
+      id: `media-${Date.now()}`,
+      title: "New Item",
+      caption: "",
+      ...(type === "image"
+        ? {
+            type: "image" as const,
+            imageUrl: "/placeholder.jpg",
+            imageAlt: "",
+            linkUrl: "",
+          }
+        : {
+            type: "video" as const,
+            embedUrl: "",
+            linkUrl: "",
+          }),
+    };
+    const nextContent = {
+      ...currentContent,
+      mediaWall: {
+        ...currentContent.mediaWall,
+        items: [...currentContent.mediaWall.items, newItem],
+      },
+    };
+    await handleSaveContent(nextContent);
+    setIsEditing(newItem);
+  };
+
+  const handleUpdateItem = async (updatedItem: MediaWallItem) => {
+    const currentContent = (await fetchBreakingContent()) ?? initialContent;
+    const nextContent = {
+      ...currentContent,
+      mediaWall: {
+        ...currentContent.mediaWall,
+        items: currentContent.mediaWall.items.map((item) =>
+          item.id === updatedItem.id ? updatedItem : item
+        ),
+      },
+    };
+    await handleSaveContent(nextContent);
+    setIsEditing(null);
+  };
 
   const handleUpload = async (id: string, event: React.ChangeEvent<HTMLInputElement>) => {
     const input = event.target;
@@ -210,25 +355,9 @@ export function BreakingMediaWallClient({
       const imageUrl = await uploadFile(file);
       const currentContent = (await fetchBreakingContent()) ?? initialContent;
       const nextContent = mergeMediaImage(currentContent, id, imageUrl);
-
-      const saveResponse = await fetch("/api/cms?type=breakingTheSilence", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nextContent),
-      });
-
-      if (saveResponse.ok) {
-        setMediaWall((prev) => ({
-          ...prev,
-          items: prev.items.map((item) =>
-            item.id === id && item.type === "image"
-              ? { ...item, imageUrl, imageAlt: item.imageAlt ?? "" }
-              : item
-          ),
-        }));
-      }
+      await handleSaveContent(nextContent);
     } catch {
-      // Silently ignore to avoid interrupting public page UX.
+      // ignore
     } finally {
       endUpload();
       resetInput(input);
@@ -236,16 +365,44 @@ export function BreakingMediaWallClient({
   };
 
   const wallItems = Array.isArray(mediaWall.items) ? mediaWall.items : [];
+  // Ensure wallItems are normalized for rendering
+  const normalizedWallItems = normalizeMediaWallItems(wallItems);
 
   return (
     <section className={styles.mediaWallSection}>
       <div className="container">
         <div className={styles.mediaWallHeader}>
-          <p className={styles.sectionEyebrow}>{mediaWall.eyebrow}</p>
-          <h2 className="title">{mediaWall.title}</h2>
+          <p className={styles.sectionEyebrow}>
+            <InlineCmsText
+              cmsType="breakingTheSilence"
+              path={["mediaWall", "eyebrow"]}
+              initialValue={mediaWall.eyebrow}
+              as="span"
+            />
+          </p>
+          <div className={styles.titleRow}>
+            <h2 className="title">
+              <InlineCmsText
+                cmsType="breakingTheSilence"
+                path={["mediaWall", "title"]}
+                initialValue={mediaWall.title}
+                as="span"
+              />
+            </h2>
+            {isAdmin && (
+              <div className={styles.adminHeaderActions}>
+                <button className="btn btn-outline btn-sm" onClick={() => handleAdd("image")}> 
+                  <Plus size={16} /> Add Image
+                </button>
+                <button className="btn btn-outline btn-sm" onClick={() => handleAdd("video")}> 
+                  <Plus size={16} /> Add Video
+                </button>
+              </div>
+            )}
+          </div>
         </div>
         <div className={styles.mediaWallGrid}>
-          {wallItems.map((item) => (
+          {normalizedWallItems.map((item) => (
             <article key={item.id} className={styles.mediaTile}>
               <div className={styles.mediaFrame}>
                 {item.type === "video" ? (
@@ -263,21 +420,32 @@ export function BreakingMediaWallClient({
                 ) : (
                   <img className={styles.mediaImage} src={item.imageUrl} alt={item.imageAlt} />
                 )}
-                {isAdmin && item.type === "image" ? (
-                  <div className={styles.adminUploadOverlay}>
-                    <input
-                      id={`breaking-wall-upload-public-${item.id}`}
-                      type="file"
-                      accept="image/*"
-                      onChange={(event) => handleUpload(item.id, event)}
-                      className={styles.adminUploadInput}
-                    />
-                    <label
-                      htmlFor={`breaking-wall-upload-public-${item.id}`}
-                      className={styles.adminUploadButton}
-                    >
-                      {uploadingTarget === "media" ? "Uploading..." : "Upload image"}
-                    </label>
+                {isAdmin ? (
+                  <div className={styles.adminTileControls}>
+                    <button className={styles.adminControlButton} onClick={() => setIsEditing(item)}>
+                      <Edit3 size={14} />
+                    </button>
+                    {item.type === "image" && (
+                      <div className={styles.adminUploadControl}>
+                        <input
+                          id={`breaking-wall-upload-public-${item.id}`}
+                          type="file"
+                          accept="image/*"
+                          onChange={(event) => handleUpload(item.id, event)}
+                          className={styles.adminUploadInput}
+                        />
+                        <label
+                          htmlFor={`breaking-wall-upload-public-${item.id}`}
+                          className={styles.adminControlButton}
+                          title="Upload new image"
+                        >
+                          {uploadingTarget === "media" ? "..." : <Plus size={14} />}
+                        </label>
+                      </div>
+                    )}
+                    <button className={`${styles.adminControlButton} ${styles.delete}`} onClick={() => handleDelete(item.id)}>
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 ) : null}
               </div>
@@ -294,6 +462,150 @@ export function BreakingMediaWallClient({
           ))}
         </div>
       </div>
+      {isEditing && (
+        <MediaEditModal
+          item={isEditing}
+          onClose={() => setIsEditing(null)}
+          onSave={handleUpdateItem}
+        />
+      )}
     </section>
+  );
+}
+
+export function BreakingCtaImageClient({
+  initialImageUrl,
+  initialContent,
+}: {
+  initialImageUrl: string;
+  initialContent: BreakingContent;
+}) {
+  const [imageUrl, setImageUrl] = useState(initialImageUrl);
+  const isAdmin = useAdminStatus();
+  const { uploadingTarget, beginUpload, endUpload } = useUploadStatus();
+
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const input = event.target;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    beginUpload("media");
+
+    try {
+      const uploadedUrl = await uploadFile(file);
+      const currentContent = (await fetchBreakingContent()) ?? initialContent;
+      const nextContent = {
+        ...currentContent,
+        discussionCtaImage: uploadedUrl,
+      };
+
+      const saveResponse = await fetch("/api/cms?type=breakingTheSilence", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nextContent),
+      });
+
+      if (saveResponse.ok) {
+        setImageUrl(uploadedUrl);
+      }
+    } catch {
+      // ignore
+    } finally {
+      endUpload();
+      resetInput(input);
+    }
+  };
+
+  return (
+    <div className={styles.ctaImageWrapper} style={{ position: 'relative' }}>
+      <img src={imageUrl} alt="Join the conversation" className={styles.ctaImage} />
+      {isAdmin && (
+        <div className={styles.adminCtaUploadOverlay}>
+          <input
+            id="breaking-cta-upload"
+            type="file"
+            accept="image/*"
+            onChange={handleUpload}
+            className={styles.adminUploadInput}
+            style={{ display: 'none' }}
+          />
+          <label htmlFor="breaking-cta-upload" className={styles.adminUploadButton}>
+            {uploadingTarget === "media" ? "..." : "Edit Image"}
+          </label>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MediaEditModal({
+  item,
+  onClose,
+  onSave,
+}: {
+  item: MediaWallItem;
+  onClose: () => void;
+  onSave: (item: MediaWallItem) => void;
+}) {
+  const [formData, setFormData] = useState({ ...item });
+
+  return (
+    <div className={styles.adminEditOverlay}>
+      <div className={styles.adminEditModal}>
+        <div className={styles.modalHeader}>
+          <h3>Edit {item.type === "video" ? "Video" : "Image"}</h3>
+          <button className={styles.closeButton} onClick={onClose}>
+            <X size={20} />
+          </button>
+        </div>
+        <div className={styles.adminEditField}>
+          <label>Title</label>
+          <input
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          />
+        </div>
+        <div className={styles.adminEditField}>
+          <label>Caption</label>
+          <textarea
+            value={formData.caption}
+            onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
+            rows={3}
+            className={styles.adminTextarea}
+          />
+        </div>
+        {item.type === "video" ? (
+          <div className={styles.adminEditField}>
+            {formData.type === 'video' && (
+              <>
+                <label>Embed URL (YouTube/Vimeo)</label>
+                <input
+                  value={formData.embedUrl}
+                  onChange={(e) => setFormData({ ...formData, embedUrl: e.target.value })}
+                  placeholder="https://www.youtube.com/embed/..."
+                />
+              </>
+            )}
+          </div>
+        ) : (
+          <div className={styles.adminEditField}>
+            <label>Link URL (Optional)</label>
+            <input
+              value={formData.linkUrl}
+              onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}
+              placeholder="https://..."
+            />
+          </div>
+        )}
+        <div className={styles.adminEditActions}>
+          <button className="btn btn-outline" onClick={onClose}>
+            Cancel
+          </button>
+          <button className="btn btn-primary" onClick={() => onSave(formData)}>
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

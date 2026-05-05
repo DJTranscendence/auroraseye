@@ -16,9 +16,13 @@ export type DonationProject = {
   shootingBeginsOn?: string;
   previousEpisodes?: { title: string; thumbnail: string; url: string }[];
   donationUrl: string;
+  /** Talam Pay (India) — when set with `donationUrl`, show region picker before funding. */
+  donationUrlIndia?: string;
   heroImage: string;
   heroVideoUrl?: string;
   heroVideoThumbnail?: string;
+  /** Tab + donations panel background (`#rrggbb`); text contrast is derived automatically. `null` = page theme. */
+  sectionColor?: string | null;
   media: {
     images: string[];
     videos: DonationProjectMediaVideo[];
@@ -46,6 +50,17 @@ type HeroMediaItem = {
 const formatCurrency = (value: number) =>
   value.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
 
+const MMI_PROJECT_ID = 'matrimandir-and-i';
+const KARSHA_PROJECT_ID = 'karsha-nuns';
+const BTS_PROJECT_ID = 'child-protection';
+/** Legacy `.../checkout/child-protection` returns 404; use AEF Talam Pay. */
+const BTS_DEFAULT_TALAM_PAY_URL = 'https://pay.auroville.org/aef';
+/** Defaults when CMS (e.g. Redis) has not yet stored `donationUrlIndia`. */
+const MMI_DEFAULT_DONATION_URL_INDIA = 'https://pay.auroville.org/aef';
+const MMI_DEFAULT_DONATION_URL_OUTSIDE = 'https://give.aviusa.org/page/MMAndI';
+const KARSHA_DEFAULT_DONATION_URL_INDIA = 'https://pay.auroville.org/aef/checkout/karsha';
+const KARSHA_DEFAULT_DONATION_URL_OUTSIDE = 'https://give.aviusa.org/page/KarshaNuns';
+
 export default function DonationProjectDetails({
   project,
   showFullPageLink,
@@ -53,6 +68,7 @@ export default function DonationProjectDetails({
 }: DonationProjectDetailsProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [imageOverrides, setImageOverrides] = useState<Record<string, string>>({});
+  const [fundPayRegion, setFundPayRegion] = useState<'india' | 'international' | ''>('');
 
   useEffect(() => {
     const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
@@ -67,6 +83,45 @@ export default function DonationProjectDetails({
       setIsAdmin(false);
     }
   }, []);
+
+  useEffect(() => {
+    setFundPayRegion('');
+  }, [project.id]);
+
+  const fundIndiaUrl =
+    project.donationUrlIndia ??
+    (project.id === MMI_PROJECT_ID
+      ? MMI_DEFAULT_DONATION_URL_INDIA
+      : project.id === KARSHA_PROJECT_ID
+        ? KARSHA_DEFAULT_DONATION_URL_INDIA
+        : undefined);
+
+  const fundOutsideUrl = (() => {
+    if (project.id === MMI_PROJECT_ID) {
+      return project.donationUrl || MMI_DEFAULT_DONATION_URL_OUTSIDE;
+    }
+    if (project.id === KARSHA_PROJECT_ID) {
+      const u = project.donationUrl;
+      if (u && u.includes('give.aviusa.org')) {
+        return u;
+      }
+      return KARSHA_DEFAULT_DONATION_URL_OUTSIDE;
+    }
+    return project.donationUrl;
+  })();
+
+  const showFundRegionPicker =
+    Boolean(fundIndiaUrl && fundOutsideUrl) &&
+    (Boolean(project.donationUrlIndia) ||
+      project.id === MMI_PROJECT_ID ||
+      project.id === KARSHA_PROJECT_ID);
+
+  const primaryDonationHref =
+    project.id === BTS_PROJECT_ID &&
+    typeof project.donationUrl === 'string' &&
+    project.donationUrl.includes('/checkout/child-protection')
+      ? BTS_DEFAULT_TALAM_PAY_URL
+      : project.donationUrl;
 
   const persistDonationProjects = async (
     updateProject: (draft: DonationProject) => void
@@ -384,9 +439,50 @@ export default function DonationProjectDetails({
             </div>
           </div>
           <div className={styles.heroActions}>
-            <a className={styles.primaryButton} href="https://pay.auroville.org/aef" target="_blank" rel="noopener noreferrer">
-              Fund this project
-            </a>
+            {showFundRegionPicker ? (
+              <div className={styles.fundRegionStack}>
+                <p className={styles.fundProjectLead}>Fund this project</p>
+                <label className={styles.fundRegionLabel} htmlFor={`fund-pay-region-${project.id}`}>
+                  Are you paying from India or outside India?
+                </label>
+                <select
+                  id={`fund-pay-region-${project.id}`}
+                  className={styles.fundRegionSelect}
+                  value={fundPayRegion}
+                  onChange={(event) => {
+                    const v = event.target.value;
+                    setFundPayRegion(v === 'india' || v === 'international' ? v : '');
+                  }}
+                >
+                  <option value="">Select…</option>
+                  <option value="india">India (Talam Pay)</option>
+                  <option value="international">Outside India (AVI USA)</option>
+                </select>
+                {fundPayRegion ? (
+                  <a
+                    className={styles.primaryButton}
+                    href={fundPayRegion === 'india' ? fundIndiaUrl! : fundOutsideUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Fund this project
+                  </a>
+                ) : (
+                  <span className={`${styles.primaryButton} ${styles.primaryButtonMuted}`} aria-disabled="true">
+                    Fund this project
+                  </span>
+                )}
+              </div>
+            ) : (
+              <a
+                className={styles.primaryButton}
+                href={primaryDonationHref}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Fund this project
+              </a>
+            )}
             {showFullPageLink && fullPageHref ? (
               <a className={styles.ghostButton} href={fullPageHref}>
                 View full page

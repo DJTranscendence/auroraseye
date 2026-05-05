@@ -2,10 +2,24 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { DEFAULT_NAVBAR_DRAGGABLE, mergeNavbarDraggableFromApi } from '@/config/navbar-draggable-defaults';
+import { normalizeDonationSectionHex } from '@/utils/donationSectionTheme';
 
 const DATA_DIR = path.join(process.cwd(), 'src/data');
 const TMP_DATA_DIR = path.join(os.tmpdir(), 'auroras-eye-films-data');
 const CONFIG_STORAGE_KEY = process.env.CMS_CONFIG_STORAGE_KEY ?? 'cms:config:v2';
+const FILMS_STORAGE_KEY = 'cms:films:v1';
+const TEAM_STORAGE_KEY = 'cms:team:v1';
+const KARSHA_STORAGE_KEY = 'cms:karshaNuns:v1';
+const BREAKING_STORAGE_KEY = 'cms:breakingTheSilence:v1';
+const DONATION_CAMPAIGN_STORAGE_KEY = 'cms:donationCampaign:v1';
+const DONATION_PROJECTS_STORAGE_KEY = 'cms:donationProjects:v1';
+const NEWS_STORAGE_KEY = 'cms:news:v1';
+const FEATURED_FILMS_STORAGE_KEY = 'cms:featuredFilms:v1';
+const DISCUSSION_TABS_STORAGE_KEY = 'cms:discussionTabs:v1';
+const DISCUSSION_MESSAGES_STORAGE_KEY = 'cms:discussionMessages:v1';
+const USERS_STORAGE_KEY = 'cms:users:v1';
+const NEWSLETTER_STORAGE_KEY = 'cms:newsletter:v1';
+const NEWSLETTER_TEMPLATE_STORAGE_KEY = 'cms:newsletterTemplate:v1';
 
 const DEFAULT_THEME = {
   headerBackground: '#0a0b12',
@@ -22,6 +36,61 @@ const DEFAULT_THEME = {
   accent: '#42c5c0',
 };
 
+const DEFAULT_PAGE_THEME = {
+  pageBackground: '',
+  textColor: '',
+  headingTextColor: '',
+  textMutedColor: '',
+  accentColor: '',
+  surfaceColor: '',
+  surfaceMutedColor: '',
+  border: '',
+};
+
+const DEFAULT_CONTACT_PAGE_COPY = {
+  headerTitle: 'Get in touch with us',
+  headerSubtitle:
+    'Get in touch with us for collaborations, consultations, screenings or documentary inquiries via the links on the right. Visit us in person using the map links on the left.',
+};
+
+const DEFAULT_DOCUMENTARIES_PAGE_COPY = {
+  badge: 'Catalog',
+  headerTitle: 'Documentary Archive',
+  headerSubtitle:
+    'Select your interest, choose a category that interests you and then browse our catalog to select a video to enjoy!',
+};
+
+const DEFAULT_NEWS_PAGE_COPY = {
+  badge: 'Newsroom',
+  headerTitle: "Aurora's Eye News",
+  headerSubtitle:
+    'A live stream of documentary and impact-story updates, plus manually curated stories from our team.',
+};
+
+const DEFAULT_TEAM_PAGE_COPY = {
+  badge: 'Our People',
+  headerTitle: 'The Visionaries Behind the Lens',
+  headerSubtitle: "Meet the documentary filmmakers and storytellers of Aurora's Eye Films.",
+  missionTitle: 'Our Mission',
+  missionBody:
+    'We aim to inspire and inform through the art of documentary filmmaking. Our focus is on projects that promote human unity, ecological sustainability, and the diverse cultural tapestry of our world.',
+  impactIntegrityTitle: 'Integrity',
+  impactIntegrityBody: 'Honest storytelling that respects the subject and the audience.',
+  impactInnovationTitle: 'Innovation',
+  impactInnovationBody: 'Pushing the boundaries of visual language and sound design.',
+  impactCommunityTitle: 'Community',
+  impactCommunityBody: 'Fostering a global network of conscious viewers and creators.',
+};
+
+const DEFAULT_HOME_PAGE_COPY = {
+  ctaTitle: 'Shape the Narrative With Us',
+  ctaBody:
+    'Stay connected to the stories that matter. Subscribe for project updates and exclusive documentary insights.',
+  mediaWallEyebrow: 'From the field',
+  mediaWallTitle: 'Instagram Highlights',
+  mediaWallSubtitle: 'The latest and greatest from our social media feed.',
+};
+
 const DEFAULT_CONFIG = {
   hero: {
     title: 'Storytelling through Light & Life',
@@ -31,8 +100,8 @@ const DEFAULT_CONFIG = {
     bgImage:
       'https://images.unsplash.com/photo-1492691523567-6170c8675fa8?q=80&w=2670&auto=format&fit=crop',
     controls: {
-      iframeTopPercent: 0,
-      iframeTopCm: 0,
+      iframeTopPercent: 2.5,
+      iframeTopCm: 0.3,
       iframeLeftPercent: 0,
       iframeWidthPercent: 100,
       iframeHeightPercent: 100,
@@ -57,8 +126,8 @@ const DEFAULT_CONFIG = {
       recruitmentOffsetY: 0,
     },
     controlsMobile: {
-      iframeTopPercent: 0,
-      iframeTopCm: 0,
+      iframeTopPercent: 2.5,
+      iframeTopCm: 0.3,
       iframeLeftPercent: 0,
       iframeWidthPercent: 100,
       iframeHeightPercent: 100,
@@ -80,7 +149,7 @@ const DEFAULT_CONFIG = {
     phone: '+91 00000 00000',
     address: 'Anitya community, Auroville, Tamil Nadu 605101, India',
     youtube: 'https://www.youtube.com/channel/UCprfkWyP0z-RqxZU-UQWcuw',
-    facebook: '',
+    facebook: 'https://www.facebook.com/AurorasEye/about/',
     instagram: 'https://www.instagram.com/auroras_eye_films/',
     linkedin: 'https://linkedin.com/company/auroras-eye-films',
   },
@@ -88,7 +157,22 @@ const DEFAULT_CONFIG = {
   typography: {
     fontFamily: 'default',
   },
+  homePageTheme: { ...DEFAULT_PAGE_THEME },
+  newsPageTheme: { ...DEFAULT_PAGE_THEME },
+  documentariesPageTheme: { ...DEFAULT_PAGE_THEME },
+  donationsPageTheme: { ...DEFAULT_PAGE_THEME },
+  contactPageTheme: { ...DEFAULT_PAGE_THEME },
+  teamPageTheme: { ...DEFAULT_PAGE_THEME },
+  contactPageCopy: { ...DEFAULT_CONTACT_PAGE_COPY },
+  documentariesPageCopy: { ...DEFAULT_DOCUMENTARIES_PAGE_COPY },
+  newsPageCopy: { ...DEFAULT_NEWS_PAGE_COPY },
+  teamPageCopy: { ...DEFAULT_TEAM_PAGE_COPY },
+  homePageCopy: { ...DEFAULT_HOME_PAGE_COPY },
   navbarDraggable: { ...DEFAULT_NAVBAR_DRAGGABLE },
+  /** Default fixed `top` (px) for Karsha floating section nav on desktop; see KarshaFloatingNav. */
+  karshaFloatingNav: {
+    desktopTopPx: 122,
+  },
 };
 
 type SiteConfig = typeof DEFAULT_CONFIG;
@@ -139,6 +223,66 @@ function asNumber(value: unknown, fallback: number) {
   return Number.isFinite(value) ? (value as number) : fallback;
 }
 
+function normalizePageTheme(value: unknown) {
+  const candidate = isObject(value) ? value : {};
+  return {
+    pageBackground: asString(candidate.pageBackground, DEFAULT_PAGE_THEME.pageBackground),
+    textColor: asString(candidate.textColor, DEFAULT_PAGE_THEME.textColor),
+    headingTextColor: asString(candidate.headingTextColor, DEFAULT_PAGE_THEME.headingTextColor),
+    textMutedColor: asString(candidate.textMutedColor, DEFAULT_PAGE_THEME.textMutedColor),
+    accentColor: asString(candidate.accentColor, DEFAULT_PAGE_THEME.accentColor),
+    surfaceColor: asString(candidate.surfaceColor, DEFAULT_PAGE_THEME.surfaceColor),
+    surfaceMutedColor: asString(candidate.surfaceMutedColor, DEFAULT_PAGE_THEME.surfaceMutedColor),
+    border: asString(candidate.border, DEFAULT_PAGE_THEME.border),
+  };
+}
+
+function readDataFromFile<T>(fileName: string, fallback: T): T {
+  const filePath = path.join(DATA_DIR, fileName);
+  if (!fs.existsSync(filePath)) return fallback;
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch {
+    return fallback;
+  }
+}
+
+function writeDataToFile<T>(fileName: string, data: T) {
+  if (isVercelRuntime()) return;
+  const filePath = path.join(DATA_DIR, fileName);
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+}
+
+async function getStoredData<T>(fileName: string, key: string, fallback: T): Promise<T> {
+  const redis = await getRedisClient();
+  if (redis) {
+    try {
+      const stored = await redis.get(key);
+      if (stored) {
+        return (typeof stored === 'string' ? JSON.parse(stored) : stored) as T;
+      }
+      const seeded = readDataFromFile(fileName, fallback);
+      await redis.set(key, JSON.stringify(seeded));
+      return seeded;
+    } catch (error) {
+      console.error(`CMS: Failed to read ${key} from Redis:`, error);
+    }
+  }
+  return readDataFromFile(fileName, fallback);
+}
+
+async function saveStoredData<T>(fileName: string, key: string, data: T): Promise<void> {
+  const redis = await getRedisClient();
+  if (redis) {
+    try {
+      await redis.set(key, JSON.stringify(data));
+    } catch (error) {
+      console.error(`CMS: Failed to save ${key} to Redis:`, error);
+    }
+  }
+  writeDataToFile(fileName, data);
+}
+
 function normalizeConfig(config: unknown): SiteConfig {
   const candidate = isObject(config) ? config : {};
   const heroCandidate = isObject(candidate.hero) ? candidate.hero : {};
@@ -148,6 +292,22 @@ function normalizeConfig(config: unknown): SiteConfig {
   const themeCandidate = isObject(candidate.theme) ? candidate.theme : {};
   const typographyCandidate = isObject(candidate.typography) ? candidate.typography : {};
   const navbarDraggableCandidate = isObject(candidate.navbarDraggable) ? candidate.navbarDraggable : {};
+  const homePageThemeCandidate = isObject(candidate.homePageTheme) ? candidate.homePageTheme : {};
+  const newsPageThemeCandidate = isObject(candidate.newsPageTheme) ? candidate.newsPageTheme : {};
+  const documentariesPageThemeCandidate = isObject(candidate.documentariesPageTheme)
+    ? candidate.documentariesPageTheme
+    : {};
+  const donationsPageThemeCandidate = isObject(candidate.donationsPageTheme) ? candidate.donationsPageTheme : {};
+  const contactPageThemeCandidate = isObject(candidate.contactPageTheme) ? candidate.contactPageTheme : {};
+  const teamPageThemeCandidate = isObject(candidate.teamPageTheme) ? candidate.teamPageTheme : {};
+  const contactPageCopyCandidate = isObject(candidate.contactPageCopy) ? candidate.contactPageCopy : {};
+  const documentariesPageCopyCandidate = isObject(candidate.documentariesPageCopy)
+    ? candidate.documentariesPageCopy
+    : {};
+  const newsPageCopyCandidate = isObject(candidate.newsPageCopy) ? candidate.newsPageCopy : {};
+  const teamPageCopyCandidate = isObject(candidate.teamPageCopy) ? candidate.teamPageCopy : {};
+  const homePageCopyCandidate = isObject(candidate.homePageCopy) ? candidate.homePageCopy : {};
+  const karshaFloatingNavCandidate = isObject(candidate.karshaFloatingNav) ? candidate.karshaFloatingNav : {};
   const normalizedFontFamily = asString(typographyCandidate.fontFamily, DEFAULT_CONFIG.typography.fontFamily);
   const fontFamily = normalizedFontFamily === 'patrick-hand' ? 'patrick-hand' : 'default';
 
@@ -294,7 +454,80 @@ function normalizeConfig(config: unknown): SiteConfig {
     typography: {
       fontFamily,
     },
+    homePageTheme: normalizePageTheme(homePageThemeCandidate),
+    newsPageTheme: normalizePageTheme(newsPageThemeCandidate),
+    documentariesPageTheme: normalizePageTheme(documentariesPageThemeCandidate),
+    donationsPageTheme: normalizePageTheme(donationsPageThemeCandidate),
+    contactPageTheme: normalizePageTheme(contactPageThemeCandidate),
+    teamPageTheme: normalizePageTheme(teamPageThemeCandidate),
+    contactPageCopy: {
+      headerTitle: asString(contactPageCopyCandidate.headerTitle, DEFAULT_CONTACT_PAGE_COPY.headerTitle),
+      headerSubtitle: asString(
+        contactPageCopyCandidate.headerSubtitle,
+        DEFAULT_CONTACT_PAGE_COPY.headerSubtitle,
+      ),
+    },
+    documentariesPageCopy: {
+      badge: asString(documentariesPageCopyCandidate.badge, DEFAULT_DOCUMENTARIES_PAGE_COPY.badge),
+      headerTitle: asString(documentariesPageCopyCandidate.headerTitle, DEFAULT_DOCUMENTARIES_PAGE_COPY.headerTitle),
+      headerSubtitle: asString(
+        documentariesPageCopyCandidate.headerSubtitle,
+        DEFAULT_DOCUMENTARIES_PAGE_COPY.headerSubtitle,
+      ),
+    },
+    newsPageCopy: {
+      badge: asString(newsPageCopyCandidate.badge, DEFAULT_NEWS_PAGE_COPY.badge),
+      headerTitle: asString(newsPageCopyCandidate.headerTitle, DEFAULT_NEWS_PAGE_COPY.headerTitle),
+      headerSubtitle: asString(newsPageCopyCandidate.headerSubtitle, DEFAULT_NEWS_PAGE_COPY.headerSubtitle),
+    },
+    teamPageCopy: {
+      badge: asString(teamPageCopyCandidate.badge, DEFAULT_TEAM_PAGE_COPY.badge),
+      headerTitle: asString(teamPageCopyCandidate.headerTitle, DEFAULT_TEAM_PAGE_COPY.headerTitle),
+      headerSubtitle: asString(teamPageCopyCandidate.headerSubtitle, DEFAULT_TEAM_PAGE_COPY.headerSubtitle),
+      missionTitle: asString(teamPageCopyCandidate.missionTitle, DEFAULT_TEAM_PAGE_COPY.missionTitle),
+      missionBody: asString(teamPageCopyCandidate.missionBody, DEFAULT_TEAM_PAGE_COPY.missionBody),
+      impactIntegrityTitle: asString(
+        teamPageCopyCandidate.impactIntegrityTitle,
+        DEFAULT_TEAM_PAGE_COPY.impactIntegrityTitle,
+      ),
+      impactIntegrityBody: asString(
+        teamPageCopyCandidate.impactIntegrityBody,
+        DEFAULT_TEAM_PAGE_COPY.impactIntegrityBody,
+      ),
+      impactInnovationTitle: asString(
+        teamPageCopyCandidate.impactInnovationTitle,
+        DEFAULT_TEAM_PAGE_COPY.impactInnovationTitle,
+      ),
+      impactInnovationBody: asString(
+        teamPageCopyCandidate.impactInnovationBody,
+        DEFAULT_TEAM_PAGE_COPY.impactInnovationBody,
+      ),
+      impactCommunityTitle: asString(
+        teamPageCopyCandidate.impactCommunityTitle,
+        DEFAULT_TEAM_PAGE_COPY.impactCommunityTitle,
+      ),
+      impactCommunityBody: asString(
+        teamPageCopyCandidate.impactCommunityBody,
+        DEFAULT_TEAM_PAGE_COPY.impactCommunityBody,
+      ),
+    },
+    homePageCopy: {
+      ctaTitle: asString(homePageCopyCandidate.ctaTitle, DEFAULT_HOME_PAGE_COPY.ctaTitle),
+      ctaBody: asString(homePageCopyCandidate.ctaBody, DEFAULT_HOME_PAGE_COPY.ctaBody),
+      mediaWallEyebrow: asString(homePageCopyCandidate.mediaWallEyebrow, DEFAULT_HOME_PAGE_COPY.mediaWallEyebrow),
+      mediaWallTitle: asString(homePageCopyCandidate.mediaWallTitle, DEFAULT_HOME_PAGE_COPY.mediaWallTitle),
+      mediaWallSubtitle: asString(
+        homePageCopyCandidate.mediaWallSubtitle,
+        DEFAULT_HOME_PAGE_COPY.mediaWallSubtitle,
+      ),
+    },
     navbarDraggable: mergeNavbarDraggableFromApi(navbarDraggableCandidate),
+    karshaFloatingNav: {
+      desktopTopPx: asNumber(
+        karshaFloatingNavCandidate.desktopTopPx,
+        DEFAULT_CONFIG.karshaFloatingNav.desktopTopPx,
+      ),
+    },
   };
 }
 
@@ -313,9 +546,7 @@ function readConfigFromFile(): SiteConfig {
 }
 
 function writeConfigToFile(config: SiteConfig) {
-  const fallbackSeed = JSON.stringify(DEFAULT_CONFIG, null, 2);
-  const filePath = getWritableDataFilePath('config.json', fallbackSeed);
-  fs.writeFileSync(filePath, JSON.stringify(config, null, 2), 'utf8');
+  writeDataToFile('config.json', config);
 }
 
 function hasRedisEnv() {
@@ -366,7 +597,8 @@ async function getRedisClient() {
 
     cachedRedisClient = {
       get: async (key) => redisSocketClient.get(key),
-      set: async (key, value) => redisSocketClient.set(key, JSON.stringify(value)),
+      set: async (key, value: unknown) =>
+        redisSocketClient.set(key, typeof value === 'string' ? value : JSON.stringify(value)),
     };
 
     return cachedRedisClient;
@@ -431,33 +663,27 @@ export function isAuroraEyeRelatedStory(candidate: {
 }
 
 export async function getFilms() {
-  const filePath = path.join(DATA_DIR, 'films.json');
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  return getStoredData('films.json', FILMS_STORAGE_KEY, []);
 }
 
 export async function saveFilms(films: any[]) {
-  const filePath = path.join(DATA_DIR, 'films.json');
-  fs.writeFileSync(filePath, JSON.stringify(films, null, 2), 'utf8');
+  return saveStoredData('films.json', FILMS_STORAGE_KEY, films);
 }
 
 export async function getFeaturedFilms() {
-  const filePath = getWritableDataFilePath('featuredFilms.json', '[]');
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  return getStoredData('featuredFilms.json', FEATURED_FILMS_STORAGE_KEY, []);
 }
 
 export async function saveFeaturedFilms(films: any[]) {
-  const filePath = getWritableDataFilePath('featuredFilms.json', '[]');
-  fs.writeFileSync(filePath, JSON.stringify(films, null, 2), 'utf8');
+  return saveStoredData('featuredFilms.json', FEATURED_FILMS_STORAGE_KEY, films);
 }
 
 export async function getTeam() {
-  const filePath = path.join(DATA_DIR, 'team.json');
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  return getStoredData('team.json', TEAM_STORAGE_KEY, []);
 }
 
 export async function saveTeam(team: any[]) {
-  const filePath = path.join(DATA_DIR, 'team.json');
-  fs.writeFileSync(filePath, JSON.stringify(team, null, 2), 'utf8');
+  return saveStoredData('team.json', TEAM_STORAGE_KEY, team);
 }
 
 export async function getConfig() {
@@ -476,7 +702,7 @@ export async function getConfig() {
       }
 
       const seeded = readConfigFromFile();
-      await redis.set(CONFIG_STORAGE_KEY, seeded);
+      await redis.set(CONFIG_STORAGE_KEY, JSON.stringify(seeded));
       return seeded;
     } catch (error) {
       console.error('Config read failed from Redis:', error);
@@ -495,7 +721,8 @@ export async function saveConfig(config: any) {
 
   if (redis) {
     try {
-      await redis.set(CONFIG_STORAGE_KEY, normalized);
+      // Upstash REST expects a string value; passing an object can fail or stringify incorrectly.
+      await redis.set(CONFIG_STORAGE_KEY, JSON.stringify(normalized));
       return;
     } catch (error) {
       console.error('Config write failed to Redis:', error);
@@ -513,73 +740,91 @@ export async function saveConfig(config: any) {
 }
 
 export async function getKarshaNuns() {
-  const filePath = path.join(DATA_DIR, 'karshaNuns.json');
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  return getStoredData('karshaNuns.json', KARSHA_STORAGE_KEY, {});
 }
 
 export async function saveKarshaNuns(content: any) {
-  const filePath = path.join(DATA_DIR, 'karshaNuns.json');
-  fs.writeFileSync(filePath, JSON.stringify(content, null, 2), 'utf8');
+  return saveStoredData('karshaNuns.json', KARSHA_STORAGE_KEY, content);
 }
 
 export async function getBreakingTheSilence() {
-  const filePath = path.join(DATA_DIR, 'breakingTheSilence.json');
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  return getStoredData('breakingTheSilence.json', BREAKING_STORAGE_KEY, {});
 }
 
 export async function saveBreakingTheSilence(content: any) {
-  const filePath = path.join(DATA_DIR, 'breakingTheSilence.json');
-  fs.writeFileSync(filePath, JSON.stringify(content, null, 2), 'utf8');
+  return saveStoredData('breakingTheSilence.json', BREAKING_STORAGE_KEY, content);
 }
 
 export async function getDonationCampaign() {
-  const filePath = path.join(DATA_DIR, 'donationCampaign.json');
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  return getStoredData('donationCampaign.json', DONATION_CAMPAIGN_STORAGE_KEY, {});
 }
 
 export async function saveDonationCampaign(campaign: any) {
-  const filePath = path.join(DATA_DIR, 'donationCampaign.json');
-  fs.writeFileSync(filePath, JSON.stringify(campaign, null, 2), 'utf8');
+  return saveStoredData('donationCampaign.json', DONATION_CAMPAIGN_STORAGE_KEY, campaign);
+}
+
+/**
+ * Redis may hold donation projects saved before `sectionColor` existed. Merge that field from
+ * repo `donationProjects.json` only when the key is absent (not when explicitly `null` — null
+ * means “use page theme” from admin).
+ */
+function mergeDonationProjectsSectionColorsFromFile(stored: unknown, filePayload: unknown): unknown {
+  if (!isObject(stored) || !Array.isArray((stored as { projects?: unknown }).projects)) {
+    return stored;
+  }
+  const fileObj = isObject(filePayload) && Array.isArray((filePayload as { projects?: unknown }).projects)
+    ? (filePayload as { projects: unknown[] })
+    : { projects: [] as unknown[] };
+  const defaultById = new Map<string, { sectionColor?: unknown }>();
+  for (const row of fileObj.projects) {
+    if (!isObject(row) || typeof row.id !== 'string') continue;
+    defaultById.set(row.id, row as { sectionColor?: unknown });
+  }
+  const projects = (stored as { projects: Record<string, unknown>[] }).projects.map((p) => {
+    if (!isObject(p) || typeof p.id !== 'string') return p;
+    if ('sectionColor' in p) return p;
+    const def = defaultById.get(p.id);
+    const cand =
+      def && typeof def.sectionColor === 'string' ? def.sectionColor : undefined;
+    const normalized = normalizeDonationSectionHex(cand);
+    return normalized ? { ...p, sectionColor: normalized } : p;
+  });
+  return { ...(stored as Record<string, unknown>), projects };
 }
 
 export async function getDonationProjects() {
-  const filePath = getWritableDataFilePath('donationProjects.json', '{}');
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  const raw = await getStoredData('donationProjects.json', DONATION_PROJECTS_STORAGE_KEY, {});
+  const fileDefaults = readDataFromFile('donationProjects.json', { projects: [] });
+  return mergeDonationProjectsSectionColorsFromFile(raw, fileDefaults);
 }
 
 export async function saveDonationProjects(payload: any) {
-  const filePath = getWritableDataFilePath('donationProjects.json', '{}');
-  fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), 'utf8');
+  return saveStoredData('donationProjects.json', DONATION_PROJECTS_STORAGE_KEY, payload);
 }
 
 export async function getDiscussionTabs() {
-  const filePath = getWritableDataFilePath('discussionTabs.json', '{"tabs": []}');
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  return getStoredData('discussionTabs.json', DISCUSSION_TABS_STORAGE_KEY, { tabs: [] });
 }
 
 export async function saveDiscussionTabs(payload: any) {
-  const filePath = getWritableDataFilePath('discussionTabs.json', '{"tabs": []}');
-  fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), 'utf8');
+  return saveStoredData('discussionTabs.json', DISCUSSION_TABS_STORAGE_KEY, payload);
 }
 
-export async function getDiscussionMessages() {
-  const filePath = getWritableDataFilePath('discussionMessages.json', '{}');
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+export async function getDiscussionMessages(): Promise<Record<string, any[]>> {
+  return getStoredData<Record<string, any[]>>('discussionMessages.json', DISCUSSION_MESSAGES_STORAGE_KEY, {});
 }
 
 export async function saveDiscussionMessages(payload: any) {
-  const filePath = getWritableDataFilePath('discussionMessages.json', '{}');
-  fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), 'utf8');
+  return saveStoredData('discussionMessages.json', DISCUSSION_MESSAGES_STORAGE_KEY, payload);
 }
 
 export async function getUsers() {
-  const filePath = getWritableDataFilePath('users.json');
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  return getStoredData('users.json', USERS_STORAGE_KEY, []);
 }
 
 export async function saveUsers(users: any[]) {
-  const filePath = getWritableDataFilePath('users.json');
-  fs.writeFileSync(filePath, JSON.stringify(users, null, 2), 'utf8');
+  return saveStoredData('users.json', USERS_STORAGE_KEY, users);
 }
 
 export async function getSubscribers() {
@@ -919,28 +1164,40 @@ function normalizeNewsList(news: NewsStory[]) {
 }
 
 export async function getNews() {
-  const filePath = getNewsFilePath();
-
-  if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, '[]', 'utf8');
-    return [] as NewsStory[];
-  }
-
-  const raw = JSON.parse(fs.readFileSync(filePath, 'utf8')) as NewsStory[];
-  const filtered = raw.filter((item) => isAuroraEyeRelatedStory(item));
-  const normalized = normalizeNewsList(filtered);
-
-  if (filtered.length !== raw.length || JSON.stringify(raw) !== JSON.stringify(normalized)) {
-    fs.writeFileSync(filePath, JSON.stringify(normalized, null, 2), 'utf8');
-  }
-
-  return normalized;
+  const normalized = await getStoredData('news.json', NEWS_STORAGE_KEY, []);
+  const filtered = normalized.filter((item: any) => isAuroraEyeRelatedStory(item));
+  const final = normalizeNewsList(filtered);
+  return final;
 }
 
 export async function saveNews(news: NewsStory[]) {
-  const filePath = getNewsFilePath();
   const filtered = news.filter((item) => isAuroraEyeRelatedStory(item));
-  fs.writeFileSync(filePath, JSON.stringify(normalizeNewsList(filtered), null, 2), 'utf8');
+  return saveStoredData('news.json', NEWS_STORAGE_KEY, normalizeNewsList(filtered));
+}
+
+function normalizeYouTubeUrl(url: string) {
+  if (!url) return url;
+  try {
+    const parsed = new URL(url);
+    let videoId = '';
+
+    if (parsed.hostname.includes('youtu.be')) {
+      videoId = parsed.pathname.slice(1);
+    } else if (parsed.searchParams.has('v')) {
+      videoId = parsed.searchParams.get('v') ?? '';
+    } else if (parsed.pathname.includes('/embed/')) {
+      videoId = parsed.pathname.split('/embed/')[1].split(/[?#]/)[0];
+    } else if (parsed.pathname.includes('/v/')) {
+       videoId = parsed.pathname.split('/v/')[1].split(/[?#]/)[0];
+    } else if (parsed.pathname.includes('/watch/')) {
+       videoId = parsed.pathname.split('/watch/')[1].split(/[?#]/)[0];
+    }
+
+    if (videoId) {
+      return `https://www.youtube.com/watch?v=${videoId}`;
+    }
+  } catch {}
+  return url;
 }
 
 export async function upsertGeneratedNews(
@@ -950,7 +1207,7 @@ export async function upsertGeneratedNews(
 ) {
   const current = await getNews();
   const now = new Date().toISOString();
-  const byUrl = new Map(current.map((item) => [item.url, item]));
+  const byUrl = new Map(current.map((item) => [normalizeYouTubeUrl(item.url), item]));
   let createdCount = 0;
   let updatedCount = 0;
 
@@ -963,10 +1220,11 @@ export async function upsertGeneratedNews(
       continue;
     }
 
-    const existing = byUrl.get(incoming.url);
+    const normalizedUrl = normalizeYouTubeUrl(incoming.url);
+    const existing = byUrl.get(normalizedUrl);
 
     if (existing) {
-      byUrl.set(incoming.url, {
+      byUrl.set(normalizedUrl, {
         ...existing,
         title: incoming.title || existing.title,
         summary: incoming.summary || existing.summary,
@@ -974,6 +1232,7 @@ export async function upsertGeneratedNews(
         image: incoming.image || existing.image,
         publishedAt: incoming.publishedAt || existing.publishedAt,
         tags: incoming.tags?.length ? incoming.tags : existing.tags,
+        url: normalizedUrl, // Use normalized URL
         updatedAt: now,
       });
       updatedCount += 1;
@@ -982,11 +1241,11 @@ export async function upsertGeneratedNews(
 
     const id = `news-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-    byUrl.set(incoming.url, {
+    byUrl.set(normalizedUrl, {
       id,
       title: incoming.title,
       summary: incoming.summary,
-      url: incoming.url,
+      url: normalizedUrl, // Use normalized URL
       source: incoming.source,
       image: incoming.image,
       publishedAt: incoming.publishedAt || now,

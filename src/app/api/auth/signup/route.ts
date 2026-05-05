@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
     }
 
-    const users = await getUsers();
+    const users: any[] = await getUsers();
 
     if (users.find((u: any) => u.email === email)) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 });

@@ -1,8 +1,90 @@
 {
+  "pageCopy": {
+    "headerProjectLabel": "Breaking the Silence Project",
+    "floatingNavLabels": [
+      "The Documentary",
+      "Why This Film Matters",
+      "Join the Conversation",
+      "Connect",
+      "Donate"
+    ],
+    "heroKicker": "🎬 Breaking the Silence",
+    "heroTitle": "A film about truth, trauma, and the possibility of healing.",
+    "heroParagraphs": [
+      "Breaking the Silence is a feature-length documentary currently in post-production.",
+      "It began with one question: What happens when the truth is never spoken?",
+      "This film explores the hidden reality of child sexual abuse — not through statistics alone, but through human stories, lived experiences, and the long journey toward healing.",
+      "Blending survivor testimonies, global expert insights, and deeply personal narration, the film moves beyond awareness and into something more powerful:"
+    ],
+    "heroListItems": [
+      "👉 a space for truth",
+      "👉 a space for listening",
+      "👉 a space for healing"
+    ],
+    "heroPrimaryCta": "The Documentary",
+    "heroSecondaryCta": "Donate",
+    "heroInlineImageUrl": "/uploads/1775379025543-Polish_20260402_171738463.jpg",
+    "heroInlineImageAlt": "Breaking the Silence",
+    "documentaryEyebrow": "🌍 The Film",
+    "documentaryTitle": "A documentary in post-production, built from lived truth",
+    "documentaryLead": "Breaking the Silence is a feature-length documentary now in the final stages of post-production.\nWe are shaping the edit by bringing together survivor voices from around the world, expert insights on trauma and healing, and visual storytelling through art, movement, and sound. This is the most crucial stage of the process — and the moment where your support can make a real difference.",
+    "calloutLabel": "🎬 Current Stage",
+    "calloutBody": "The film is now in post-production. We are shaping the final edit — bringing together survivor voices, expert insights, and visual storytelling. This is the moment where your support can help the film reach the world.",
+    "whyEyebrow": "🔥 Why This Film Matters",
+    "whyTitle": "The conversation cannot end at awareness",
+    "whyLead": "Child sexual abuse is one of the most widespread — and most silenced — issues in the world.\nYet the conversation often ends too soon. This film is not just about exposing the problem. It is about continuing the conversation. Because real change does not happen in a cinema. It happens afterwards — in communities, in groups, in safe spaces where people can finally speak.",
+    "conversationJoinCta": "❤️ Join the conversation - In our chatroom 💬",
+    "conversationStarterEyebrow": "🌱 More Than a Film — a Conversation Starter",
+    "conversationStarterTitle": "Stories that open doors, truth that creates connection",
+    "conversationStarterLead": "Breaking the Silence is designed to be used as a tool for dialogue and transformation. We are creating this film as a starting point — not an ending. We believe that stories can open doors, truth can create connection, and safe spaces can lead to healing. But for this to happen, we need people who are ready to hold that space.",
+    "partnerGroups": [
+      {
+        "title": "NGOs & Organisations",
+        "items": [
+          "Child protection groups",
+          "Women's organisations",
+          "Trauma and mental health practitioners",
+          "Community facilitators"
+        ],
+        "note": "Those who can host screenings and guide conversations safely."
+      },
+      {
+        "title": "Distribution Partners",
+        "items": [
+          "Impact distributors",
+          "Film festivals",
+          "Educational platforms",
+          "Broadcasters"
+        ],
+        "note": "To help bring this film to audiences worldwide."
+      },
+      {
+        "title": "Supporters & Funders",
+        "items": ["Individuals", "Foundations", "Grants & impact investors"],
+        "note": "To support the final stages of post-production."
+      }
+    ],
+    "connectEyebrow": "✨ Get Involved",
+    "connectTitle": "Join the conversation and help carry it forward",
+    "connectLead": "If this film speaks to you — if you believe in the importance of this conversation — we would love to connect.",
+    "contactEmailLine": "📩 Contact us: Serena_aurora@auroville.org.in",
+    "contactWebsiteLine": "🌐 Website: auroraseyefilms.com",
+    "finalLine1": "🕊️ The opposite of silence is not only speaking.",
+    "finalLine2": "The opposite of silence is healing.",
+    "donateEyebrow": "🚨 Call to Action",
+    "donateTitle": "Support the film and help it reach the world",
+    "donateBody": "We are inviting you to be part of this journey. Help us complete post-production and bring this story to life. Partner with us to host screenings, hold conversations, and create safe spaces. Support distribution and impact outreach.",
+    "donateRegionPrompt": "Are you donating from India or outside India?",
+    "donateRegionPlaceholder": "Select…",
+    "donateRegionIndia": "India (Talam Pay)",
+    "donateRegionOutside": "Outside India (AVI USA)",
+    "donatePrimaryCta": "Donate",
+    "donatePartnerCta": "Partner With Us"
+  },
   "pageColors": {
-    "pageBackground": "#c4b7dc",
+    "pageBackground": "#f08da9",
     "textColor": "#6381a1",
-    "textMutedColor": "#335e8e",
+    "textMutedColor": "#e6f3ff",
     "accentTextColor": "#fdd898",
     "mediaTileBackground": "#0b1456",
     "partnerCardBackground": "#430a61",
@@ -13,7 +95,12 @@
     "imageUrl": "/uploads/1775657695735-file_000000006dc471fabd4a6595e1ca28ed.png",
     "imageAlt": "Breaking the Silence hero frame",
     "linkUrl": "https://www.youtube.com/watch?v=bNnKqnkzzSY",
-    "linkLabel": "Watch the teaser"
+    "linkLabel": "Watch the teaser",
+    "cardTitle": "Breaking the Silence",
+    "cardLines": [
+      "Not just a film — a space to listen, speak, and heal.",
+      "Because silence protects harm. Conversation creates change."
+    ]
   },
   "mediaWall": {
     "eyebrow": "Behind the Film",
@@ -27,14 +114,6 @@
         "imageUrl": "/uploads/1775379012809-Polish_20250321_232822407.jpg",
         "imageAlt": "Group in conversation",
         "linkUrl": ""
-      },
-      {
-        "id": "wall-2",
-        "type": "video",
-        "title": "A survivor speaks",
-        "caption": "Excerpt from a testimony",
-        "embedUrl": "https://www.youtube-nocookie.com/embed/bNnKqnkzzSY?rel=0",
-        "linkUrl": "https://www.youtube.com/watch?v=bNnKqnkzzSY"
       },
       {
         "id": "wall-3",
@@ -72,5 +151,6 @@
         "linkUrl": ""
       }
     ]
-  }
+  },
+  "discussionCtaImage": "/uploads/1777276844318-1775379025543-Polish_20260402_171738463.jpg"
 }

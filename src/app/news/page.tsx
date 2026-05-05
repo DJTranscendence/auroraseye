@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import PageThemeDock from '@/components/PageThemeDock';
+import { InlineCmsText } from '@/components/cms/InlineCmsBlocks';
 import styles from './page.module.css';
 
 type NewsStory = {
@@ -83,15 +85,24 @@ export default function NewsPage() {
   const [previewId, setPreviewId] = useState<string | null>(null);
   const previewTimeoutRef = useRef<number | null>(null);
 
+  const [config, setConfig] = useState<any>(null);
+
   const loadStories = async () => {
-    const response = await fetch('/api/cms?type=news');
+    const response = await fetch(`/api/cms?type=news&t=${Date.now()}`, { cache: 'no-store' });
     const data = await response.json();
     setStories(Array.isArray(data) ? data : []);
   };
 
+  const loadConfig = async () => {
+    const response = await fetch('/api/cms?type=config', { cache: 'no-store' });
+    if (response.ok) {
+      setConfig(await response.json());
+    }
+  };
+
   useEffect(() => {
-    loadStories()
-      .catch(() => setStories([]))
+    Promise.all([loadStories(), loadConfig()])
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
@@ -294,15 +305,42 @@ export default function NewsPage() {
   };
 
   return (
-    <>
+    <PageThemeDock
+      pageType="news"
+      initialColors={config?.newsPageTheme}
+      initialPayload={config}
+    >
       <Navbar />
       <main className={styles.main}>
         <div className="container">
           <header className={styles.header}>
-            <div className={styles.badge}>Newsroom</div>
-            <h1 className={styles.title}>Aurora's Eye News</h1>
+            <div className={styles.badge}>
+              <InlineCmsText
+                cmsType="config"
+                path={['newsPageCopy', 'badge']}
+                initialValue={config?.newsPageCopy?.badge ?? 'Newsroom'}
+                as="span"
+              />
+            </div>
+            <h1 className={styles.title}>
+              <InlineCmsText
+                cmsType="config"
+                path={['newsPageCopy', 'headerTitle']}
+                initialValue={config?.newsPageCopy?.headerTitle ?? "Aurora's Eye News"}
+                as="span"
+              />
+            </h1>
             <p className={styles.subtitle}>
-              A live stream of documentary and impact-story updates, plus manually curated stories from our team.
+              <InlineCmsText
+                cmsType="config"
+                path={['newsPageCopy', 'headerSubtitle']}
+                initialValue={
+                  config?.newsPageCopy?.headerSubtitle ??
+                  'A live stream of documentary and impact-story updates, plus manually curated stories from our team.'
+                }
+                as="span"
+                multiline
+              />
             </p>
           </header>
 
@@ -490,6 +528,6 @@ export default function NewsPage() {
         </div>
       </main>
       <Footer />
-    </>
+    </PageThemeDock>
   );
 }

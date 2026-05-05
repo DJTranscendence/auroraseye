@@ -1,5 +1,12 @@
 [
   {
+    "id": "team-1777275571214",
+    "name": "Ricarda Fantastica",
+    "role": "Salsa Dancer, Masseur & Video editor",
+    "bio": "There are no words to describe me...",
+    "photo": "/uploads/1777908635895-Products_on_boxes.png"
+  },
+  {
     "id": "1",
     "name": "Serena Aurora",
     "role": "Founder & Filmmaker",
@@ -12,13 +19,6 @@
     "role": "Sound Designer",
     "bio": "Experienced sound designer focused on capturing the acoustic soul of Auroville.",
     "photo": "/uploads/1774409628535-Kardash.png"
-  },
-  {
-    "name": "Marco",
-    "role": "",
-    "bio": "Marco is the quiet force behind the sound - precise, intuitive, and relentlessly attentive to detail. As a sound engineer, he doesn’t just manage audio; he shapes atmosphere, clarity, and emotional impact. Whether balancing live acoustics or refining recordings in post, Marco brings a deep technical fluency paired with a musician’s ear, ensuring every frequency sits exactly where it should. The result is sound that feels effortless, immersive, and exact.",
-    "photo": "/uploads/1774409649228-Marco.png",
-    "id": "1774409813075"
   },
   {
     "name": "Shinu",

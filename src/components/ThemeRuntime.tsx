@@ -102,7 +102,7 @@ export default function ThemeRuntime() {
   useEffect(() => {
     const loadTheme = async () => {
       try {
-        const response = await fetch('/api/cms?type=config', { cache: 'no-store' });
+        const response = await fetch(`/api/cms?type=config&t=${Date.now()}`, { cache: 'no-store' });
         const data = await response.json();
 
         if (!response.ok) {

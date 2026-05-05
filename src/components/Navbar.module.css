@@ -10,8 +10,8 @@
   z-index: 12000;
   padding: 0.4rem 0;
   transition: var(--transition-smooth);
-  overflow-x: hidden;
-  overflow-y: hidden;
+  /* Both axes visible: any non-visible on one axis forces the other to "auto" and clips flyouts. */
+  overflow: visible;
 }
 
 .navPending {
@@ -93,6 +93,15 @@
   background: rgba(255, 255, 255, 0.14);
 }
 
+.adminBarError {
+  flex: 1 1 100%;
+  max-width: 100%;
+  font-size: 0.68rem;
+  line-height: 1.25;
+  color: #fecaca;
+  letter-spacing: 0.04em;
+}
+
 .nav::before {
   content: "";
   position: absolute;
@@ -120,12 +129,12 @@
   z-index: 2;
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
+  min-width: 0;
+  /* visible so dropdowns/submenus are not clipped; page uses body overflow-x: hidden */
+  overflow: visible;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  isolation: isolate;
 }
 
 .navScrollInner::-webkit-scrollbar {
@@ -146,9 +155,38 @@
   padding-right: clamp(1rem, 2.5vw, 1.75rem);
 }
 
+@media (min-width: 769px) {
+  .navScrollInner > .container {
+    transform: translateX(-1cm);
+  }
+
+  /* Counter partial clip from bar shift: logo only, not the rest of the cluster. */
+  .navScrollInner > .container > :first-child {
+    transform: translateX(8mm);
+  }
+
+  /* Shift home + links, donate ring, views ticker, and social cluster left (logo excluded via :first-child above). */
+  .navMenuCluster {
+    transform: translateX(-3cm);
+  }
+
+  .donateActionPiece {
+    transform: translateX(-3cm);
+  }
+
+  .actions > .navDragPiece:first-of-type,
+  .actions > .adminNavLink {
+    transform: translateX(-3cm);
+  }
+
+  .socialDragCluster {
+    transform: translateX(-1cm);
+  }
+}
+
 .container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   height: 100%;
   position: relative;
@@ -166,6 +204,7 @@
   justify-content: space-around;
   min-width: min-content;
   gap: 1rem;
+  margin-left: 5cm;
 }
 
 @media (min-width: 1400px) {
@@ -192,19 +231,6 @@
 .navDragPieceBodySocialGroup {
   margin-left: 0.5cm;
   gap: 0.65rem;
-}
-
-@media (max-width: 768px) {
-  .navMenuCluster {
-    padding-left: 0;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    gap: 0.5rem;
-  }
-
-  .navDragPieceBodySocialGroup {
-    margin-left: 0;
-  }
 }
 
 .logo {
@@ -250,11 +276,10 @@
 
 .links {
   display: flex;
-  gap: 1rem; /* was 2.5rem; ~60% tighter */
+  gap: 1.5rem;
   align-items: center;
-  flex: 1 1 auto;
-  flex-shrink: 0;
-  justify-content: center;
+  flex: 1 1 0%;
+  justify-content: flex-end;
   overflow: visible;
 }
 
@@ -264,7 +289,7 @@
   flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
-  gap: 0.52rem; /* was calc(0.65rem * 2); ~60% tighter */
+  gap: calc(0.75cm + 0.675rem);
   margin-left: 1rem;
   flex: 1;
   min-width: 0;
@@ -317,6 +342,7 @@
   border: none;
   background: transparent;
   cursor: pointer !important;
+  margin-left: 0.5cm;
 }
 
 .links a:hover {
@@ -332,6 +358,7 @@
 
 .dropdown {
   position: relative;
+  anchor-name: --nav-documents-dd;
 }
 
 .dropTrigger {
@@ -360,7 +387,18 @@
   z-index: 13000;
 }
 
-.dropdown:hover .dropdownMenu {
+/* Escape horizontal scroll + overflow clipping (fixed to anchor when supported). */
+@supports (top: anchor(bottom)) {
+  .dropdownMenu {
+    position: fixed;
+    position-anchor: --nav-documents-dd;
+    top: anchor(bottom);
+    left: anchor(left);
+    margin-top: 0.2rem;
+  }
+}
+
+.dropdownMenuOpen {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -416,12 +454,35 @@
   animation: slideInLeft 0.2s ease-out;
 }
 
-.submenuShow {
+.submenuOpen {
   display: flex;
 }
 
-.rotated {
-  transform: rotate(90deg);
+/* Desktop: open Current Projects flyout on hover (and keyboard focus-within). */
+@media (min-width: 769px) {
+  .dropdown .submenuContainer:hover .submenu,
+  .dropdown .submenuContainer:focus-within .submenu {
+    display: flex !important;
+  }
+
+  .dropdown .submenuContainer:hover .submenuChevron,
+  .dropdown .submenuContainer:focus-within .submenuChevron {
+    transform: rotate(90deg);
+  }
+
+  /* Hit target over the margin gap so the pointer can reach the flyout without closing. */
+  .dropdown .submenu::before {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 0;
+    bottom: 0;
+    width: 0.75rem;
+    pointer-events: auto;
+  }
+}
+
+.submenuChevron {
   transition: transform 0.2s ease;
 }
 
@@ -436,11 +497,11 @@
 }
 
 .submenu .projectLinkBreaking {
-  color: #7fe9e6;
+  color: #f38ca8;
 }
 
 .submenu .projectLinkBreaking:hover {
-  color: #b7fbf8;
+  color: #ffd0dd;
 }
 
 .submenu .projectLinkKarsha {
@@ -459,15 +520,44 @@
   color: #7ff;
 }
 
+.projectLinkCurrent {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
 
+.submenu .projectLinkBreaking.projectLinkCurrent {
+  box-shadow: inset 0 0 0 1px rgba(243, 140, 168, 0.55), 0 0 18px rgba(243, 140, 168, 0.25);
+}
+
+.submenu .projectLinkKarsha.projectLinkCurrent {
+  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.55), 0 0 18px rgba(251, 191, 36, 0.22);
+}
+
+.submenu .projectLinkMatrimandir.projectLinkCurrent {
+  box-shadow: inset 0 0 0 1px rgba(63, 224, 221, 0.55), 0 0 18px rgba(63, 224, 221, 0.22);
+}
+
+
+.mobileSocialSection {
+  display: none;
+}
+
+/** Narrow tap target around SVG only (do not inherit full-width nav row link styles). */
+.mobileSocialIconLink {
+  line-height: 0;
+}
 
 .actions {
   display: flex;
   align-items: center;
-  flex-shrink: 0;
-  gap: calc(1.5rem + 5mm);
-  margin-left: clamp(0.75rem, 2vw, 1.75rem);
-  justify-content: space-evenly;
+  flex: 1 1 0%;
+  gap: 1.5rem;
+  margin-left: 2cm;
+}
+
+.actionsFlexSpacer {
+  flex: 1;
+  min-width: 0;
 }
 
 /* Tighter spacing between the four brand tiles only (50% of .actions gap). */
@@ -475,7 +565,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-left: 0.5rem;
+  margin-left: -2.5cm;
 }
 
 .draggableItem {
@@ -521,6 +611,14 @@
   filter: none;
 }
 
+.donateActionPiece {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 1rem 0 2cm;
+}
+
 .donateAction {
   display: inline-flex;
   align-items: center;
@@ -563,6 +661,11 @@
 
 .donateActionRingSpinning {
   animation: donateRingSpin 3s linear infinite;
+  animation-play-state: paused;
+}
+
+.donateAction:hover .donateActionRingSpinning {
+  animation-play-state: running;
 }
 
 .donateActionRing text {
@@ -634,12 +737,93 @@
     height: 88px;
   }
 
+  /* Mobile top bar: logo (content width) | Documentaries (flexible centre) | menu (content width).
+     Equal 1fr columns forced ~33% width and .mobileDocLink used overflow:hidden + ellipsis, which clipped "Documentaries". */
+  .navScrollInner > .container {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'logo center menu';
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding-left: max(0.65rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.65rem, env(safe-area-inset-right, 0px));
+  }
+
+  .navScrollInner > .container > :first-child {
+    grid-area: logo;
+    justify-self: start;
+    min-width: 0;
+  }
+
+  .navMenuCluster {
+    grid-area: center;
+    justify-self: stretch;
+    margin-left: 0 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0 !important;
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+    padding-left: 0;
+  }
+
+  .navDragPieceBodySocialGroup {
+    margin-left: 0;
+  }
+
+  .donateActionPiece {
+    display: none !important;
+  }
+
+  .actions {
+    grid-area: menu;
+    justify-self: stretch;
+    margin-left: 0 !important;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    gap: 0.35rem;
+  }
+
+  .actions > :first-child {
+    display: none !important;
+  }
+
+  .actionsFlexSpacer {
+    display: none !important;
+  }
+
   .mobileDocLink {
     display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.92rem;
-    letter-spacing: 0.1em;
+    position: static;
+    left: auto;
+    transform: none;
+    white-space: nowrap;
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--logo-brown);
+    text-decoration: none;
+    z-index: 10;
+    margin-left: 0;
+    max-width: 100%;
+    min-width: 0;
+    justify-content: center;
+    text-align: center;
+    /* Do not clip: centre column is now 1fr between auto logo/menu, not a third of the bar */
+    overflow: visible;
+    text-overflow: clip;
   }
 
   .links {
@@ -651,17 +835,36 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    text-align: center;
     position: fixed;
     top: var(--nav-height);
     left: 0;
     right: 0;
-    width: 100vw;
+    isolation: isolate;
+    /* 100vw is wider than the layout viewport when a vertical scrollbar exists, which skews centering */
+    width: 100%;
+    max-width: 100%;
     min-height: calc(100vh - var(--nav-height));
     max-height: calc(100vh - var(--nav-height));
-    background: linear-gradient(165deg, rgba(15, 18, 28, 0.98) 0%, rgba(10, 11, 18, 0.99) 45%, rgba(12, 14, 22, 0.98) 100%);
-    padding: clamp(1.5rem, 5vw, 2.75rem) clamp(1.25rem, 4vw, 2rem) 2.5rem;
+    background: linear-gradient(
+      168deg,
+      rgba(236, 253, 251, 0.97) 0%,
+      rgba(255, 248, 252, 0.96) 28%,
+      rgba(245, 243, 255, 0.95) 58%,
+      rgba(224, 247, 250, 0.98) 100%
+    );
+    backdrop-filter: blur(18px) saturate(1.25);
+    -webkit-backdrop-filter: blur(18px) saturate(1.25);
+    padding-top: clamp(1.5rem, 5vw, 2.75rem);
+    padding-bottom: 2.5rem;
+    padding-left: max(clamp(1.25rem, 4vw, 2rem), env(safe-area-inset-left, 0px));
+    padding-right: max(clamp(1.25rem, 4vw, 2rem), env(safe-area-inset-right, 0px));
     gap: 0;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(66, 197, 192, 0.22);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.75),
+      0 -6px 32px rgba(66, 197, 192, 0.12),
+      0 16px 48px rgba(15, 23, 42, 0.12);
     animation: slideDown 0.3s ease-out;
     z-index: 2600;
     overflow-y: auto;
@@ -669,26 +872,53 @@
     box-sizing: border-box;
   }
 
+  .links.active::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 100% 60% at 50% -8%, rgba(66, 197, 192, 0.42), transparent 58%),
+      radial-gradient(ellipse 75% 55% at 102% 22%, rgba(243, 140, 168, 0.22), transparent 52%),
+      radial-gradient(ellipse 70% 50% at -5% 55%, rgba(63, 224, 221, 0.28), transparent 55%),
+      radial-gradient(ellipse 90% 45% at 50% 108%, rgba(167, 139, 250, 0.18), transparent 55%);
+    opacity: 0.95;
+  }
+
   .links.active .linksDraggableRow {
+    position: relative;
+    z-index: 1;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
+    align-self: center;
     flex: 0 0 auto;
-    width: 100%;
-    max-width: min(22rem, 100%);
+    width: min(22rem, 100%);
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
     gap: 0.2rem; /* was 0.5rem; ~60% tighter */
     margin-top: auto;
     margin-bottom: auto;
+    /* Optical / subpixel tweak: menu read slightly right of centre (letter-spacing + vw); nudge ~1mm left */
+    transform: translateX(-1mm);
   }
 
   .links.active .navDragPiece {
     width: 100%;
+    display: flex;
     justify-content: center;
+    align-items: center;
   }
 
   .links.active .navDragPieceBody {
     width: 100%;
+    max-width: 100%;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
+    align-content: center;
   }
 
   .links.active .linksDraggableRow > .navDragPiece + .navDragPiece {
@@ -699,10 +929,15 @@
     width: 3.5rem;
     height: 3.5rem;
     margin: 0 auto 0.35rem;
+    align-self: center;
     border-radius: 999px;
-    background: rgba(69, 44, 34, 0.12);
-    border: 1px solid rgba(69, 44, 34, 0.28);
-    color: var(--logo-brown);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(204, 251, 241, 0.88) 100%);
+    border: 2px solid rgba(66, 197, 192, 0.5);
+    color: #0f766e;
+    box-shadow:
+      0 4px 18px rgba(66, 197, 192, 0.35),
+      0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+      0 0 28px rgba(63, 224, 221, 0.25);
   }
 
   .links.active .homeIconLink svg {
@@ -710,7 +945,12 @@
     height: 1.45rem;
   }
 
-  .links.active .linksDraggableRow a:not(.homeIconLink),
+  /* Exclude project + compact social links (social uses `.mobileSocialIconLink`). */
+  .links.active
+    .linksDraggableRow
+    a:not(.homeIconLink):not(.projectLinkBreaking):not(.projectLinkKarsha):not(.projectLinkMatrimandir):not(
+      .mobileSocialIconLink
+    ),
   .links.active .dropTrigger {
     font-size: clamp(1.08rem, 3.8vw, 1.35rem);
     font-weight: 700;
@@ -724,21 +964,43 @@
     justify-content: center;
     text-align: center;
     box-sizing: border-box;
-    border: 1px solid transparent;
-    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    border: 1px solid rgba(66, 197, 192, 0.22);
+    color: #1e293b;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 2px 14px rgba(15, 23, 42, 0.06);
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .links.active .linksDraggableRow a:not(.homeIconLink):active,
+  .links.active
+    .linksDraggableRow
+    a:not(.homeIconLink):not(.projectLinkBreaking):not(.projectLinkKarsha):not(.projectLinkMatrimandir):not(
+      .mobileSocialIconLink
+    ):hover,
+  .links.active .dropTrigger:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(224, 242, 254, 0.85) 100%);
+    border-color: rgba(66, 197, 192, 0.45);
+    color: #0f172a;
+    box-shadow: 0 4px 20px rgba(66, 197, 192, 0.18);
+  }
+
+  .links.active
+    .linksDraggableRow
+    a:not(.homeIconLink):not(.projectLinkBreaking):not(.projectLinkKarsha):not(.projectLinkMatrimandir):not(
+      .mobileSocialIconLink
+    ):active,
   .links.active .dropTrigger:active {
-    background: rgba(127, 233, 230, 0.1);
-    border-color: rgba(127, 233, 230, 0.2);
+    background: linear-gradient(135deg, rgba(204, 251, 241, 0.95) 0%, rgba(224, 231, 255, 0.75) 100%);
+    border-color: rgba(66, 197, 192, 0.55);
+    color: #0f172a;
+    box-shadow: 0 2px 16px rgba(99, 102, 241, 0.15);
   }
 
   .links.active .dropdown {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
+    text-align: center;
   }
 
   .links.active .dropdownMenu {
@@ -752,9 +1014,12 @@
     padding: 0.9rem 1rem;
     gap: 0.55rem;
     border-radius: 0.85rem;
-    background: rgba(4, 8, 18, 0.75);
-    border: 1px solid rgba(127, 233, 230, 0.15);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.94) 0%, rgba(236, 254, 255, 0.88) 100%);
+    border: 1px solid rgba(66, 197, 192, 0.28);
+    box-shadow:
+      0 8px 28px rgba(15, 23, 42, 0.08),
+      0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+      0 0 40px rgba(66, 197, 192, 0.12);
   }
 
   .links.active .dropdownMenu a {
@@ -763,40 +1028,275 @@
     text-align: center;
     justify-content: center;
     border-radius: 0.55rem;
+    color: #2a1810;
+  }
+
+  .links.active .dropdownMenu a:hover {
+    color: var(--logo-brown-hover);
+    background: rgba(127, 233, 230, 0.14);
   }
 
   .links.active .dropdownSectionLabel {
     font-size: 0.72rem;
     text-align: center;
     padding: 0.35rem 0 0.15rem;
+    color: rgba(42, 26, 18, 0.65);
+    letter-spacing: 0.08em;
+  }
+
+  /* No solid panel: let the pastel menu sheet show through; links carry the colour. */
+  .links.active .submenu {
+    position: static;
+    width: 100%;
+    margin: 0.35rem 0 0;
+    padding: 0.35rem 0.15rem;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.2rem;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    animation: none;
+  }
+
+  .links.active .submenuShow {
+    display: flex;
+  }
+
+  .links.active .submenu a {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    padding: 0.5rem 0.5rem;
+    border-radius: 0.5rem;
+    color: var(--text-muted, #64748b);
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+
+  .links.active .submenu a:hover {
+    color: var(--logo-brown-hover, #1e293b);
+    background: rgba(127, 233, 230, 0.18);
+  }
+
+  /* Project links: strong hues on the light sheet (same family as desktop flyout). */
+  .links.active .submenu .projectLinkBreaking {
+    color: #db2777;
+  }
+
+  .links.active .submenu .projectLinkBreaking:hover {
+    color: #be185d;
+    background: rgba(251, 113, 133, 0.2);
+  }
+
+  .links.active .submenu .projectLinkKarsha {
+    color: #ca8a04;
+  }
+
+  .links.active .submenu .projectLinkKarsha:hover {
+    color: #a16207;
+    background: rgba(253, 224, 71, 0.35);
+  }
+
+  .links.active .submenu .projectLinkMatrimandir {
+    color: #0d9488;
+  }
+
+  .links.active .submenu .projectLinkMatrimandir:hover {
+    color: #0f766e;
+    background: rgba(45, 212, 191, 0.22);
+  }
+
+  .links.active .submenuTrigger {
+    width: 100%;
+    justify-content: center;
+    padding: 0.65rem;
+    font-size: clamp(0.98rem, 3.2vw, 1.12rem);
+    color: #2a1810;
+  }
+
+  .links.active .submenuTrigger:hover {
+    color: var(--logo-brown-hover);
+    background: rgba(127, 233, 230, 0.12);
+  }
+
+  .mobileProjectsBlock {
+    width: 100%;
+    margin-top: 0.15rem;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mobileProjectsTrigger {
+    font: inherit;
+    text-align: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .mobileProjectsTriggerRow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    margin: 0 auto;
+    max-width: 100%;
+  }
+
+  .mobileProjectsChevron {
+    flex-shrink: 0;
+    transition: transform 0.22s ease;
+  }
+
+  .mobileProjectsChevronOpen {
+    transform: rotate(180deg);
+  }
+
+  /* Higher specificity than .links.active .submenu { display: none } so open panel shows */
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown.submenuOpen {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown {
+    margin-top: 0.35rem;
+    padding: 0.35rem 0.15rem;
+    gap: 0.2rem;
+    border-radius: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+    animation: mobileProjectsReveal 0.22s ease-out;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  @keyframes mobileProjectsReveal {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .links.active .mobileProjectsBlock .submenuTrigger {
+    font-size: clamp(1.08rem, 3.8vw, 1.35rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    min-height: 3.1rem;
+    padding: 0.75rem 1.35rem;
+    border-radius: 0.85rem;
+    border: 1px solid rgba(66, 197, 192, 0.42);
+    box-sizing: border-box;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    color: #0f172a;
+    background: linear-gradient(
+      125deg,
+      rgba(204, 251, 241, 0.95) 0%,
+      rgba(224, 242, 254, 0.9) 45%,
+      rgba(252, 231, 243, 0.75) 100%
+    );
+    box-shadow:
+      0 4px 20px rgba(66, 197, 192, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  }
+
+  .links.active .mobileProjectsBlock .submenuTrigger:active {
+    background: linear-gradient(125deg, rgba(153, 246, 228, 0.95) 0%, rgba(199, 210, 254, 0.85) 100%);
+    border-color: rgba(66, 197, 192, 0.55);
+    color: #0f172a;
+    box-shadow: 0 2px 16px rgba(99, 102, 241, 0.2);
+  }
+
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown a {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 2.65rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: clamp(0.95rem, 3.1vw, 1.08rem);
+    background: transparent;
+    border: none;
+    color: var(--text-muted, #64748b);
+    transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  }
+
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown a:hover {
+    transform: translateY(-1px);
+  }
+
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown a.projectLinkBreaking {
+    color: #db2777;
+  }
+
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown a.projectLinkBreaking:hover {
+    color: #be185d;
+    background: rgba(251, 113, 133, 0.2);
+  }
+
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown a.projectLinkKarsha {
+    color: #ca8a04;
+  }
+
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown a.projectLinkKarsha:hover {
+    color: #a16207;
+    background: rgba(253, 224, 71, 0.35);
+  }
+
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown a.projectLinkMatrimandir {
+    color: #0d9488;
+  }
+
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown a.projectLinkMatrimandir:hover {
+    color: #0f766e;
+    background: rgba(45, 212, 191, 0.22);
+  }
+
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown a.projectLinkBreaking.projectLinkCurrent,
+  .links.active .submenu .projectLinkBreaking.projectLinkCurrent {
+    background: rgba(251, 113, 133, 0.18);
+    box-shadow: inset 0 0 0 2px rgba(219, 39, 119, 0.45);
+  }
+
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown a.projectLinkKarsha.projectLinkCurrent,
+  .links.active .submenu .projectLinkKarsha.projectLinkCurrent {
+    background: rgba(253, 224, 71, 0.28);
+    box-shadow: inset 0 0 0 2px rgba(202, 138, 4, 0.55);
+  }
+
+  .links.active .mobileProjectsBlock .mobileProjectsDropdown a.projectLinkMatrimandir.projectLinkCurrent,
+  .links.active .submenu .projectLinkMatrimandir.projectLinkCurrent {
+    background: rgba(45, 212, 191, 0.2);
+    box-shadow: inset 0 0 0 2px rgba(13, 148, 136, 0.5);
   }
 
   .links.active .navAuthExtras {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
-    max-width: min(22rem, 100%);
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
     gap: 0.45rem;
     margin-top: 0.65rem;
     padding-top: 0.85rem;
-    border-top: 1px solid rgba(148, 163, 184, 0.18);
-  }
-
-  .links.active .navAuthExtras .mobileOnly {
-    font-size: clamp(1.05rem, 3.6vw, 1.28rem);
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    min-height: 3rem;
-    padding: 0.7rem 1.25rem;
-    border-radius: 0.85rem;
-    justify-content: center;
-    width: 100%;
-    max-width: 100%;
-    text-align: center;
-    border: 1px solid rgba(127, 233, 230, 0.18);
-    background: rgba(127, 233, 230, 0.06);
+    border-top: 1px solid rgba(66, 197, 192, 0.25);
+    box-shadow: 0 -1px 0 rgba(243, 140, 168, 0.15);
   }
 
   .links.active .navAuthExtras .menuAction {
@@ -807,8 +1307,96 @@
     width: 100%;
     max-width: 100%;
     justify-content: center;
-    border: 1px solid rgba(127, 233, 230, 0.15);
-    background: rgba(255, 255, 255, 0.04);
+    border: 2px solid rgba(66, 197, 192, 0.45);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%);
+    color: #0f172a;
+    font-weight: 700;
+    box-shadow: 0 2px 14px rgba(15, 23, 42, 0.06);
+  }
+ 
+  .mobileSocialSection {
+    display: flex;
+    margin-top: 1.1rem;
+    padding: 1rem 0.65rem 0.95rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(66, 197, 192, 0.28);
+    background: linear-gradient(
+      165deg,
+      rgba(255, 255, 255, 0.75) 0%,
+      rgba(224, 242, 254, 0.55) 40%,
+      rgba(252, 231, 243, 0.45) 100%
+    );
+    box-shadow:
+      0 8px 28px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    width: 100%;
+    max-width: 100%;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.85rem;
+  }
+
+  .mobileSocialLabel {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text-muted);
+    width: 100%;
+    margin: 0;
+    text-align: center;
+  }
+
+  .links.active .mobileSocialLabel {
+    color: #0f766e;
+    text-shadow: 0 0 24px rgba(45, 212, 191, 0.35);
+  }
+
+  .mobileSocialIcons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.35rem, 2vw, 0.55rem);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .links.active .mobileSocialIcons .mobileSocialIconLink {
+    display: inline-flex;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    min-height: unset;
+    align-items: center;
+    justify-content: center;
+    padding: 0.28rem;
+    margin: 0;
+    border-radius: 0.55rem;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(66, 197, 192, 0.3);
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    box-sizing: border-box;
+    line-height: 0;
+  }
+
+  .links.active .mobileSocialIcons .mobileSocialIconLink svg {
+    display: block;
+  }
+
+  .links.active .mobileSocialIcons .mobileSocialIconLink:hover {
+    transform: translateY(-2px) scale(1.04);
+    border-color: rgba(66, 197, 192, 0.55);
+    box-shadow: 0 6px 18px rgba(66, 197, 192, 0.22);
+  }
+
+  .links.active .mobileSocialIcons .mobileSocialIconLink:active {
+    transform: scale(0.98);
   }
 
   @keyframes slideDown {
@@ -842,7 +1430,7 @@
   }
 
   .socialDragCluster {
-    gap: 0.375rem;
+    display: none;
   }
 
   .actions::-webkit-scrollbar {
@@ -850,6 +1438,10 @@
   }
 
   .actions [data-role="donate"] {
+    display: none;
+  }
+
+  .adminNavLink {
     display: none;
   }
 
@@ -870,9 +1462,16 @@
   display: none !important;
 }
 
+.desktopOnly {
+  display: inline-flex !important;
+}
+
 @media (max-width: 768px) {
   .mobileOnly {
     display: inline-flex !important;
+  }
+  .desktopOnly {
+    display: none !important;
   }
 }
 
@@ -945,6 +1544,4 @@
     display: none;
   }
 }
-
-
 

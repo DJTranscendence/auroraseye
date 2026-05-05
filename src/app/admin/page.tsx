@@ -131,6 +131,10 @@ export default async function AdminDashboard() {
                 <Settings />
                 <span>Settings</span>
               </Link>
+              <Link href="/?edit=layout" className={styles.actionCard}>
+                <Edit />
+                <span>Homepage Layout</span>
+              </Link>
               <Link href="/admin/donations" className={styles.actionCard}>
                 <HandCoins />
                 <span>Donations</span>

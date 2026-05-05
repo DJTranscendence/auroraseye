@@ -2,7 +2,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 0.8rem;
   pointer-events: auto;
 }
 
@@ -140,7 +140,7 @@
 .viewport {
   position: relative;
   min-height: 56rem;
-  padding: 2rem 0 0;
+  padding: 0.8rem 0 0;
   perspective: 1800px;
   pointer-events: auto;
 }
@@ -177,7 +177,7 @@
 
 .videoGrid {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  margin-top: 2.5rem;
+  margin-top: 1rem;
   touch-action: pan-y;
 }
 
